@@ -4,7 +4,7 @@ import DITranquillityLinterFramework
 
 DispatchQueue.global().async {
 	let tokenizer = Tokenizer()
-	let url = URL(fileURLWithPath: "/Users/nikita/development/DITranquillityLinter/DITranquillityLinter/Example")
+	let url = URL(fileURLWithPath: "/Users/nikitapatskov/Develop/DITranquillityLinter/DITranquillityLinter/Example")
 	let enumerator = FileManager.default.enumerator(at: url,
 													includingPropertiesForKeys: [],
 													options: [.skipsHiddenFiles], errorHandler: { (url, error) -> Bool in
@@ -17,6 +17,7 @@ DispatchQueue.global().async {
 		urls.append(fileURL)
 	}
 	tokenizer.process(files: urls)
+	print("end")
 }
 
 dispatchMain()

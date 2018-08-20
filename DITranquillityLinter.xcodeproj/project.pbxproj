@@ -28,6 +28,7 @@
 		11F94BC42129EAF500603936 /* SourceKittenFramework.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11F94BBF2129EAA500603936 /* SourceKittenFramework.framework.dSYM */; };
 		11F94BC52129EAF500603936 /* SWXMLHash.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11F94BBD2129EAA500603936 /* SWXMLHash.framework.dSYM */; };
 		11F94BC62129EAF500603936 /* Yams.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11F94BBE2129EAA500603936 /* Yams.framework.dSYM */; };
+		FDC353B9212ACAE400F1CC43 /* SwiftType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC353B8212ACAE400F1CC43 /* SwiftType.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +98,7 @@
 		11F94BBD2129EAA500603936 /* SWXMLHash.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SWXMLHash.framework.dSYM; path = Carthage/Build/Mac/SWXMLHash.framework.dSYM; sourceTree = "<group>"; };
 		11F94BBE2129EAA500603936 /* Yams.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Yams.framework.dSYM; path = Carthage/Build/Mac/Yams.framework.dSYM; sourceTree = "<group>"; };
 		11F94BBF2129EAA500603936 /* SourceKittenFramework.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SourceKittenFramework.framework.dSYM; path = Carthage/Build/Mac/SourceKittenFramework.framework.dSYM; sourceTree = "<group>"; };
+		FDC353B8212ACAE400F1CC43 /* SwiftType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +174,7 @@
 			children = (
 				117E93AB2129E1A000D01E61 /* DITranquillityLinterFramework.h */,
 				117E93B72129E1D500D01E61 /* Tokenizer.swift */,
+				FDC353B8212ACAE400F1CC43 /* SwiftType.swift */,
 				117E93AC2129E1A000D01E61 /* Info.plist */,
 			);
 			path = DITranquillityLinterFramework;
@@ -301,6 +304,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				117E93B82129E1D500D01E61 /* Tokenizer.swift in Sources */,
+				FDC353B9212ACAE400F1CC43 /* SwiftType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
