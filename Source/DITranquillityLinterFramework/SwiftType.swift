@@ -36,15 +36,17 @@ final class SwiftType: Equatable {
 	let kind: Kind
 	let inheritedTypes: [String]
 	let substructure: [[String: SourceKitRepresentable]]
+	let file: File
 	
 	static func ==(lhs: SwiftType, rhs: SwiftType) -> Bool {
 		return lhs.name == rhs.name && lhs.kind == rhs.kind && lhs.inheritedTypes == rhs.inheritedTypes
 	}
 	
-	init(name: String, kind: Kind, inheritedTypes: [String], substructure: [[String: SourceKitRepresentable]]) {
+	init(name: String, kind: Kind, inheritedTypes: [String], substructure: [[String: SourceKitRepresentable]], file: File) {
 		self.name = name
 		self.kind = kind
 		self.inheritedTypes = inheritedTypes
 		self.substructure = substructure
+		self.file = file
 	}
 }

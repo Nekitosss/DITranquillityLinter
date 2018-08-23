@@ -11,17 +11,20 @@
 		1137F8492129E4050010B207 /* Yams.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8462129E4050010B207 /* Yams.framework */; };
 		1137F84A2129E4050010B207 /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8472129E4050010B207 /* SourceKittenFramework.framework */; };
 		1137F84B2129E4680010B207 /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8472129E4050010B207 /* SourceKittenFramework.framework */; };
-		1137F84C2129E4680010B207 /* SourceKittenFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8472129E4050010B207 /* SourceKittenFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1137F84D2129E4680010B207 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8452129E4050010B207 /* SWXMLHash.framework */; };
-		1137F84E2129E4680010B207 /* SWXMLHash.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8452129E4050010B207 /* SWXMLHash.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1137F84F2129E4680010B207 /* Yams.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8462129E4050010B207 /* Yams.framework */; };
-		1137F8502129E4680010B207 /* Yams.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8462129E4050010B207 /* Yams.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		1137F8522129E6A70010B207 /* Example in Resources */ = {isa = PBXBuildFile; fileRef = 1137F8512129E6A70010B207 /* Example */; };
 		117E93A22129E0A300D01E61 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117E93A12129E0A300D01E61 /* main.swift */; };
 		117E93AD2129E1A000D01E61 /* DITranquillityLinterFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 117E93AB2129E1A000D01E61 /* DITranquillityLinterFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		117E93B02129E1A000D01E61 /* DITranquillityLinterFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 117E93A92129E1A000D01E61 /* DITranquillityLinterFramework.framework */; };
-		117E93B12129E1A000D01E61 /* DITranquillityLinterFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 117E93A92129E1A000D01E61 /* DITranquillityLinterFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		117E93B82129E1D500D01E61 /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117E93B72129E1D500D01E61 /* Tokenizer.swift */; };
+		119ABD9C212DB43C00FD9A85 /* Registration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119ABD9B212DB43C00FD9A85 /* Registration.swift */; };
+		119ABD9F212DB55B00FD9A85 /* RegistrationToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119ABD9E212DB55B00FD9A85 /* RegistrationToken.swift */; };
+		119ABDA1212DB56600FD9A85 /* AliasToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119ABDA0212DB56600FD9A85 /* AliasToken.swift */; };
+		119ABDA4212F080000FD9A85 /* DITranquillityLinterFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 117E93A92129E1A000D01E61 /* DITranquillityLinterFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		119ABDA6212F087A00FD9A85 /* SourceKittenFramework.framework in Embed Frameworks into DITranquillityLinterFramework.framework */ = {isa = PBXBuildFile; fileRef = 1137F8472129E4050010B207 /* SourceKittenFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		119ABDA7212F087A00FD9A85 /* SWXMLHash.framework in Embed Frameworks into DITranquillityLinterFramework.framework */ = {isa = PBXBuildFile; fileRef = 1137F8452129E4050010B207 /* SWXMLHash.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		119ABDA8212F087A00FD9A85 /* Yams.framework in Embed Frameworks into DITranquillityLinterFramework.framework */ = {isa = PBXBuildFile; fileRef = 1137F8462129E4050010B207 /* Yams.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		119ABDAB212F3B7B00FD9A85 /* Example in Resources */ = {isa = PBXBuildFile; fileRef = 119ABDAA212F3B7B00FD9A85 /* Example */; };
 		11F94BC02129EAA500603936 /* SWXMLHash.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11F94BBD2129EAA500603936 /* SWXMLHash.framework.dSYM */; };
 		11F94BC12129EAA500603936 /* Yams.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11F94BBE2129EAA500603936 /* Yams.framework.dSYM */; };
 		11F94BC22129EAA500603936 /* SourceKittenFramework.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11F94BBF2129EAA500603936 /* SourceKittenFramework.framework.dSYM */; };
@@ -48,12 +51,22 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1137F8502129E4680010B207 /* Yams.framework in Embed Frameworks */,
-				117E93B12129E1A000D01E61 /* DITranquillityLinterFramework.framework in Embed Frameworks */,
-				1137F84C2129E4680010B207 /* SourceKittenFramework.framework in Embed Frameworks */,
-				1137F84E2129E4680010B207 /* SWXMLHash.framework in Embed Frameworks */,
+				119ABDA4212F080000FD9A85 /* DITranquillityLinterFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		119ABDA5212F080B00FD9A85 /* Embed Frameworks into DITranquillityLinterFramework.framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = DITranquillityLinterFramework.framework/Versions/Current/Frameworks;
+			dstSubfolderSpec = 7;
+			files = (
+				119ABDA6212F087A00FD9A85 /* SourceKittenFramework.framework in Embed Frameworks into DITranquillityLinterFramework.framework */,
+				119ABDA7212F087A00FD9A85 /* SWXMLHash.framework in Embed Frameworks into DITranquillityLinterFramework.framework */,
+				119ABDA8212F087A00FD9A85 /* Yams.framework in Embed Frameworks into DITranquillityLinterFramework.framework */,
+			);
+			name = "Embed Frameworks into DITranquillityLinterFramework.framework";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		11F94BBC2129EA8600603936 /* CopyFiles */ = {
@@ -86,15 +99,17 @@
 		1137F8452129E4050010B207 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SWXMLHash.framework; path = Carthage/Build/Mac/SWXMLHash.framework; sourceTree = "<group>"; };
 		1137F8462129E4050010B207 /* Yams.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Yams.framework; path = Carthage/Build/Mac/Yams.framework; sourceTree = "<group>"; };
 		1137F8472129E4050010B207 /* SourceKittenFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SourceKittenFramework.framework; path = Carthage/Build/Mac/SourceKittenFramework.framework; sourceTree = "<group>"; };
-		1137F8512129E6A70010B207 /* Example */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Example; sourceTree = "<group>"; };
 		117E938F2129E06800D01E61 /* DITranquillityLinter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DITranquillityLinter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		117E93992129E06A00D01E61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		117E93A02129E0A300D01E61 /* DITranquillityLinter-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DITranquillityLinter-Bridging-Header.h"; sourceTree = "<group>"; };
 		117E93A12129E0A300D01E61 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		117E93A92129E1A000D01E61 /* DITranquillityLinterFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DITranquillityLinterFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		117E93AB2129E1A000D01E61 /* DITranquillityLinterFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DITranquillityLinterFramework.h; sourceTree = "<group>"; };
 		117E93AC2129E1A000D01E61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		117E93B72129E1D500D01E61 /* Tokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokenizer.swift; sourceTree = "<group>"; };
+		119ABD9B212DB43C00FD9A85 /* Registration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Registration.swift; sourceTree = "<group>"; };
+		119ABD9E212DB55B00FD9A85 /* RegistrationToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationToken.swift; sourceTree = "<group>"; };
+		119ABDA0212DB56600FD9A85 /* AliasToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AliasToken.swift; sourceTree = "<group>"; };
+		119ABDAA212F3B7B00FD9A85 /* Example */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Example; path = ../../../Example; sourceTree = "<group>"; };
 		11F94BBD2129EAA500603936 /* SWXMLHash.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SWXMLHash.framework.dSYM; path = Carthage/Build/Mac/SWXMLHash.framework.dSYM; sourceTree = "<group>"; };
 		11F94BBE2129EAA500603936 /* Yams.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Yams.framework.dSYM; path = Carthage/Build/Mac/Yams.framework.dSYM; sourceTree = "<group>"; };
 		11F94BBF2129EAA500603936 /* SourceKittenFramework.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SourceKittenFramework.framework.dSYM; path = Carthage/Build/Mac/SourceKittenFramework.framework.dSYM; sourceTree = "<group>"; };
@@ -142,8 +157,7 @@
 				11F94BBF2129EAA500603936 /* SourceKittenFramework.framework.dSYM */,
 				11F94BBD2129EAA500603936 /* SWXMLHash.framework.dSYM */,
 				11F94BBE2129EAA500603936 /* Yams.framework.dSYM */,
-				117E93912129E06800D01E61 /* DITranquillityLinter */,
-				117E93AA2129E1A000D01E61 /* DITranquillityLinterFramework */,
+				119ABDA9212F3B3000FD9A85 /* Source */,
 				117E93902129E06800D01E61 /* Products */,
 				1137F8442129E4050010B207 /* Frameworks */,
 			);
@@ -163,8 +177,7 @@
 			children = (
 				117E93992129E06A00D01E61 /* Info.plist */,
 				117E93A12129E0A300D01E61 /* main.swift */,
-				117E93A02129E0A300D01E61 /* DITranquillityLinter-Bridging-Header.h */,
-				1137F8512129E6A70010B207 /* Example */,
+				119ABDAA212F3B7B00FD9A85 /* Example */,
 			);
 			path = DITranquillityLinter;
 			sourceTree = "<group>";
@@ -174,10 +187,30 @@
 			children = (
 				117E93AB2129E1A000D01E61 /* DITranquillityLinterFramework.h */,
 				117E93B72129E1D500D01E61 /* Tokenizer.swift */,
+				119ABD9B212DB43C00FD9A85 /* Registration.swift */,
 				FDC353B8212ACAE400F1CC43 /* SwiftType.swift */,
+				119ABD9D212DB51500FD9A85 /* DIToken */,
 				117E93AC2129E1A000D01E61 /* Info.plist */,
 			);
 			path = DITranquillityLinterFramework;
+			sourceTree = "<group>";
+		};
+		119ABD9D212DB51500FD9A85 /* DIToken */ = {
+			isa = PBXGroup;
+			children = (
+				119ABD9E212DB55B00FD9A85 /* RegistrationToken.swift */,
+				119ABDA0212DB56600FD9A85 /* AliasToken.swift */,
+			);
+			path = DIToken;
+			sourceTree = "<group>";
+		};
+		119ABDA9212F3B3000FD9A85 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				117E93912129E06800D01E61 /* DITranquillityLinter */,
+				117E93AA2129E1A000D01E61 /* DITranquillityLinterFramework */,
+			);
+			path = Source;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,8 +233,9 @@
 			buildPhases = (
 				117E938B2129E06800D01E61 /* Sources */,
 				117E938C2129E06800D01E61 /* Frameworks */,
-				117E938D2129E06800D01E61 /* Resources */,
+				119ABDA3212F07A400FD9A85 /* Extract CLI Tool */,
 				117E93B52129E1A000D01E61 /* Embed Frameworks */,
+				119ABDA5212F080B00FD9A85 /* Embed Frameworks into DITranquillityLinterFramework.framework */,
 				11F94BC32129EAED00603936 /* CopyFiles */,
 			);
 			buildRules = (
@@ -273,22 +307,34 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		117E938D2129E06800D01E61 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				1137F8522129E6A70010B207 /* Example in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		117E93A72129E1A000D01E61 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				119ABDAB212F3B7B00FD9A85 /* Example in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		119ABDA3212F07A400FD9A85 /* Extract CLI Tool */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "Extract CLI Tool";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = ". script/extract-tool";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		117E938B2129E06800D01E61 /* Sources */ = {
@@ -304,6 +350,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				117E93B82129E1D500D01E61 /* Tokenizer.swift in Sources */,
+				119ABD9C212DB43C00FD9A85 /* Registration.swift in Sources */,
+				119ABDA1212DB56600FD9A85 /* AliasToken.swift in Sources */,
+				119ABD9F212DB55B00FD9A85 /* RegistrationToken.swift in Sources */,
 				FDC353B9212ACAE400F1CC43 /* SwiftType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
