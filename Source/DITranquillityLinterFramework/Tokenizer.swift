@@ -53,6 +53,8 @@ public class Tokenizer {
 		print(body)
 		if let alias = AliasToken(functionName: actualName, invocationBody: body) {
 			print(alias)
+		} else if let injection = InjectionToken(functionName: actualName, invocationBody: body) {
+			print(injection)
 		}
 		
 		let substructureList = loadContainerBodyPart[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []
