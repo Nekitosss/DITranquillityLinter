@@ -10,6 +10,9 @@
 		1137F8482129E4050010B207 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8452129E4050010B207 /* SWXMLHash.framework */; };
 		1137F8492129E4050010B207 /* Yams.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8462129E4050010B207 /* Yams.framework */; };
 		1137F84A2129E4050010B207 /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8472129E4050010B207 /* SourceKittenFramework.framework */; };
+		11768022213DB02900F82DED /* SwiftExpressionKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11768021213DB02900F82DED /* SwiftExpressionKind.swift */; };
+		11768024213DB15100F82DED /* ArgumentInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11768023213DB15100F82DED /* ArgumentInfo.swift */; };
+		11768026213DB1E800F82DED /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11768025213DB1E800F82DED /* Extensions.swift */; };
 		117E93A22129E0A300D01E61 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117E93A12129E0A300D01E61 /* main.swift */; };
 		117E93AD2129E1A000D01E61 /* DITranquillityLinterFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 117E93AB2129E1A000D01E61 /* DITranquillityLinterFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		117E93B82129E1D500D01E61 /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117E93B72129E1D500D01E61 /* Tokenizer.swift */; };
@@ -90,6 +93,9 @@
 		1137F8452129E4050010B207 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SWXMLHash.framework; path = Carthage/Build/Mac/SWXMLHash.framework; sourceTree = "<group>"; };
 		1137F8462129E4050010B207 /* Yams.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Yams.framework; path = Carthage/Build/Mac/Yams.framework; sourceTree = "<group>"; };
 		1137F8472129E4050010B207 /* SourceKittenFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SourceKittenFramework.framework; path = Carthage/Build/Mac/SourceKittenFramework.framework; sourceTree = "<group>"; };
+		11768021213DB02900F82DED /* SwiftExpressionKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftExpressionKind.swift; sourceTree = "<group>"; };
+		11768023213DB15100F82DED /* ArgumentInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArgumentInfo.swift; sourceTree = "<group>"; };
+		11768025213DB1E800F82DED /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		117E938F2129E06800D01E61 /* DITranquillityLinter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DITranquillityLinter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		117E93992129E06A00D01E61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		117E93A12129E0A300D01E61 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -181,6 +187,8 @@
 				117E93B72129E1D500D01E61 /* Tokenizer.swift */,
 				119ABD9B212DB43C00FD9A85 /* Registration.swift */,
 				FDC353B8212ACAE400F1CC43 /* SwiftType.swift */,
+				11768021213DB02900F82DED /* SwiftExpressionKind.swift */,
+				11768025213DB1E800F82DED /* Extensions.swift */,
 				119ABD9D212DB51500FD9A85 /* DIToken */,
 				117E93AC2129E1A000D01E61 /* Info.plist */,
 			);
@@ -193,6 +201,7 @@
 				119ABD9E212DB55B00FD9A85 /* RegistrationToken.swift */,
 				119ABDA0212DB56600FD9A85 /* AliasToken.swift */,
 				119ABDAC212F3E8C00FD9A85 /* InjectionToken.swift */,
+				11768023213DB15100F82DED /* ArgumentInfo.swift */,
 			);
 			path = DIToken;
 			sourceTree = "<group>";
@@ -322,8 +331,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				117E93B82129E1D500D01E61 /* Tokenizer.swift in Sources */,
+				11768026213DB1E800F82DED /* Extensions.swift in Sources */,
 				119ABD9C212DB43C00FD9A85 /* Registration.swift in Sources */,
 				119ABDA1212DB56600FD9A85 /* AliasToken.swift in Sources */,
+				11768022213DB02900F82DED /* SwiftExpressionKind.swift in Sources */,
+				11768024213DB15100F82DED /* ArgumentInfo.swift in Sources */,
 				119ABD9F212DB55B00FD9A85 /* RegistrationToken.swift in Sources */,
 				FDC353B9212ACAE400F1CC43 /* SwiftType.swift in Sources */,
 				119ABDAD212F3E8C00FD9A85 /* InjectionToken.swift in Sources */,

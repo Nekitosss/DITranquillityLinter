@@ -18,25 +18,29 @@ class AliasToken {
 		self.tag = tag
 	}
 	
-	init?(functionName: String, invocationBody: String) {
+	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo]) {
 		guard functionName == "as" else { return nil }
-		let variables = invocationBody.split(separator: ",")
-		let argumentInfo = variables.map(String.init).map(AliasToken.parseArgument)
-		
-		for (index, argument) in argumentInfo.enumerated() {
-			if index == 0 {
+		for argument in argumentStack {
+			switch argument.name {
+			case "", "check":
 				self.typeName = argument.value
-			} else if index == 1 {
+			case "tag":
 				self.tag = argument.value
+			default:
+				break
 			}
 		}
 	}
 	
-	static func parseArgument(argument: String) -> (outerName: String, innerName: String, value: String) {
+	static func parseArgumentList(body: String) -> [ArgumentInfo] {
+		return body.split(separator: ",").compactMap({ parseArgument(argument: String($0)) })
+	}
+	
+	static func parseArgument(argument: String) -> ArgumentInfo? {
 		let parts = argument.split(separator: ":")
 		var result: (outerName: String, innerName: String, value: String) = ("", "", "")
 		if parts.count == 0 {
-			return result
+			return nil
 		} else if parts.count == 1 {
 			result.value = String(parts[0])
 		} else {
@@ -51,6 +55,7 @@ class AliasToken {
 				result.outerName = String(nameParts[0])
 			}
 		}
-		return result
+		return ArgumentInfo(name: result.outerName, value: result.value, structure: [:])
 	}
+	
 }

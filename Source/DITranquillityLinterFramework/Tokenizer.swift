@@ -34,7 +34,6 @@ public class Tokenizer {
 	}
 	
 	private func processLoadContainerFunction(loadContainerStructure: [String : SourceKitRepresentable], file: File) {
-		
 		let content = file.contents.bridge()
 		let substructureList = loadContainerStructure[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []
 		for substructure in substructureList {
@@ -43,24 +42,51 @@ public class Tokenizer {
 	}
 	
 	private func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], content: NSString) {
-		guard let name = loadContainerBodyPart[SwiftDocKey.name.rawValue] as? String,
-			let bodyOffset = loadContainerBodyPart[SwiftDocKey.bodyOffset.rawValue] as? Int64,
-			let bodyLength = loadContainerBodyPart[SwiftDocKey.bodyLength.rawValue] as? Int64
-			else { return }
-		let body = content.substringWithByteRange(start: Int(bodyOffset), length: Int(bodyLength))!
-		let actualName = extractActualFuncionInvokation(name: name)
-		print(actualName)
-		print(body)
-		if let alias = AliasToken(functionName: actualName, invocationBody: body) {
-			print(alias)
-		} else if let injection = InjectionToken(functionName: actualName, invocationBody: body) {
-			print(injection)
-		}
+		guard let kind = loadContainerBodyPart[SwiftDocKey.kind.rawValue] as? String else { return }
 		
-		let substructureList = loadContainerBodyPart[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []
-		for substructure in substructureList {
-			processLoadContainerBodyPart(loadContainerBodyPart: substructure, content: content)
+		switch kind {
+		case SwiftExpressionKind.call.rawValue:
+			guard let name = loadContainerBodyPart[SwiftDocKey.name.rawValue] as? String,
+				let bodyOffset = loadContainerBodyPart[SwiftDocKey.bodyOffset.rawValue] as? Int64,
+				let bodyLength = loadContainerBodyPart[SwiftDocKey.bodyLength.rawValue] as? Int64
+				else { return }
+			let body = content.substringWithByteRange(start: Int(bodyOffset), length: Int(bodyLength))!
+			let actualName = extractActualFuncionInvokation(name: name)
+			
+			let substructureList = loadContainerBodyPart[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []
+			let argumentStack = argumentInfo(substructures: substructureList, content: content)
+			
+			if let alias = AliasToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack) {
+				print(alias)
+			} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack) {
+				print(injection)
+			}
+			
+			for substructure in substructureList {
+				processLoadContainerBodyPart(loadContainerBodyPart: substructure, content: content)
+			}
+			
+		default:
+			break
 		}
+	}
+	
+	func argumentInfo(substructures: [[String: SourceKitRepresentable]], content: NSString) -> [ArgumentInfo] {
+		var argumentStack = [ArgumentInfo]()
+		let substructures = substructures.filter({ ($0[SwiftDocKey.kind.rawValue] as? String) == SwiftExpressionKind.argument.rawValue })
+		
+		for structure in substructures {
+			guard let bodyOffset = structure[SwiftDocKey.bodyOffset.rawValue] as? Int64,
+				let bodyLength = structure[SwiftDocKey.bodyLength.rawValue] as? Int64,
+				let nameLength = structure[SwiftDocKey.nameLength.rawValue] as? Int64,
+				let nameOffset = structure[SwiftDocKey.nameOffset.rawValue] as? Int64
+				else { continue }
+			let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength) ?? ""
+			let name = nameLength > 0 ? content.substringUsingByteRange(start: nameOffset, length: nameLength) ?? "" : ""
+			let argument = ArgumentInfo(name: name, value: body, structure: structure)
+			argumentStack.append(argument)
+		}
+		return argumentStack
 	}
 	
 	func extractActualFuncionInvokation(name: String) -> String {
