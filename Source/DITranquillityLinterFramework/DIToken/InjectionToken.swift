@@ -29,14 +29,20 @@ class InjectionToken {
 		}
 		
 		for argument in argumentStack {
-			switch argument.name {
-			case "cycle":
+			if argument.name == "cycle" {
 				cycle = argument.value == "\(true)"
-			case "" where argument.value.starts(with: "\\"):
-				name = argument.value
-			default:
-				break
+			} else if argument.name.isEmpty && argument.value.starts(with: "\\.") {
+				name = String(argument.value.dropFirst(2))
+			} else if let dotIndex = argument.value.index(of: "."), argument.name.isEmpty && argument.value.firstMatch("\\\\[^.]") != nil  {
+				name = String(argument.value[argument.value.index(after: dotIndex)...])
+			} else if let nameFromPattern = argument.value.firstMatch("\\$0\\.[a-z0-9\\.]+[^= ]") {
+				name = String(nameFromPattern.dropFirst(3))
+			}
+			if let typeFromPattern = argument.value.firstMatch("\\s[a-zA-Z]+\\s*$")?.trimmingCharacters(in: .whitespaces) {
+				typeName = typeFromPattern
 			}
 		}
 	}
+	
+	
 }

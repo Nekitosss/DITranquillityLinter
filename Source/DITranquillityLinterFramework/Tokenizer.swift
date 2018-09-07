@@ -27,9 +27,9 @@ public class Tokenizer {
 		let diParts = dictionary.values.filter({ $0.inheritedTypes.contains("DIPart") })
 		
 		
-		let settingsPart = diParts.first(where: { $0.name == "SettingsUIDIPart" })!
-		let loadContainerStructure = settingsPart.substructure.first(where: { $0[SwiftDocKey.name.rawValue] as! String == "load(container:)" })!
-		processLoadContainerFunction(loadContainerStructure: loadContainerStructure, file: settingsPart.file)
+		let mainPart = diParts.first(where: { $0.name == "MainDIPart" })!
+		let loadContainerStructure = mainPart.substructure.first(where: { $0[SwiftDocKey.name.rawValue] as! String == "load(container:)" })!
+		processLoadContainerFunction(loadContainerStructure: loadContainerStructure, file: mainPart.file)
 		print("End")
 	}
 	

@@ -1,0 +1,432 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		117EFFDC2142FB210082EA06 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117EFFDB2142FB210082EA06 /* AppDelegate.swift */; };
+		117EFFDE2142FB210082EA06 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117EFFDD2142FB210082EA06 /* ViewController.swift */; };
+		117EFFE12142FB210082EA06 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 117EFFDF2142FB210082EA06 /* Main.storyboard */; };
+		117EFFE32142FB230082EA06 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 117EFFE22142FB230082EA06 /* Assets.xcassets */; };
+		117EFFE62142FB230082EA06 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 117EFFE42142FB230082EA06 /* LaunchScreen.storyboard */; };
+		117EFFF22142FEC30082EA06 /* MyPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117EFFF12142FEC30082EA06 /* MyPresenter.swift */; };
+		117EFFF42142FEF40082EA06 /* MainDIPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117EFFF32142FEF40082EA06 /* MainDIPart.swift */; };
+		D9702440A11CC123D48D7EAB /* Pods_LintableProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 90DD9BCF1810B25E7A234F34 /* Pods_LintableProject.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		117EFFD82142FB210082EA06 /* LintableProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LintableProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		117EFFDB2142FB210082EA06 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		117EFFDD2142FB210082EA06 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		117EFFE02142FB210082EA06 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		117EFFE22142FB230082EA06 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		117EFFE52142FB230082EA06 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		117EFFE72142FB230082EA06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		117EFFF12142FEC30082EA06 /* MyPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPresenter.swift; sourceTree = "<group>"; };
+		117EFFF32142FEF40082EA06 /* MainDIPart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainDIPart.swift; sourceTree = "<group>"; };
+		6A58C79706F5DD0C467ADB0F /* Pods-LintableProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LintableProject.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject.debug.xcconfig"; sourceTree = "<group>"; };
+		90DD9BCF1810B25E7A234F34 /* Pods_LintableProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LintableProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B155841C5469E9BB60055504 /* Pods-LintableProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LintableProject.release.xcconfig"; path = "Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		117EFFD52142FB210082EA06 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D9702440A11CC123D48D7EAB /* Pods_LintableProject.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		117EFFCF2142FB210082EA06 = {
+			isa = PBXGroup;
+			children = (
+				117EFFDA2142FB210082EA06 /* LintableProject */,
+				117EFFD92142FB210082EA06 /* Products */,
+				8586AEA6E647EFD095579730 /* Pods */,
+				ED5A3A9011EC5CDB3B196828 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		117EFFD92142FB210082EA06 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				117EFFD82142FB210082EA06 /* LintableProject.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		117EFFDA2142FB210082EA06 /* LintableProject */ = {
+			isa = PBXGroup;
+			children = (
+				117EFFDB2142FB210082EA06 /* AppDelegate.swift */,
+				117EFFDD2142FB210082EA06 /* ViewController.swift */,
+				117EFFF32142FEF40082EA06 /* MainDIPart.swift */,
+				117EFFF12142FEC30082EA06 /* MyPresenter.swift */,
+				117EFFDF2142FB210082EA06 /* Main.storyboard */,
+				117EFFE22142FB230082EA06 /* Assets.xcassets */,
+				117EFFE42142FB230082EA06 /* LaunchScreen.storyboard */,
+				117EFFE72142FB230082EA06 /* Info.plist */,
+			);
+			path = LintableProject;
+			sourceTree = "<group>";
+		};
+		8586AEA6E647EFD095579730 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				6A58C79706F5DD0C467ADB0F /* Pods-LintableProject.debug.xcconfig */,
+				B155841C5469E9BB60055504 /* Pods-LintableProject.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		ED5A3A9011EC5CDB3B196828 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				90DD9BCF1810B25E7A234F34 /* Pods_LintableProject.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		117EFFD72142FB210082EA06 /* LintableProject */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 117EFFEA2142FB230082EA06 /* Build configuration list for PBXNativeTarget "LintableProject" */;
+			buildPhases = (
+				2911A670807116D0AE17E663 /* [CP] Check Pods Manifest.lock */,
+				117EFFD42142FB210082EA06 /* Sources */,
+				117EFFD52142FB210082EA06 /* Frameworks */,
+				117EFFD62142FB210082EA06 /* Resources */,
+				AC407540D2C0685322503B17 /* [CP] Embed Pods Frameworks */,
+				F1C48C0149EDA6FE3ABEE92A /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LintableProject;
+			productName = LintableProject;
+			productReference = 117EFFD82142FB210082EA06 /* LintableProject.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		117EFFD02142FB210082EA06 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0940;
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = Nikita;
+				TargetAttributes = {
+					117EFFD72142FB210082EA06 = {
+						CreatedOnToolsVersion = 9.4.1;
+					};
+				};
+			};
+			buildConfigurationList = 117EFFD32142FB210082EA06 /* Build configuration list for PBXProject "LintableProject" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 117EFFCF2142FB210082EA06;
+			productRefGroup = 117EFFD92142FB210082EA06 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				117EFFD72142FB210082EA06 /* LintableProject */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		117EFFD62142FB210082EA06 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				117EFFE62142FB230082EA06 /* LaunchScreen.storyboard in Resources */,
+				117EFFE32142FB230082EA06 /* Assets.xcassets in Resources */,
+				117EFFE12142FB210082EA06 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2911A670807116D0AE17E663 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-LintableProject-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AC407540D2C0685322503B17 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/DITranquillity/DITranquillity.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftLazy/SwiftLazy.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DITranquillity.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftLazy.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F1C48C0149EDA6FE3ABEE92A /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		117EFFD42142FB210082EA06 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				117EFFF42142FEF40082EA06 /* MainDIPart.swift in Sources */,
+				117EFFDE2142FB210082EA06 /* ViewController.swift in Sources */,
+				117EFFDC2142FB210082EA06 /* AppDelegate.swift in Sources */,
+				117EFFF22142FEC30082EA06 /* MyPresenter.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		117EFFDF2142FB210082EA06 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				117EFFE02142FB210082EA06 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		117EFFE42142FB230082EA06 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				117EFFE52142FB230082EA06 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		117EFFE82142FB230082EA06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		117EFFE92142FB230082EA06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		117EFFEB2142FB230082EA06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6A58C79706F5DD0C467ADB0F /* Pods-LintableProject.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TXT5Y2EP72;
+				INFOPLIST_FILE = LintableProject/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.patskovn.LintableProject;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		117EFFEC2142FB230082EA06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B155841C5469E9BB60055504 /* Pods-LintableProject.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TXT5Y2EP72;
+				INFOPLIST_FILE = LintableProject/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.patskovn.LintableProject;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		117EFFD32142FB210082EA06 /* Build configuration list for PBXProject "LintableProject" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				117EFFE82142FB230082EA06 /* Debug */,
+				117EFFE92142FB230082EA06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		117EFFEA2142FB230082EA06 /* Build configuration list for PBXNativeTarget "LintableProject" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				117EFFEB2142FB230082EA06 /* Debug */,
+				117EFFEC2142FB230082EA06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 117EFFD02142FB210082EA06 /* Project object */;
+}

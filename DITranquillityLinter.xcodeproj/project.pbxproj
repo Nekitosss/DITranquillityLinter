@@ -19,7 +19,6 @@
 		119ABD9C212DB43C00FD9A85 /* Registration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119ABD9B212DB43C00FD9A85 /* Registration.swift */; };
 		119ABD9F212DB55B00FD9A85 /* RegistrationToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119ABD9E212DB55B00FD9A85 /* RegistrationToken.swift */; };
 		119ABDA1212DB56600FD9A85 /* AliasToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119ABDA0212DB56600FD9A85 /* AliasToken.swift */; };
-		119ABDAB212F3B7B00FD9A85 /* Example in Resources */ = {isa = PBXBuildFile; fileRef = 119ABDAA212F3B7B00FD9A85 /* Example */; };
 		119ABDAD212F3E8C00FD9A85 /* InjectionToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119ABDAC212F3E8C00FD9A85 /* InjectionToken.swift */; };
 		119ABDB4212F408600FD9A85 /* DITranquillityLinterFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 117E93A92129E1A000D01E61 /* DITranquillityLinterFramework.framework */; };
 		119ABDB5212F408600FD9A85 /* DITranquillityLinterFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 117E93A92129E1A000D01E61 /* DITranquillityLinterFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -106,7 +105,6 @@
 		119ABD9B212DB43C00FD9A85 /* Registration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Registration.swift; sourceTree = "<group>"; };
 		119ABD9E212DB55B00FD9A85 /* RegistrationToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationToken.swift; sourceTree = "<group>"; };
 		119ABDA0212DB56600FD9A85 /* AliasToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AliasToken.swift; sourceTree = "<group>"; };
-		119ABDAA212F3B7B00FD9A85 /* Example */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Example; path = ../../../Example; sourceTree = "<group>"; };
 		119ABDAC212F3E8C00FD9A85 /* InjectionToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InjectionToken.swift; sourceTree = "<group>"; };
 		11F94BBD2129EAA500603936 /* SWXMLHash.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SWXMLHash.framework.dSYM; path = Carthage/Build/Mac/SWXMLHash.framework.dSYM; sourceTree = "<group>"; };
 		11F94BBE2129EAA500603936 /* Yams.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Yams.framework.dSYM; path = Carthage/Build/Mac/Yams.framework.dSYM; sourceTree = "<group>"; };
@@ -175,7 +173,6 @@
 			children = (
 				117E93992129E06A00D01E61 /* Info.plist */,
 				117E93A12129E0A300D01E61 /* main.swift */,
-				119ABDAA212F3B7B00FD9A85 /* Example */,
 			);
 			path = DITranquillityLinter;
 			sourceTree = "<group>";
@@ -311,7 +308,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				119ABDAB212F3B7B00FD9A85 /* Example in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

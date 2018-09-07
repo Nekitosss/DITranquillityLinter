@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:DITranquillityLinter.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:LintableProject/LintableProject.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:LintableProject/Pods/Pods.xcodeproj">
+   </FileRef>
+</Workspace>
