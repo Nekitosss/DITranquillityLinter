@@ -9,6 +9,7 @@
 import Foundation
 import SourceKittenFramework
 
+
 public class Tokenizer {
 	
 	typealias SourceKitTuple = (structure: Structure, file: File)
@@ -29,19 +30,21 @@ public class Tokenizer {
 		
 		let mainPart = diParts.first(where: { $0.name == "MainDIPart" })!
 		let loadContainerStructure = mainPart.substructure.first(where: { $0[SwiftDocKey.name.rawValue] as! String == "load(container:)" })!
-		processLoadContainerFunction(loadContainerStructure: loadContainerStructure, file: mainPart.file)
+		processLoadContainerFunction(loadContainerStructure: loadContainerStructure, file: mainPart.file, collectedInfo: dictionary)
 		print("End")
 	}
 	
-	private func processLoadContainerFunction(loadContainerStructure: [String : SourceKitRepresentable], file: File) {
+	private func processLoadContainerFunction(loadContainerStructure: [String : SourceKitRepresentable], file: File, collectedInfo: [String: SwiftType]) {
 		let content = file.contents.bridge()
 		let substructureList = loadContainerStructure[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []
+		var result: [RegistrationToken] = []
+		var tokenList: [DIToken] = []
 		for substructure in substructureList {
-			processLoadContainerBodyPart(loadContainerBodyPart: substructure, content: content)
+			processLoadContainerBodyPart(loadContainerBodyPart: substructure, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
 		}
 	}
 	
-	private func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], content: NSString) {
+	private func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], content: NSString, collectedInfo: [String: SwiftType], result: inout [RegistrationToken], tokenList: inout [DIToken]) {
 		guard let kind = loadContainerBodyPart[SwiftDocKey.kind.rawValue] as? String else { return }
 		
 		switch kind {
@@ -57,13 +60,16 @@ public class Tokenizer {
 			let argumentStack = argumentInfo(substructures: substructureList, content: content)
 			
 			if let alias = AliasToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack) {
-				print(alias)
+				tokenList.append(alias)
 			} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack) {
-				print(injection)
+				tokenList.append(injection)
+			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo) {
+				tokenList.removeAll()
+				result.append(registration)
 			}
 			
 			for substructure in substructureList {
-				processLoadContainerBodyPart(loadContainerBodyPart: substructure, content: content)
+				processLoadContainerBodyPart(loadContainerBodyPart: substructure, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
 			}
 			
 		default:

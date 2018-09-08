@@ -9,11 +9,12 @@
 import Foundation
 import SourceKittenFramework
 
-class InjectionToken {
+class InjectionToken: DIToken {
 	
 	var name: String = ""
 	var typeName: String = ""
 	var cycle: Bool = false
+	var optionalInjection: Bool = false
 	
 	init(name: String, typeName: String) {
 		self.name = typeName

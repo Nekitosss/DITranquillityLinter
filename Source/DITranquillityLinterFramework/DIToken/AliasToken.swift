@@ -8,7 +8,7 @@
 
 import Foundation
 
-class AliasToken {
+class AliasToken: DIToken {
 	
 	var typeName: String = ""
 	var tag: String = ""
@@ -20,6 +20,12 @@ class AliasToken {
 	
 	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo]) {
 		guard functionName == "as" else { return nil }
+		
+		var argumentStack = argumentStack
+		if argumentStack.isEmpty {
+			argumentStack = AliasToken.parseArgumentList(body: invocationBody)
+		}
+		
 		for argument in argumentStack {
 			switch argument.name {
 			case "", "check":
