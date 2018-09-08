@@ -12,12 +12,12 @@ final class MainDIPart: DIPart {
 	
 	static func load(container: DIContainer) {
 		
-		container.register(ViewController.self)
-			.as(UIViewController.self)
-			.injection(\ViewController.presenter)
-			.injection(\.presenter)
-			.injection { $0.presenter = $1 }
-			.injection { $0.presenter = $1 as MyPresenter }
+		container.register {
+			MyPresenter(stringValue: $0,
+						$1)
+			
+			}
+			.as(MyPresenterProtocol.self)
 		
 	}
 	

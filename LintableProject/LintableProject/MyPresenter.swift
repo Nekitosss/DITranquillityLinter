@@ -14,6 +14,8 @@ protocol MyPresenterProtocol {
 
 class MyPresenter: MyPresenterProtocol {
 	
-	
+	init(stringValue str: String, _ intValue: Int) {
+		
+	}
 	
 }

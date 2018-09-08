@@ -14,7 +14,7 @@ class RegistrationToken: DIToken {
 	var typeName: String = ""
 	var tokenList: [DIToken] = []
 	
-	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], tokenList: [DIToken], collectedInfo: [String: SwiftType]) {
+	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], tokenList: [DIToken], collectedInfo: [String: SwiftType], substructureList: [[String : SourceKitRepresentable]]) {
 		guard functionName == "register" || functionName == "register1" else {
 			return nil
 		}
@@ -22,7 +22,38 @@ class RegistrationToken: DIToken {
 		if let typedRegistration = invocationBody.firstMatch("[a-zA-Z]+\\.self") {
 			typeName = String(typedRegistration.dropLast(5))
 		}
+		extractClosureRegistration(substructureList: substructureList)
 		fillTokenListWithInfo(collectedInfo: collectedInfo)
+	}
+	
+	private func extractClosureRegistration(substructureList: [[String : SourceKitRepresentable]]) {
+		guard substructureList.count == 1 else { return }
+		let substructure = substructureList[0]
+		guard let kind = substructure[SwiftDocKey.kind.rawValue] as? String,
+			let name = substructure[SwiftDocKey.name.rawValue] as? String,
+			kind == SwiftExpressionKind.call.rawValue
+			else { return }
+		self.typeName = name.hasSuffix(".init") ? String(name.dropLast(5)) : name
+		let argumentsSubstructure = substructure[SwiftDocKey.substructure.rawValue] as? [[String : SourceKitRepresentable]] ?? []
+		let signature = restoreSignature(name: name, substructureList: argumentsSubstructure)
+	}
+	
+	private func restoreSignature(name: String, substructureList: [[String: SourceKitRepresentable]]) -> String {
+		var signature = "init"
+		if !substructureList.isEmpty {
+			signature.append("(")
+		}
+		for substucture in substructureList {
+			let name = substucture[SwiftDocKey.name.rawValue] as? String ?? "_"
+			guard let kind = substucture[SwiftDocKey.kind.rawValue] as? String,
+				kind == SwiftExpressionKind.argument.rawValue
+				else { continue }
+			signature += name + ":"
+		}
+		if !substructureList.isEmpty {
+			signature.append(")")
+		}
+		return signature
 	}
 	
 	private func fillTokenListWithInfo(collectedInfo: [String: SwiftType]) {
