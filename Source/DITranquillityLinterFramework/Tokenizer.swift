@@ -63,7 +63,7 @@ public class Tokenizer {
 				tokenList.append(alias)
 			} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack) {
 				tokenList.append(injection)
-			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList) {
+			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content) {
 				tokenList.removeAll()
 				result.append(registration)
 			}

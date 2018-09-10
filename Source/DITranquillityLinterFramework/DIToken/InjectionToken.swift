@@ -15,10 +15,14 @@ class InjectionToken: DIToken {
 	var typeName: String = ""
 	var cycle: Bool = false
 	var optionalInjection: Bool = false
+	var methodInjection = false
+	var modificators: [InjectionModificator] = []
 	
-	init(name: String, typeName: String) {
-		self.name = typeName
+	init(name: String, typeName: String, optionalInjection: Bool, methodInjection: Bool) {
+		self.name = name
 		self.typeName = typeName
+		self.optionalInjection = optionalInjection
+		self.methodInjection = methodInjection
 	}
 	
 	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo]) {
@@ -39,11 +43,13 @@ class InjectionToken: DIToken {
 			} else if let nameFromPattern = argument.value.firstMatch("\\$0\\.[a-z0-9\\.]+[^= ]") {
 				name = String(nameFromPattern.dropFirst(3))
 			}
-			if let typeFromPattern = argument.value.firstMatch("\\s[a-zA-Z]+\\s*$")?.trimmingCharacters(in: .whitespaces) {
+			if let typeFromPattern = argument.value.firstMatch(InjectionToken.forcedTypeRegexp)?.trimmingCharacters(in: .whitespaces) {
 				typeName = typeFromPattern
+				modificators.append(InjectionModificator.typed(typeFromPattern))
 			}
 		}
 	}
 	
+	static let forcedTypeRegexp = "\\s[a-zA-Z]+\\s*$"
 	
 }

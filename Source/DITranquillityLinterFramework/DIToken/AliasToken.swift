@@ -49,6 +49,7 @@ class AliasToken: DIToken {
 			return nil
 		} else if parts.count == 1 {
 			result.value = String(parts[0])
+			result.outerName = "_"
 		} else {
 			result.value = String(parts[1])
 			

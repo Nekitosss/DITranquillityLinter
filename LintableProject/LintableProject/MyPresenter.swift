@@ -12,9 +12,18 @@ protocol MyPresenterProtocol {
 	
 }
 
-class MyPresenter: MyPresenterProtocol {
+class MyPresenterParent {
+	
+	var ss: String!
 	
 	init(stringValue str: String, _ intValue: Int) {
+		
+	}
+}
+
+class MyPresenter: MyPresenterParent, MyPresenterProtocol {
+	
+	func methodInjection(stringValue: String) {
 		
 	}
 	

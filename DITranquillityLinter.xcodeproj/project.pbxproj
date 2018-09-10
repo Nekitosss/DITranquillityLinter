@@ -14,6 +14,9 @@
 		11768022213DB02900F82DED /* SwiftExpressionKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11768021213DB02900F82DED /* SwiftExpressionKind.swift */; };
 		11768024213DB15100F82DED /* ArgumentInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11768023213DB15100F82DED /* ArgumentInfo.swift */; };
 		11768026213DB1E800F82DED /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11768025213DB1E800F82DED /* Extensions.swift */; };
+		117C3E312146B5DB00CA889F /* SignatureBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C3E2F2146B5D800CA889F /* SignatureBuilder.swift */; };
+		117C3E332146C29900CA889F /* MethodFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C3E322146C29900CA889F /* MethodFinder.swift */; };
+		117C3E352146DE5E00CA889F /* InjectionModificator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117C3E342146DE5E00CA889F /* InjectionModificator.swift */; };
 		117E93A22129E0A300D01E61 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117E93A12129E0A300D01E61 /* main.swift */; };
 		117E93AD2129E1A000D01E61 /* DITranquillityLinterFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 117E93AB2129E1A000D01E61 /* DITranquillityLinterFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		117E93B82129E1D500D01E61 /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117E93B72129E1D500D01E61 /* Tokenizer.swift */; };
@@ -97,6 +100,9 @@
 		11768021213DB02900F82DED /* SwiftExpressionKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftExpressionKind.swift; sourceTree = "<group>"; };
 		11768023213DB15100F82DED /* ArgumentInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArgumentInfo.swift; sourceTree = "<group>"; };
 		11768025213DB1E800F82DED /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		117C3E2F2146B5D800CA889F /* SignatureBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureBuilder.swift; sourceTree = "<group>"; };
+		117C3E322146C29900CA889F /* MethodFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MethodFinder.swift; sourceTree = "<group>"; };
+		117C3E342146DE5E00CA889F /* InjectionModificator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InjectionModificator.swift; sourceTree = "<group>"; };
 		117E938F2129E06800D01E61 /* DITranquillityLinter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DITranquillityLinter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		117E93992129E06A00D01E61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		117E93A12129E0A300D01E61 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -188,6 +194,8 @@
 				FDC353B8212ACAE400F1CC43 /* SwiftType.swift */,
 				11768021213DB02900F82DED /* SwiftExpressionKind.swift */,
 				11768025213DB1E800F82DED /* Extensions.swift */,
+				117C3E2F2146B5D800CA889F /* SignatureBuilder.swift */,
+				117C3E322146C29900CA889F /* MethodFinder.swift */,
 				119ABD9D212DB51500FD9A85 /* DIToken */,
 				117E93AC2129E1A000D01E61 /* Info.plist */,
 			);
@@ -202,6 +210,7 @@
 				119ABDAC212F3E8C00FD9A85 /* InjectionToken.swift */,
 				11768023213DB15100F82DED /* ArgumentInfo.swift */,
 				1135649D2144571F009DE91D /* DIToken.swift */,
+				117C3E342146DE5E00CA889F /* InjectionModificator.swift */,
 			);
 			path = DIToken;
 			sourceTree = "<group>";
@@ -335,9 +344,12 @@
 				119ABDA1212DB56600FD9A85 /* AliasToken.swift in Sources */,
 				1135649F21445748009DE91D /* DIToken.swift in Sources */,
 				11768022213DB02900F82DED /* SwiftExpressionKind.swift in Sources */,
+				117C3E332146C29900CA889F /* MethodFinder.swift in Sources */,
+				117C3E312146B5DB00CA889F /* SignatureBuilder.swift in Sources */,
 				11768024213DB15100F82DED /* ArgumentInfo.swift in Sources */,
 				119ABD9F212DB55B00FD9A85 /* RegistrationToken.swift in Sources */,
 				FDC353B9212ACAE400F1CC43 /* SwiftType.swift in Sources */,
+				117C3E352146DE5E00CA889F /* InjectionModificator.swift in Sources */,
 				119ABDAD212F3E8C00FD9A85 /* InjectionToken.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
