@@ -25,7 +25,7 @@ public class Tokenizer {
 		structures.forEach({ getDIParts(values: $0, result: &result) })
 		let dictionary = result.reduce(into: [String: SwiftType]()) { $0[$1.name] = $1 }
 		print(dictionary.keys.count)
-		let diParts = dictionary.values.filter({ $0.inheritedTypes.contains("DIPart") })
+		let diParts = dictionary.values.filter({ $0.inheritedTypes.contains("DIPart") || $0.inheritedTypes.contains("DIFramework") })
 		
 		
 		let mainPart = diParts.first(where: { $0.name == "MainDIPart" })!

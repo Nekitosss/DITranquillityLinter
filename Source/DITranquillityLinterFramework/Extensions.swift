@@ -31,3 +31,13 @@ extension String {
 		}
 	}
 }
+
+typealias SourceKitObject = [String: SourceKitRepresentable]
+
+extension Dictionary where Value == SourceKitRepresentable, Key == String  {
+	
+	func get<T>(_ key: SwiftDocKey, of type: T.Type = T.self) -> T? {
+		return self[key.rawValue] as? T
+	}
+	
+}

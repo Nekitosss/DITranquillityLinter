@@ -195,7 +195,7 @@
 				11768021213DB02900F82DED /* SwiftExpressionKind.swift */,
 				11768025213DB1E800F82DED /* Extensions.swift */,
 				117C3E2F2146B5D800CA889F /* SignatureBuilder.swift */,
-				117C3E322146C29900CA889F /* MethodFinder.swift */,
+				FD3A6AD02147DE87002F9C7E /* MethodFinder */,
 				119ABD9D212DB51500FD9A85 /* DIToken */,
 				117E93AC2129E1A000D01E61 /* Info.plist */,
 			);
@@ -222,6 +222,14 @@
 				117E93AA2129E1A000D01E61 /* DITranquillityLinterFramework */,
 			);
 			path = Source;
+			sourceTree = "<group>";
+		};
+		FD3A6AD02147DE87002F9C7E /* MethodFinder */ = {
+			isa = PBXGroup;
+			children = (
+				117C3E322146C29900CA889F /* MethodFinder.swift */,
+			);
+			path = MethodFinder;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

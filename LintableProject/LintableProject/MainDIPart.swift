@@ -12,9 +12,9 @@ final class MainDIPart: DIPart {
 	
 	static func load(container: DIContainer) {
 		
-		container.register {
+		container.register1 {
 			MyPresenter(stringValue: $0 as String,
-						$1)
+						55)
 			
 			}
 			.as(MyPresenterProtocol.self)

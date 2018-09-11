@@ -34,7 +34,7 @@ class RegistrationToken: DIToken {
 			kind == SwiftExpressionKind.call.rawValue
 			else { return }
 		self.typeName = name.hasSuffix(".init") ? String(name.dropLast(5)) : name
-		let argumentsSubstructure = substructure[SwiftDocKey.substructure.rawValue] as? [[String : SourceKitRepresentable]] ?? []
+		let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitObject].self) ?? []
 		let signature = restoreSignature(name: name, substructureList: argumentsSubstructure, content: content)
 		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo) {
 			self.tokenList += methodInjection as [DIToken]
@@ -50,10 +50,11 @@ class RegistrationToken: DIToken {
 		}
 		var argumentNumber = 0
 		for substucture in substructureList {
-			let name = substucture[SwiftDocKey.name.rawValue] as? String ?? "_"
-			guard let kind = substucture[SwiftDocKey.kind.rawValue] as? String,
-				let bodyLenght = substucture[SwiftDocKey.bodyLength.rawValue] as? Int64,
-				let bodyOffset = substucture[SwiftDocKey.bodyOffset.rawValue] as? Int64,
+			
+			let name = substucture.get(.name, of: String.self) ?? "_"
+			guard let kind: String = substucture.get(.kind),
+				let bodyLenght: Int64 = substucture.get(.bodyLength),
+				let bodyOffset: Int64 = substucture.get(.bodyOffset),
 				kind == SwiftExpressionKind.argument.rawValue,
 				let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLenght)
 				else { continue }
@@ -84,9 +85,9 @@ class RegistrationToken: DIToken {
 		guard let ownerType = collectedInfo[typeName] else { return false }
 		let structuredInfo = ownerType.substructure
 		for structure in structuredInfo {
-			guard let declarationKind = structure[SwiftDocKey.kind.rawValue] as? String,
-				let name = structure[SwiftDocKey.name.rawValue] as? String,
-				var typeName = structure[SwiftDocKey.typeName.rawValue] as? String,
+			guard let declarationKind: String = structure.get(.kind),
+				let name: String = structure.get(.name),
+				var typeName: String = structure.get(.typeName),
 				declarationKind == SwiftDeclarationKind.varInstance.rawValue,
 				name == token.name else {
 					continue

@@ -31,13 +31,14 @@ class MethodFinder {
 		var argumentInfo: [InjectionToken] = []
 		var argumentIndex = -1
 		for substucture in methodSubstructureList {
-			guard let kind = substucture[SwiftDocKey.kind.rawValue] as? String,
+			guard let kind: String = substucture.get(.kind),
 				kind == SwiftExpressionKind.parameter.rawValue else { continue }
 			argumentIndex += 1
-			guard let name = substucture[SwiftDocKey.name.rawValue] as? String,
-				let typeName = substucture[SwiftDocKey.typeName.rawValue] as? String,
+			guard let name: String = substucture.get(.name),
+				let typeName: String = substucture.get(.typeName),
 				methodSignature.injectableArgumentNumbers.contains(argumentIndex)
 				else { continue }
+			
 			let injection = InjectionToken(name: name, typeName: typeName, optionalInjection: typeName.contains("?"), methodInjection: true)
 			if let modificators = methodSignature.injectionModificators[argumentIndex] {
 				injection.modificators.append(contentsOf: modificators)
