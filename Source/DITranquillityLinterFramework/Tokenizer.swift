@@ -32,7 +32,7 @@ public class Tokenizer {
 			guard let loadContainerStructure = part.substructure.first(where: { $0.get(.name, of: String.self) == "load(container:)" }) else { return nil }
 			return (loadContainerStructure, part)
 			}.map {
-				ContainerPart(loadContainerStructure: $0, file: $1.file, collectedInfo: dictionary)
+				ContainerPart(loadContainerStructure: $0, file: $1.file, collectedInfo: dictionary, currentPartName: $1.name)
 		}
 		
 		print("End")

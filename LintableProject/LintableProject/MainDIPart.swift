@@ -21,6 +21,7 @@ final class MainDIPart: DIPart {
 			.injection { $0.methodInjection(stringValue: $1) }
 			.injection { $0.ss = $1 as String }
 		
+		container.append(part: MainDIPart.self)
 	}
 	
 }

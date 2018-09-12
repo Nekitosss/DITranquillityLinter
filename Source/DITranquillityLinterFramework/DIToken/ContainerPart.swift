@@ -15,19 +15,19 @@ final class ContainerPart {
 	
 	let tokenList: [DIToken]
 	
-	init(loadContainerStructure: [String : SourceKitRepresentable], file: File, collectedInfo: [String: SwiftType]) {
+	init(loadContainerStructure: [String : SourceKitRepresentable], file: File, collectedInfo: [String: SwiftType], currentPartName: String?) {
 		let content = file.contents.bridge()
 		let substructureList = loadContainerStructure.substructures ?? []
-		var result: [RegistrationToken] = []
+		var result: [DIToken] = []
 		var tmpTokenList: [DIToken] = []
 		for substructure in substructureList {
-			ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tmpTokenList)
+			ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tmpTokenList, currentPartName: currentPartName)
 		}
 	
 		self.tokenList = result
 	}
 	
-	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: SwiftType], result: inout [RegistrationToken], tokenList: inout [DIToken]) {
+	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: SwiftType], result: inout [DIToken], tokenList: inout [DIToken], currentPartName: String?) {
 		guard let kind: String = loadContainerBodyPart.get(.kind) else { return }
 		
 		switch kind {
@@ -49,10 +49,12 @@ final class ContainerPart {
 			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
 				tokenList.removeAll()
 				result.append(registration)
+			} else if let appendContainerToken = AppendContainerToken(functionName: actualName, invocationBody: body, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
+				result.append(appendContainerToken)
 			}
 			
 			for substructure in substructureList {
-				processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
+				processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList, currentPartName: currentPartName)
 			}
 			
 		default:

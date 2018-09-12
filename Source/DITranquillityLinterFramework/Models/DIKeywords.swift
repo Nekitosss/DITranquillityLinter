@@ -16,4 +16,8 @@ enum DIKeywords: String {
 	case by = "by"
 	case many = "many"
 	case cycle = "cycle"
+	case loadContainer = "load(container:)"
+	case diFramework = "DIFramework"
+	case diPart = "DIPart"
+	case append = "append"
 }

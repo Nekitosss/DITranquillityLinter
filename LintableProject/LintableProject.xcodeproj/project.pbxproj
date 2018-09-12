@@ -106,6 +106,7 @@
 				117EFFD52142FB210082EA06 /* Frameworks */,
 				117EFFD62142FB210082EA06 /* Resources */,
 				AC407540D2C0685322503B17 /* [CP] Embed Pods Frameworks */,
+				286C5F67042D078DD6BE5E69 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -163,6 +164,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		286C5F67042D078DD6BE5E69 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		2911A670807116D0AE17E663 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

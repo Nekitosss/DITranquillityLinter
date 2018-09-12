@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1109169B2149685F00007BC2 /* AppendContainerToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110916992149685600007BC2 /* AppendContainerToken.swift */; };
 		1135649F21445748009DE91D /* DIToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1135649D2144571F009DE91D /* DIToken.swift */; };
 		1137F8482129E4050010B207 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8452129E4050010B207 /* SWXMLHash.framework */; };
 		1137F8492129E4050010B207 /* Yams.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137F8462129E4050010B207 /* Yams.framework */; };
@@ -97,6 +98,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		110916992149685600007BC2 /* AppendContainerToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppendContainerToken.swift; sourceTree = "<group>"; };
 		1135649D2144571F009DE91D /* DIToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIToken.swift; sourceTree = "<group>"; };
 		1137F8452129E4050010B207 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SWXMLHash.framework; path = Carthage/Build/Mac/SWXMLHash.framework; sourceTree = "<group>"; };
 		1137F8462129E4050010B207 /* Yams.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Yams.framework; path = Carthage/Build/Mac/Yams.framework; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				119ABDAC212F3E8C00FD9A85 /* InjectionToken.swift */,
 				11768023213DB15100F82DED /* ArgumentInfo.swift */,
 				1135649D2144571F009DE91D /* DIToken.swift */,
+				110916992149685600007BC2 /* AppendContainerToken.swift */,
 				FD3A6AE9214941A4002F9C7E /* ContainerPart.swift */,
 			);
 			path = DIToken;
@@ -381,6 +384,7 @@
 				FD3A6AEA214941A4002F9C7E /* ContainerPart.swift in Sources */,
 				119ABDA1212DB56600FD9A85 /* AliasToken.swift in Sources */,
 				FD3A6ADF21493367002F9C7E /* MethodSignature.swift in Sources */,
+				1109169B2149685F00007BC2 /* AppendContainerToken.swift in Sources */,
 				FD3A6AE4214937D0002F9C7E /* Dictionary+Extension.swift in Sources */,
 				1135649F21445748009DE91D /* DIToken.swift in Sources */,
 				11768022213DB02900F82DED /* SwiftExpressionKind.swift in Sources */,
