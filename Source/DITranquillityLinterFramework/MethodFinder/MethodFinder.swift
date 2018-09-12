@@ -10,7 +10,7 @@ import SourceKittenFramework
 
 class MethodFinder {
 	
-	static func findMethodInfo(methodSignature: MethodSignature, initialObjectName: String, collectedInfo: [String: SwiftType]) -> [InjectionToken]? {
+	static func findMethodInfo(methodSignature: MethodSignature, initialObjectName: String, collectedInfo: [String: SwiftType], file: File) -> [InjectionToken]? {
 		guard let swiftType = collectedInfo[initialObjectName] else { return [] }
 		for substructure in swiftType.substructure {
 			if let kind = substructure[SwiftDocKey.kind.rawValue] as? String,
@@ -18,16 +18,16 @@ class MethodFinder {
 				let methodSubstructureList = substructure[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]],
 				kind == SwiftExpressionKind.call.rawValue || kind == SwiftExpressionKind.instance.rawValue,
 				name == methodSignature.name {
-				return extractArgumentInfo(methodSignature: methodSignature, methodSubstructureList: methodSubstructureList)
+				return extractArgumentInfo(methodSignature: methodSignature, methodSubstructureList: methodSubstructureList, file: file)
 			}
 		}
 		for inheritedType in swiftType.inheritedTypes {
-			return findMethodInfo(methodSignature: methodSignature, initialObjectName: inheritedType, collectedInfo: collectedInfo)
+			return findMethodInfo(methodSignature: methodSignature, initialObjectName: inheritedType, collectedInfo: collectedInfo, file: file)
 		}
 		return nil
 	}
 	
-	static func extractArgumentInfo(methodSignature: MethodSignature, methodSubstructureList: [[String: SourceKitRepresentable]]) -> [InjectionToken] {
+	static func extractArgumentInfo(methodSignature: MethodSignature, methodSubstructureList: [[String: SourceKitRepresentable]], file: File) -> [InjectionToken] {
 		var argumentInfo: [InjectionToken] = []
 		var argumentIndex = -1
 		for substucture in methodSubstructureList {
@@ -36,10 +36,12 @@ class MethodFinder {
 			argumentIndex += 1
 			guard let name: String = substucture.get(.name),
 				let typeName: String = substucture.get(.typeName),
-				methodSignature.injectableArgumentNumbers.contains(argumentIndex)
+				let injectableArgInfo = methodSignature.injectableArgumentInfo.first(where: { $0.argumentCount == argumentIndex }),
+				injectableArgInfo.argumentCount == argumentIndex
 				else { continue }
 			
-			let injection = InjectionToken(name: name, typeName: typeName, optionalInjection: typeName.contains("?"), methodInjection: true)
+			let location = Location(file: file, byteOffset: injectableArgInfo.argumentBodyOffset)
+			let injection = InjectionToken(name: name, typeName: typeName, optionalInjection: typeName.contains("?"), methodInjection: true, location: location)
 			if let modificators = methodSignature.injectionModificators[argumentIndex] {
 				injection.modificators.append(contentsOf: modificators)
 				for modificator in modificators {

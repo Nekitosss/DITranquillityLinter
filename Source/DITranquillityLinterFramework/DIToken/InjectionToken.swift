@@ -17,16 +17,18 @@ class InjectionToken: DIToken {
 	var optionalInjection: Bool = false
 	var methodInjection = false
 	var modificators: [InjectionModificator] = []
+	let location: Location
 	
-	init(name: String, typeName: String, optionalInjection: Bool, methodInjection: Bool) {
+	init(name: String, typeName: String, optionalInjection: Bool, methodInjection: Bool, location: Location) {
 		self.name = name
 		self.typeName = typeName
 		self.optionalInjection = optionalInjection
 		self.methodInjection = methodInjection
+		self.location = location
 	}
 	
-	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo]) {
-		guard functionName == "injection" else { return nil }
+	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File) {
+		guard functionName == DIKeywords.injection.rawValue else { return nil }
 		
 		var argumentStack = argumentStack
 		if argumentStack.isEmpty {
@@ -34,22 +36,22 @@ class InjectionToken: DIToken {
 		}
 		
 		for argument in argumentStack {
-			if argument.name == "cycle" {
+			if argument.name == DIKeywords.cycle.rawValue {
 				cycle = argument.value == "\(true)"
-			} else if argument.name.isEmpty && argument.value.starts(with: "\\.") {
+			} else if argument.name.isEmpty && argument.value.starts(with: RegExp.implicitKeyPath.rawValue) {
 				name = String(argument.value.dropFirst(2))
 			} else if let dotIndex = argument.value.index(of: "."), argument.name.isEmpty && argument.value.firstMatch("\\\\[^.]") != nil  {
+				// I forgot what it is :(
 				name = String(argument.value[argument.value.index(after: dotIndex)...])
-			} else if let nameFromPattern = argument.value.firstMatch("\\$0\\.[a-z0-9\\.]+[^= ]") {
+			} else if let nameFromPattern = argument.value.firstMatch(RegExp.nameFromParameterInjection) {
 				name = String(nameFromPattern.dropFirst(3))
 			}
-			if let typeFromPattern = argument.value.firstMatch(InjectionToken.forcedTypeRegexp)?.trimmingCharacters(in: .whitespaces) {
+			if let typeFromPattern = argument.value.firstMatch(.forcedType)?.trimmingCharacters(in: .whitespaces) {
 				typeName = typeFromPattern
 				modificators.append(InjectionModificator.typed(typeFromPattern))
 			}
 		}
+		self.location = Location(file: file, byteOffset: bodyOffset)
 	}
-	
-	static let forcedTypeRegexp = "\\s[a-zA-Z]+\\s*$"
 	
 }

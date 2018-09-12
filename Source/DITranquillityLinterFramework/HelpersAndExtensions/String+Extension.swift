@@ -1,8 +1,8 @@
 //
-//  Extensions.swift
+//  String+Extension.swift
 //  DITranquillityLinterFramework
 //
-//  Created by Nikita on 03/09/2018.
+//  Created by Nikita Patskov on 12.09.2018.
 //  Copyright © 2018 Nikita. All rights reserved.
 //
 
@@ -16,6 +16,10 @@ extension NSString {
 }
 
 extension String {
+	func firstMatch(_ regExp: RegExp) -> String? {
+		return firstMatch(regExp.rawValue)
+	}
+	
 	func firstMatch(_ pattern: String) -> String? {
 		return listMatches(pattern).first
 	}
@@ -30,14 +34,4 @@ extension String {
 			return (self as NSString).substring(with: range)
 		}
 	}
-}
-
-typealias SourceKitObject = [String: SourceKitRepresentable]
-
-extension Dictionary where Value == SourceKitRepresentable, Key == String  {
-	
-	func get<T>(_ key: SwiftDocKey, of type: T.Type = T.self) -> T? {
-		return self[key.rawValue] as? T
-	}
-	
 }

@@ -14,19 +14,19 @@ class RegistrationToken: DIToken {
 	var typeName: String = ""
 	var tokenList: [DIToken] = []
 	
-	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], tokenList: [DIToken], collectedInfo: [String: SwiftType], substructureList: [[String : SourceKitRepresentable]], content: NSString) {
-		guard functionName == "register" || functionName == "register1" else {
+	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], tokenList: [DIToken], collectedInfo: [String: SwiftType], substructureList: [[String : SourceKitRepresentable]], content: NSString, bodyOffset: Int64, file: File) {
+		guard functionName == DIKeywords.register.rawValue || functionName == DIKeywords.register1.rawValue else {
 			return nil
 		}
 		self.tokenList = tokenList
-		if let typedRegistration = invocationBody.firstMatch("[a-zA-Z]+\\.self") {
+		if let typedRegistration = invocationBody.firstMatch(RegExp.typeInfo) {
 			typeName = String(typedRegistration.dropLast(5))
 		}
-		extractClosureRegistration(substructureList: substructureList, collectedInfo: collectedInfo, content: content)
+		extractClosureRegistration(substructureList: substructureList, collectedInfo: collectedInfo, content: content, file: file)
 		fillTokenListWithInfo(collectedInfo: collectedInfo)
 	}
 	
-	private func extractClosureRegistration(substructureList: [[String : SourceKitRepresentable]], collectedInfo: [String: SwiftType], content: NSString) {
+	private func extractClosureRegistration(substructureList: [[String : SourceKitRepresentable]], collectedInfo: [String: SwiftType], content: NSString, file: File) {
 		guard substructureList.count == 1 else { return }
 		let substructure = substructureList[0]
 		guard let kind = substructure[SwiftDocKey.kind.rawValue] as? String,
@@ -35,15 +35,15 @@ class RegistrationToken: DIToken {
 			else { return }
 		self.typeName = name.hasSuffix(".init") ? String(name.dropLast(5)) : name
 		let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitObject].self) ?? []
-		let signature = restoreSignature(name: name, substructureList: argumentsSubstructure, content: content)
-		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo) {
+		let signature = restoreSignature(name: name, substructureList: argumentsSubstructure, content: content, file: file)
+		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file) {
 			self.tokenList += methodInjection as [DIToken]
 		}
 	}
 	
-	private func restoreSignature(name: String, substructureList: [[String: SourceKitRepresentable]], content: NSString) -> MethodSignature {
+	private func restoreSignature(name: String, substructureList: [[String: SourceKitRepresentable]], content: NSString, file: File) -> MethodSignature {
 		var signatureName = "init"
-		var injectableArguments: [Int] = []
+		var injectableArguments: [(Int, Int64)] = []
 		var injectionModificators: [Int : [InjectionModificator]] = [:]
 		if !substructureList.isEmpty {
 			signatureName.append("(")
@@ -58,10 +58,11 @@ class RegistrationToken: DIToken {
 				kind == SwiftExpressionKind.argument.rawValue,
 				let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLenght)
 				else { continue }
-			if body.firstMatch("\\$[0-9][0-9]?") != nil {
-				injectableArguments.append(argumentNumber)
+			
+			if body.firstMatch(RegExp.implicitClosureArgument) != nil {
+				injectableArguments.append((argumentNumber, bodyOffset))
 			}
-			if let forcedType = body.firstMatch(InjectionToken.forcedTypeRegexp)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+			if let forcedType = body.firstMatch(RegExp.forcedType)?.trimmingCharacters(in: .whitespacesAndNewlines) {
 				injectionModificators[argumentNumber, default: []].append(InjectionModificator.typed(forcedType))
 			}
 			signatureName += name + ":"
@@ -70,7 +71,7 @@ class RegistrationToken: DIToken {
 		if !substructureList.isEmpty {
 			signatureName.append(")")
 		}
-		return MethodSignature(name: signatureName, injectableArgumentNumbers: injectableArguments, injectionModificators: injectionModificators)
+		return MethodSignature(name: signatureName, injectableArgumentInfo: injectableArguments, injectionModificators: injectionModificators)
 	}
 	
 	private func fillTokenListWithInfo(collectedInfo: [String: SwiftType]) {

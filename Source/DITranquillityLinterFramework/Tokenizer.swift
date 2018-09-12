@@ -27,8 +27,7 @@ public class Tokenizer {
 		print(dictionary.keys.count)
 		let diParts = dictionary.values.filter({ $0.inheritedTypes.contains("DIPart") || $0.inheritedTypes.contains("DIFramework") })
 		
-		
-		let mainPart = diParts.first(where: { $0.name == "MainDIPart" })!
+		let mainPart = dictionary.values.first(where: { $0.name == "MainDIPart" })!
 		let loadContainerStructure = mainPart.substructure.first(where: { $0[SwiftDocKey.name.rawValue] as! String == "load(container:)" })!
 		processLoadContainerFunction(loadContainerStructure: loadContainerStructure, file: mainPart.file, collectedInfo: dictionary)
 		print("End")
@@ -40,11 +39,11 @@ public class Tokenizer {
 		var result: [RegistrationToken] = []
 		var tokenList: [DIToken] = []
 		for substructure in substructureList {
-			processLoadContainerBodyPart(loadContainerBodyPart: substructure, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
+			processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
 		}
 	}
 	
-	private func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], content: NSString, collectedInfo: [String: SwiftType], result: inout [RegistrationToken], tokenList: inout [DIToken]) {
+	private func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: SwiftType], result: inout [RegistrationToken], tokenList: inout [DIToken]) {
 		guard let kind = loadContainerBodyPart[SwiftDocKey.kind.rawValue] as? String else { return }
 		
 		switch kind {
@@ -59,17 +58,17 @@ public class Tokenizer {
 			let substructureList = loadContainerBodyPart[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []
 			let argumentStack = argumentInfo(substructures: substructureList, content: content)
 			
-			if let alias = AliasToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack) {
+			if let alias = AliasToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
 				tokenList.append(alias)
-			} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack) {
+			} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
 				tokenList.append(injection)
-			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content) {
+			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
 				tokenList.removeAll()
 				result.append(registration)
 			}
 			
 			for substructure in substructureList {
-				processLoadContainerBodyPart(loadContainerBodyPart: substructure, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
+				processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
 			}
 			
 		default:

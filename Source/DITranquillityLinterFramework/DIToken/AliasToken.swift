@@ -7,19 +7,16 @@
 //
 
 import Foundation
+import SourceKittenFramework
 
 class AliasToken: DIToken {
 	
 	var typeName: String = ""
 	var tag: String = ""
+	let location: Location
 	
-	init(typeName: String, tag: String) {
-		self.typeName = typeName
-		self.tag = tag
-	}
-	
-	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo]) {
-		guard functionName == "as" else { return nil }
+	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File) {
+		guard functionName == DIKeywords.as.rawValue else { return nil }
 		
 		var argumentStack = argumentStack
 		if argumentStack.isEmpty {
@@ -28,14 +25,15 @@ class AliasToken: DIToken {
 		
 		for argument in argumentStack {
 			switch argument.name {
-			case "", "check":
+			case "", DIKeywords.check.rawValue:
 				self.typeName = argument.value
-			case "tag":
+			case DIKeywords.tag.rawValue:
 				self.tag = argument.value
 			default:
 				break
 			}
 		}
+		location = Location(file: file, byteOffset: bodyOffset)
 	}
 	
 	static func parseArgumentList(body: String) -> [ArgumentInfo] {

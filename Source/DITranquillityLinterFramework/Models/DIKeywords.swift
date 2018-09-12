@@ -1,0 +1,19 @@
+//
+//  DIKeywords.swift
+//  DITranquillityLinterFramework
+//
+//  Created by Nikita Patskov on 12.09.2018.
+//  Copyright © 2018 Nikita. All rights reserved.
+//
+
+enum DIKeywords: String {
+	case register = "register"
+	case register1 = "register1"
+	case injection = "injection"
+	case `as` = "as"
+	case check = "check"
+	case tag = "tag"
+	case by = "by"
+	case many = "many"
+	case cycle = "cycle"
+}
