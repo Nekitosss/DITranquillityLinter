@@ -25,8 +25,8 @@ class AliasToken: DIToken {
 		
 		for argument in argumentStack {
 			switch argument.name {
-			case "", DIKeywords.check.rawValue:
-				self.typeName = argument.value
+			case "", "_", DIKeywords.check.rawValue:
+				self.typeName = argument.value.hasSuffix(".self") ? String(argument.value.dropLast(5)) : argument.value
 			case DIKeywords.tag.rawValue:
 				self.tag = argument.value
 			default:

@@ -28,8 +28,13 @@ public class Tokenizer {
 		let diParts = dictionary.values.filter({ $0.inheritedTypes.contains("DIPart") || $0.inheritedTypes.contains("DIFramework") })
 		
 		let mainPart = dictionary.values.first(where: { $0.name == "MainDIPart" })!
-		let loadContainerStructure = mainPart.substructure.first(where: { $0[SwiftDocKey.name.rawValue] as! String == "load(container:)" })!
-		ContainerPart(loadContainerStructure: loadContainerStructure, file: mainPart.file, collectedInfo: dictionary)
+		let containerParts = diParts.compactMap { (part) -> (SourceKitObject, SwiftType)? in
+			guard let loadContainerStructure = part.substructure.first(where: { $0.get(.name, of: String.self) == "load(container:)" }) else { return nil }
+			return (loadContainerStructure, part)
+			}.map {
+				ContainerPart(loadContainerStructure: $0, file: $1.file, collectedInfo: dictionary)
+		}
+		
 		print("End")
 	}
 	

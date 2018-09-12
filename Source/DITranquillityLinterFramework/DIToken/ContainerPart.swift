@@ -19,12 +19,12 @@ final class ContainerPart {
 		let content = file.contents.bridge()
 		let substructureList = loadContainerStructure.substructures ?? []
 		var result: [RegistrationToken] = []
-		var tokenList: [DIToken] = []
+		var tmpTokenList: [DIToken] = []
 		for substructure in substructureList {
-			ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
+			ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tmpTokenList)
 		}
 	
-		self.tokenList = tokenList
+		self.tokenList = result
 	}
 	
 	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: SwiftType], result: inout [RegistrationToken], tokenList: inout [DIToken]) {
