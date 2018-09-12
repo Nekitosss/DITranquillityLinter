@@ -41,6 +41,7 @@
 		FD3A6AE4214937D0002F9C7E /* Dictionary+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3A6AE3214937D0002F9C7E /* Dictionary+Extension.swift */; };
 		FD3A6AE621493828002F9C7E /* RegExp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3A6AE521493828002F9C7E /* RegExp.swift */; };
 		FD3A6AE821493BDA002F9C7E /* DIKeywords.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3A6AE721493BDA002F9C7E /* DIKeywords.swift */; };
+		FD3A6AEA214941A4002F9C7E /* ContainerPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3A6AE9214941A4002F9C7E /* ContainerPart.swift */; };
 		FDC353B9212ACAE400F1CC43 /* SwiftType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC353B8212ACAE400F1CC43 /* SwiftType.swift */; };
 /* End PBXBuildFile section */
 
@@ -123,6 +124,7 @@
 		FD3A6AE3214937D0002F9C7E /* Dictionary+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Extension.swift"; sourceTree = "<group>"; };
 		FD3A6AE521493828002F9C7E /* RegExp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegExp.swift; sourceTree = "<group>"; };
 		FD3A6AE721493BDA002F9C7E /* DIKeywords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIKeywords.swift; sourceTree = "<group>"; };
+		FD3A6AE9214941A4002F9C7E /* ContainerPart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerPart.swift; sourceTree = "<group>"; };
 		FDC353B8212ACAE400F1CC43 /* SwiftType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -213,6 +215,7 @@
 				119ABDAC212F3E8C00FD9A85 /* InjectionToken.swift */,
 				11768023213DB15100F82DED /* ArgumentInfo.swift */,
 				1135649D2144571F009DE91D /* DIToken.swift */,
+				FD3A6AE9214941A4002F9C7E /* ContainerPart.swift */,
 			);
 			path = DIToken;
 			sourceTree = "<group>";
@@ -375,6 +378,7 @@
 				FD3A6AE2214937AC002F9C7E /* String+Extension.swift in Sources */,
 				117E93B82129E1D500D01E61 /* Tokenizer.swift in Sources */,
 				FD3A6ADE21493363002F9C7E /* InjectionModificator.swift in Sources */,
+				FD3A6AEA214941A4002F9C7E /* ContainerPart.swift in Sources */,
 				119ABDA1212DB56600FD9A85 /* AliasToken.swift in Sources */,
 				FD3A6ADF21493367002F9C7E /* MethodSignature.swift in Sources */,
 				FD3A6AE4214937D0002F9C7E /* Dictionary+Extension.swift in Sources */,

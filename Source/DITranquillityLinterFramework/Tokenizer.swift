@@ -29,76 +29,8 @@ public class Tokenizer {
 		
 		let mainPart = dictionary.values.first(where: { $0.name == "MainDIPart" })!
 		let loadContainerStructure = mainPart.substructure.first(where: { $0[SwiftDocKey.name.rawValue] as! String == "load(container:)" })!
-		processLoadContainerFunction(loadContainerStructure: loadContainerStructure, file: mainPart.file, collectedInfo: dictionary)
+		ContainerPart(loadContainerStructure: loadContainerStructure, file: mainPart.file, collectedInfo: dictionary)
 		print("End")
-	}
-	
-	private func processLoadContainerFunction(loadContainerStructure: [String : SourceKitRepresentable], file: File, collectedInfo: [String: SwiftType]) {
-		let content = file.contents.bridge()
-		let substructureList = loadContainerStructure[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []
-		var result: [RegistrationToken] = []
-		var tokenList: [DIToken] = []
-		for substructure in substructureList {
-			processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
-		}
-	}
-	
-	private func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: SwiftType], result: inout [RegistrationToken], tokenList: inout [DIToken]) {
-		guard let kind = loadContainerBodyPart[SwiftDocKey.kind.rawValue] as? String else { return }
-		
-		switch kind {
-		case SwiftExpressionKind.call.rawValue:
-			guard let name = loadContainerBodyPart[SwiftDocKey.name.rawValue] as? String,
-				let bodyOffset = loadContainerBodyPart[SwiftDocKey.bodyOffset.rawValue] as? Int64,
-				let bodyLength = loadContainerBodyPart[SwiftDocKey.bodyLength.rawValue] as? Int64
-				else { return }
-			let body = content.substringWithByteRange(start: Int(bodyOffset), length: Int(bodyLength))!
-			let actualName = extractActualFuncionInvokation(name: name)
-			
-			let substructureList = loadContainerBodyPart[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []
-			let argumentStack = argumentInfo(substructures: substructureList, content: content)
-			
-			if let alias = AliasToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
-				tokenList.append(alias)
-			} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
-				tokenList.append(injection)
-			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
-				tokenList.removeAll()
-				result.append(registration)
-			}
-			
-			for substructure in substructureList {
-				processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList)
-			}
-			
-		default:
-			break
-		}
-	}
-	
-	func argumentInfo(substructures: [[String: SourceKitRepresentable]], content: NSString) -> [ArgumentInfo] {
-		var argumentStack = [ArgumentInfo]()
-		let substructures = substructures.filter({ ($0[SwiftDocKey.kind.rawValue] as? String) == SwiftExpressionKind.argument.rawValue })
-		
-		for structure in substructures {
-			guard let bodyOffset = structure[SwiftDocKey.bodyOffset.rawValue] as? Int64,
-				let bodyLength = structure[SwiftDocKey.bodyLength.rawValue] as? Int64,
-				let nameLength = structure[SwiftDocKey.nameLength.rawValue] as? Int64,
-				let nameOffset = structure[SwiftDocKey.nameOffset.rawValue] as? Int64
-				else { continue }
-			let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength) ?? ""
-			let name = nameLength > 0 ? content.substringUsingByteRange(start: nameOffset, length: nameLength) ?? "" : ""
-			let argument = ArgumentInfo(name: name, value: body, structure: structure)
-			argumentStack.append(argument)
-		}
-		return argumentStack
-	}
-	
-	func extractActualFuncionInvokation(name: String) -> String {
-		guard let dotIndex = name.reversed().index(of: ".") else {
-			return name
-		}
-		return String(name[dotIndex.base...])
 	}
 	
 	private func getStructure(file: File) -> SourceKitTuple? {
@@ -111,19 +43,19 @@ public class Tokenizer {
 	}
 	
 	func getDIParts(values: SourceKitTuple, result: inout [SwiftType]) {
-		for ss in (values.structure.dictionary[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []) {
+		for ss in (values.structure.dictionary.substructures ?? []) {
 			checkDiPart(ss: ss, parentName: "", file: values.file, result: &result)
 		}
 	}
 	
 	func checkDiPart(ss: [String: SourceKitRepresentable], parentName: String, file: File, result: inout [SwiftType]) {
 		var parentName = parentName
-		if let name = ss[SwiftDocKey.name.rawValue] as? String,
-			let kindString = ss[SwiftDocKey.kind.rawValue] as? String {
+		if let name: String = ss.get(.name),
+			let kindString: String = ss.get(.kind) {
 			
 			if let kind = SwiftType.Kind.init(string: kindString) {
-				let inheritedTypes = (ss[SwiftDocKey.inheritedtypes.rawValue] as? [[String: SourceKitRepresentable]] ?? []).compactMap({ $0[SwiftDocKey.name.rawValue] as? String })
-				let substructures = ss[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []
+				let inheritedTypes = (ss.get(.inheritedtypes, of: [SourceKitObject].self) ?? []).compactMap({ $0.get(.name, of: String.self) })
+				let substructures = ss.substructures ?? []
 				let newName = parentName + (parentName.isEmpty ? "" : ".") + name
 				let swiftType = SwiftType(name: newName, kind: kind, inheritedTypes: inheritedTypes, substructure: substructures, file: file)
 				parentName += newName
@@ -131,7 +63,7 @@ public class Tokenizer {
 			}
 		}
 		
-		for ss in (ss[SwiftDocKey.substructure.rawValue] as? [[String: SourceKitRepresentable]] ?? []) {
+		for ss in (ss.substructures ?? []) {
 			checkDiPart(ss: ss, parentName: parentName, file: file, result: &result)
 		}
 	}
