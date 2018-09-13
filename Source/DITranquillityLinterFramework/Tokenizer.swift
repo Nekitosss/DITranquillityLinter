@@ -8,7 +8,7 @@
 
 import Foundation
 import SourceKittenFramework
-
+import xcodeproj
 
 public class Tokenizer {
 	
@@ -16,10 +16,9 @@ public class Tokenizer {
 	
 	public init() {}
 	
-	public func process(files: [URL]) {
+	public func process(files: [URL], project: XcodeProj) {
 		let skFile = files.compactMap({ File(path: $0.path) })
 		print(skFile.count)
-		
 		let structures = skFile.compactMap(getStructure)
 		var result: [SwiftType] = []
 		structures.forEach({ getDIParts(values: $0, result: &result) })
@@ -32,7 +31,7 @@ public class Tokenizer {
 			guard let loadContainerStructure = part.substructure.first(where: { $0.get(.name, of: String.self) == "load(container:)" }) else { return nil }
 			return (loadContainerStructure, part)
 			}.map {
-				ContainerPart(loadContainerStructure: $0, file: $1.file, collectedInfo: dictionary, currentPartName: $1.name)
+				ContainerPart(loadContainerStructure: $0, file: $1.file, collectedInfo: dictionary, currentPartName: $1.name, project: project, files: files)
 		}
 		
 		print("End")

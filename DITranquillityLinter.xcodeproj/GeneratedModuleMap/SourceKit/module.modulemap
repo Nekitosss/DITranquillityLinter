@@ -1,0 +1,4 @@
+module SourceKit {
+    umbrella header "/Users/nikita/development/DITranquillityLinter/.build/checkouts/SourceKitten.git-6484296299232452758/Source/SourceKit/include/SourceKit.h"
+    export *
+}

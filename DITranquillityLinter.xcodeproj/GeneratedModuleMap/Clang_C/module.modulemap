@@ -1,0 +1,4 @@
+module Clang_C {
+    umbrella header "/Users/nikita/development/DITranquillityLinter/.build/checkouts/SourceKitten.git-6484296299232452758/Source/Clang_C/include/Clang_C.h"
+    export *
+}

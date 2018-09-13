@@ -8,6 +8,7 @@
 
 import Foundation
 import SourceKittenFramework
+import xcodeproj
 
 class AppendContainerToken: DIToken {
 	
@@ -15,7 +16,7 @@ class AppendContainerToken: DIToken {
 	let typeName: String
 	let containerPart: ContainerPart
 	
-	init?(functionName: String, invocationBody: String, collectedInfo: [String : SwiftType], argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File, currentPartName: String?) {
+	init?(functionName: String, invocationBody: String, collectedInfo: [String : SwiftType], argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File, currentPartName: String?, project: XcodeProj, files: [URL]) {
 		guard functionName == DIKeywords.append.rawValue else { return nil }
 		guard let appendInfo = argumentStack.first, argumentStack.count == 1 else { return nil }
 		let value = String(appendInfo.value.dropLast(5)) // .self
@@ -32,7 +33,7 @@ class AppendContainerToken: DIToken {
 			else { return nil }
 		
 		location = Location(file: file, byteOffset: bodyOffset)
-		containerPart = ContainerPart(loadContainerStructure: loadContainerStructure, file: swiftType.file, collectedInfo: collectedInfo, currentPartName: typeName)
+		containerPart = ContainerPart(loadContainerStructure: loadContainerStructure, file: swiftType.file, collectedInfo: collectedInfo, currentPartName: typeName, project: project, files: files)
 	}
 	
 	

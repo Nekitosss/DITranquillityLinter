@@ -1,22 +1,28 @@
 import Dispatch
 import Foundation
 import DITranquillityLinterFramework
+import xcodeproj
+import Basic
+
+
+func projectFiles(project: XcodeProj, srcRoot: String) -> [URL] {
+	let srcAbsolute = AbsolutePath(srcRoot)
+	let sourceFileReferences = project.pbxproj.objects.sourcesBuildPhases.flatMap({ $0.value.files.compactMap({ $0.file }) })
+	return sourceFileReferences.compactMap({ (element: PBXFileElement) -> URL? in
+		guard let fullPath = (try? element.fullPath(sourceRoot: srcAbsolute))??.asString else { return nil }
+		return URL(string: fullPath)
+	})
+}
 
 DispatchQueue.global().async {
 	let tokenizer = Tokenizer()
-	let url = URL(fileURLWithPath: "/Users/nikitapatskov/Develop/DITranquillityLinter/LintableProject")
-	let enumerator = FileManager.default.enumerator(at: url,
-													includingPropertiesForKeys: [],
-													options: [.skipsHiddenFiles], errorHandler: { (url, error) -> Bool in
-														print("directoryEnumerator error at \(url): ", error)
-														return true
-	})!
 	
-	var urls: [URL] = []
-	for case let fileURL as URL in enumerator where fileURL.pathExtension == "swift" {
-		urls.append(fileURL)
-	}
-	tokenizer.process(files: urls)
+	let srcRoot = "/Users/nikita/development/DITranquillityLinter/LintableProject/"
+	let workspace = try! XCWorkspace(pathString: srcRoot + "LintableProject.xcworkspace")
+	let project = try! XcodeProj(pathString: srcRoot + "LintableProject.xcodeproj")
+	let podsProject = try! XcodeProj(pathString: srcRoot + "Pods/Pods.xcodeproj")
+	let paths = projectFiles(project: project, srcRoot: srcRoot) + projectFiles(project: podsProject, srcRoot: srcRoot)
+	tokenizer.process(files: paths, project: project)
 	print("end")
 }
 

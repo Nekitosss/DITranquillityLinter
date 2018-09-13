@@ -8,6 +8,7 @@
 
 import Foundation
 import SourceKittenFramework
+import xcodeproj
 
 
 // DIPart, DIFramework
@@ -15,19 +16,19 @@ final class ContainerPart {
 	
 	let tokenList: [DIToken]
 	
-	init(loadContainerStructure: [String : SourceKitRepresentable], file: File, collectedInfo: [String: SwiftType], currentPartName: String?) {
+	init(loadContainerStructure: [String : SourceKitRepresentable], file: File, collectedInfo: [String: SwiftType], currentPartName: String?, project: XcodeProj, files: [URL]) {
 		let content = file.contents.bridge()
 		let substructureList = loadContainerStructure.substructures ?? []
 		var result: [DIToken] = []
 		var tmpTokenList: [DIToken] = []
 		for substructure in substructureList {
-			ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tmpTokenList, currentPartName: currentPartName)
+			ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tmpTokenList, currentPartName: currentPartName, project: project, files: files)
 		}
 	
 		self.tokenList = result
 	}
 	
-	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: SwiftType], result: inout [DIToken], tokenList: inout [DIToken], currentPartName: String?) {
+	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: SwiftType], result: inout [DIToken], tokenList: inout [DIToken], currentPartName: String?, project: XcodeProj, files: [URL]) {
 		guard let kind: String = loadContainerBodyPart.get(.kind) else { return }
 		
 		switch kind {
@@ -46,15 +47,15 @@ final class ContainerPart {
 				tokenList.append(alias)
 			} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
 				tokenList.append(injection)
-			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
+			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file, project: project, files: files) {
 				tokenList.removeAll()
 				result.append(registration)
-			} else if let appendContainerToken = AppendContainerToken(functionName: actualName, invocationBody: body, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
+			} else if let appendContainerToken = AppendContainerToken(functionName: actualName, invocationBody: body, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName, project: project, files: files) {
 				result.append(appendContainerToken)
 			}
 			
 			for substructure in substructureList {
-				processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList, currentPartName: currentPartName)
+				processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList, currentPartName: currentPartName, project: project, files: files)
 			}
 			
 		default:
