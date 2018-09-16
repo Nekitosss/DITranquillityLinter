@@ -9,7 +9,7 @@
 import Foundation
 import SourceKittenFramework
 
-typealias SourceKitObject = [String: SourceKitRepresentable]
+typealias SourceKitStructure = [String: SourceKitRepresentable]
 
 extension Dictionary where Value == SourceKitRepresentable, Key == String  {
 	
@@ -17,7 +17,7 @@ extension Dictionary where Value == SourceKitRepresentable, Key == String  {
 		return self[key.rawValue] as? T
 	}
 	
-	var substructures: [SourceKitObject]? {
+	var substructures: [SourceKitStructure]? {
 		return get(.substructure)
 	}
 	

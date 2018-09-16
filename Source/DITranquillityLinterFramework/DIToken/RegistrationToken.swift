@@ -35,10 +35,8 @@ class RegistrationToken: DIToken {
 			let bodyOffset: Int64 = substructure.get(.bodyOffset),
 			kind == SwiftExpressionKind.call.rawValue
 			else { return }
-		let request = Request.codeCompletionRequest(file: file.path!, contents: "", offset: bodyOffset, arguments: files.map({ $0.absoluteString }) + ["-j4"])
-		let aaa = try! request.send()
 		self.typeName = name.hasSuffix(".init") ? String(name.dropLast(5)) : name
-		let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitObject].self) ?? []
+		let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitStructure].self) ?? []
 		let signature = restoreSignature(name: name, substructureList: argumentsSubstructure, content: content, file: file, project: project, files: files)
 		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file) {
 			self.tokenList += methodInjection as [DIToken]

@@ -23,17 +23,10 @@ public class Tokenizer {
 		var result: [SwiftType] = []
 		structures.forEach({ getDIParts(values: $0, result: &result) })
 		let dictionary = result.reduce(into: [String: SwiftType]()) { $0[$1.name] = $1 }
-		print(dictionary.keys.count)
-		let diParts = dictionary.values.filter({ $0.inheritedTypes.contains("DIPart") || $0.inheritedTypes.contains("DIFramework") })
 		
-		let mainPart = dictionary.values.first(where: { $0.name == "MainDIPart" })!
-		let containerParts = diParts.compactMap { (part) -> (SourceKitObject, SwiftType)? in
-			guard let loadContainerStructure = part.substructure.first(where: { $0.get(.name, of: String.self) == "load(container:)" }) else { return nil }
-			return (loadContainerStructure, part)
-			}.map {
-				ContainerPart(loadContainerStructure: $0, file: $1.file, collectedInfo: dictionary, currentPartName: $1.name, project: project, files: files)
+		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: dictionary, project: project) {
+			print(1)
 		}
-		
 		print("End")
 	}
 	
@@ -58,7 +51,7 @@ public class Tokenizer {
 			let kindString: String = ss.get(.kind) {
 			
 			if let kind = SwiftType.Kind.init(string: kindString) {
-				let inheritedTypes = (ss.get(.inheritedtypes, of: [SourceKitObject].self) ?? []).compactMap({ $0.get(.name, of: String.self) })
+				let inheritedTypes = (ss.get(.inheritedtypes, of: [SourceKitStructure].self) ?? []).compactMap({ $0.get(.name, of: String.self) })
 				let substructures = ss.substructures ?? []
 				let newName = parentName + (parentName.isEmpty ? "" : ".") + name
 				let swiftType = SwiftType(name: newName, kind: kind, inheritedTypes: inheritedTypes, substructure: substructures, file: file)

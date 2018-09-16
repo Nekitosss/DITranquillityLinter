@@ -16,9 +16,8 @@ final class ContainerPart {
 	
 	let tokenList: [DIToken]
 	
-	init(loadContainerStructure: [String : SourceKitRepresentable], file: File, collectedInfo: [String: SwiftType], currentPartName: String?, project: XcodeProj, files: [URL]) {
+	init(substructureList: [SourceKitStructure], file: File, collectedInfo: [String: SwiftType], currentPartName: String?, project: XcodeProj, files: [URL]) {
 		let content = file.contents.bridge()
-		let substructureList = loadContainerStructure.substructures ?? []
 		var result: [DIToken] = []
 		var tmpTokenList: [DIToken] = []
 		for substructure in substructureList {
@@ -63,7 +62,7 @@ final class ContainerPart {
 		}
 	}
 	
-	static func argumentInfo(substructures: [[String: SourceKitRepresentable]], content: NSString) -> [ArgumentInfo] {
+	static func argumentInfo(substructures: [SourceKitStructure], content: NSString) -> [ArgumentInfo] {
 		var argumentStack = [ArgumentInfo]()
 		let substructures = substructures.filter({ $0.get(.kind, of: String.self) == SwiftExpressionKind.argument.rawValue })
 		

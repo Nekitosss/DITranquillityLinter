@@ -35,7 +35,7 @@ final class SwiftType: Equatable {
 	let name: String
 	let kind: Kind
 	let inheritedTypes: [String]
-	let substructure: [[String: SourceKitRepresentable]]
+	let substructure: [SourceKitStructure]
 	let file: File
 	
 	static func ==(lhs: SwiftType, rhs: SwiftType) -> Bool {

@@ -33,7 +33,7 @@ class AppendContainerToken: DIToken {
 			else { return nil }
 		
 		location = Location(file: file, byteOffset: bodyOffset)
-		containerPart = ContainerPart(loadContainerStructure: loadContainerStructure, file: swiftType.file, collectedInfo: collectedInfo, currentPartName: typeName, project: project, files: files)
+		containerPart = ContainerPart(substructureList: (loadContainerStructure.substructures ?? []), file: swiftType.file, collectedInfo: collectedInfo, currentPartName: typeName, project: project, files: files)
 	}
 	
 	
