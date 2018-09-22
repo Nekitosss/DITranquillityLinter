@@ -9,15 +9,15 @@
 import Foundation
 import SourceKittenFramework
 
-final class SwiftType: Equatable {
-	
+final class SwiftType {
+
 	enum Kind: Equatable {
 		case object
 		case structure
 		case interface
-		case generic([SwiftType])
-		case optinal(SwiftType)
-		
+		case generic([Type])
+		case optinal(Type)
+
 		init?(string: String) {
 			switch string {
 			case SwiftDeclarationKind.class.rawValue:
@@ -31,17 +31,13 @@ final class SwiftType: Equatable {
 			}
 		}
 	}
-	
+
 	let name: String
 	let kind: Kind
 	let inheritedTypes: [String]
 	let substructure: [SourceKitStructure]
 	let file: File
-	
-	static func ==(lhs: SwiftType, rhs: SwiftType) -> Bool {
-		return lhs.name == rhs.name && lhs.kind == rhs.kind && lhs.inheritedTypes == rhs.inheritedTypes
-	}
-	
+
 	init(name: String, kind: Kind, inheritedTypes: [String], substructure: [[String: SourceKitRepresentable]], file: File) {
 		self.name = name
 		self.kind = kind

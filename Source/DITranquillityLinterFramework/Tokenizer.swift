@@ -9,6 +9,7 @@
 import Foundation
 import SourceKittenFramework
 import xcodeproj
+import PathKit
 
 public class Tokenizer {
 	
@@ -17,12 +18,23 @@ public class Tokenizer {
 	public init() {}
 	
 	public func process(files: [URL], project: XcodeProj) {
-		let skFile = files.compactMap({ File(path: $0.path) })
-		print(skFile.count)
-		let structures = skFile.compactMap(getStructure)
+		let paths = files.map({ Path.init($0.path) })
+		let filesParsers: [FileParser] = paths.compactMap({
+			guard let contents = File(path: $0.string)?.contents else { return nil }
+			return try? FileParser(contents: contents, path: $0, module: nil)
+		})
+		let allResults = filesParsers.map({ try! $0.parse() })
+		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [])) { acc, next in
+			acc.typealiases += next.typealiases
+			acc.types += next.types
+			return acc
+		}
+		
+		let composed = Composer().uniqueTypes(parserResult)
+		
+		let structures = files.compactMap({ File(path: $0.path) }).compactMap(getStructure)
 		var result: [SwiftType] = []
-		structures.forEach({ getDIParts(values: $0, result: &result) })
-		let dictionary = result.reduce(into: [String: SwiftType]()) { $0[$1.name] = $1 }
+		let dictionary = composed.reduce(into: [String: Type]()) { $0[$1.name] = $1 }
 		
 		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: dictionary, project: project) {
 			print(1)

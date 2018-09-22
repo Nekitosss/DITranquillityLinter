@@ -31,3 +31,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+extension AppDelegate {
+	
+	func anotherFunc() {
+		
+	}
+	
+}

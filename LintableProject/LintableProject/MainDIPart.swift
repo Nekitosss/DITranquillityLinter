@@ -19,6 +19,7 @@ final class MainDIPart: DIPart {
 			}
 			.as(MyPresenterProtocol.self)
 			.injection { $0.methodInjection(stringValue: $1) }
+			.injection(\.ss) { by(tag: ViewController.self, on: $0) }
 			.injection { $0.ss = $1 as String }
 		
 		container.append(part: MainDIPart.self)

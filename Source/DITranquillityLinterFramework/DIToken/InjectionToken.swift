@@ -8,6 +8,7 @@
 
 import Foundation
 import SourceKittenFramework
+import xcodeproj
 
 class InjectionToken: DIToken {
 	
@@ -17,6 +18,7 @@ class InjectionToken: DIToken {
 	var optionalInjection: Bool = false
 	var methodInjection = false
 	var modificators: [InjectionModificator] = []
+	var injectionSubstructureList: [[String : SourceKitRepresentable]] = []
 	let location: Location
 	
 	init(name: String, typeName: String, optionalInjection: Bool, methodInjection: Bool, location: Location) {
@@ -27,7 +29,7 @@ class InjectionToken: DIToken {
 		self.location = location
 	}
 	
-	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File) {
+	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File, substructureList: [[String : SourceKitRepresentable]]) {
 		guard functionName == DIKeywords.injection.rawValue else { return nil }
 		
 		var argumentStack = argumentStack
@@ -51,6 +53,7 @@ class InjectionToken: DIToken {
 				modificators.append(InjectionModificator.typed(typeFromPattern))
 			}
 		}
+		injectionSubstructureList = substructureList
 		self.location = Location(file: file, byteOffset: bodyOffset)
 	}
 	
