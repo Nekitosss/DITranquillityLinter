@@ -48,13 +48,40 @@ class InjectionToken: DIToken {
 			} else if let nameFromPattern = argument.value.firstMatch(RegExp.nameFromParameterInjection) {
 				name = String(nameFromPattern.dropFirst(3))
 			}
-			if let typeFromPattern = argument.value.firstMatch(.forcedType)?.trimmingCharacters(in: .whitespaces) {
+			if let taggedModificators = InjectionToken.parseTaggedInjection(structure: argument.structure, content: file.contents.bridge()) {
+				modificators += taggedModificators
+			}
+			if var typeFromPattern = argument.value.firstMatch(.forcedType) {
+				// $0 "as String }"
+				if let bracketIndex = typeFromPattern.index(of: "}") {
+					typeFromPattern.remove(at: bracketIndex)
+				}
+				typeFromPattern = typeFromPattern.trimmingCharacters(in: .whitespacesAndNewlines)
 				typeName = typeFromPattern
-				modificators.append(InjectionModificator.typed(typeFromPattern))
+				modificators.append(.typed(typeFromPattern))
 			}
 		}
 		injectionSubstructureList = substructureList
 		self.location = Location(file: file, byteOffset: bodyOffset)
+	}
+	
+	private static func parseTaggedInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
+		let expresstionCallSubstructures = structure.substructures ?? []
+		var result: [InjectionModificator] = []
+		for substructure in expresstionCallSubstructures {
+			guard let name: String = substructure.get(.name),
+				let kind: String = substructure.get(.kind),
+				kind == SwiftExpressionKind.call.rawValue,
+				let argumentsSubstructure = substructure.substructures,
+				name == DIKeywords.by.rawValue
+				else { continue }
+			let arguments = ContainerPart.argumentInfo(substructures: argumentsSubstructure, content: content)
+			guard let tagType = arguments.first(where: { $0.name == DIKeywords.tag.rawValue }) else { continue }
+			let tagTypeName = tagType.value.hasSuffix(".self") ? String(tagType.value.dropLast(5)) : tagType.value
+			result.append(.tagged(tagTypeName))
+		}
+		return result
+		
 	}
 	
 }
