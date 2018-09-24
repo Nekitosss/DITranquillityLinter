@@ -140,7 +140,7 @@ struct Composer {
             closure.parameters.forEach({ parameter in
                 parameter.type = resolveTypeWithName(parameter.typeName)
             })
-        } else if let generic = parseGenericType(lookupName) {
+        } else if let generic = Composer.parseGenericType(lookupName.unwrappedTypeName) {
             // should also set generic data for optional types
             lookupName.generic = generic
             generic.typeParameters.forEach {typeParameter in
@@ -503,8 +503,8 @@ struct Composer {
         }
     }
 
-    fileprivate func parseGenericType(_ typeName: TypeName) -> GenericType? {
-        let genericComponents = typeName.unwrappedTypeName
+    static func parseGenericType(_ unwrappedTypeName: String) -> GenericType? {
+        let genericComponents = unwrappedTypeName
             .split(separator: "<", maxSplits: 1)
             .map({ String($0).stripped() })
 
@@ -517,10 +517,14 @@ struct Composer {
         return GenericType(name: name, typeParameters: parseGenericTypeParameters(typeParametersString))
     }
 
-    fileprivate func parseGenericTypeParameters(_ typeParametersString: String) -> [GenericTypeParameter] {
+    fileprivate static func parseGenericTypeParameters(_ typeParametersString: String) -> [GenericTypeParameter] {
         return typeParametersString
             .commaSeparated()
-            .map({ GenericTypeParameter(typeName: TypeName($0.stripped())) })
+            .map({ GenericTypeParameter(typeName: TypeName(removingGenericConstraints($0).stripped())) })
     }
+	
+	fileprivate static func removingGenericConstraints(_ genericTypeString: String) -> String {
+		return genericTypeString.split(separator: ":", maxSplits: 1).first.flatMap({ String($0) }) ?? genericTypeString
+	}
 
 }

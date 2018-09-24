@@ -13,7 +13,7 @@ final class MainDIPart: DIPart {
 	static func load(container: DIContainer) {
 		
 		container.register1 {
-			MyPresenter(stringValue: by(tag: ViewController.self, on: $0) as String,
+			MyPresenter<Float>(value: by(tag: ViewController.self, on: $0),
 						by(tag: MainDIPart.self, on: $1))
 			
 			}

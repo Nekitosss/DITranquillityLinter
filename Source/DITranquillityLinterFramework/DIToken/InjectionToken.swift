@@ -65,7 +65,7 @@ class InjectionToken: DIToken {
 		self.location = Location(file: file, byteOffset: bodyOffset)
 	}
 	
-	private static func parseTaggedInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
+	static func parseTaggedInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
 		let expresstionCallSubstructures = structure.substructures ?? []
 		var result: [InjectionModificator] = []
 		for substructure in expresstionCallSubstructures {

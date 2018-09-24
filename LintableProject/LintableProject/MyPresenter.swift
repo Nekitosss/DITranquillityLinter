@@ -12,16 +12,22 @@ protocol MyPresenterProtocol {
 	
 }
 
-class MyPresenterParent {
+protocol AnyProtocol {}
+
+extension Float: AnyProtocol {
+	
+}
+
+class MyPresenterParent<T: AnyProtocol> {
 	
 	var ss: String!
 	
-	init(stringValue str: String, _ intValue: Int) {
+	init(value: T, _ intValue: Int) {
 		
 	}
 }
 
-class MyPresenter: MyPresenterParent, MyPresenterProtocol {
+class MyPresenter<T: AnyProtocol>: MyPresenterParent<T>, MyPresenterProtocol {
 	
 	func methodInjection(stringValue: String) {
 		

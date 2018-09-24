@@ -161,8 +161,10 @@ final class FileParser {
                 Log.verbose("\(logPrefix) Unsupported entry \"\(access) \(kind) \(name)\"")
                 return nil
             }
-
             type.isGeneric = isGeneric(source: source)
+			if type.isGeneric, let genericInfo = genericTypeInfo(source: source) {
+				type.genericTypeParameters = genericInfo.typeParameters
+			}
             type.annotations = annotations.from(source)
             type.attributes = parseDeclarationAttributes(source)
             type.bodyBytesRange = Substring.body.range(for: source).map { BytesRange(range: $0) }
@@ -305,6 +307,17 @@ extension FileParser {
         guard let substring = extract(.nameSuffix, from: source), substring.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("<") == true else { return false }
         return true
     }
+	
+	fileprivate func genericTypeInfo(source: [String: SourceKitRepresentable]) -> GenericType? {
+		guard let substring = extract(.nameSuffix, from: source),
+			let name = extract(.name, from: source),
+			let closeBracketIndex = substring.index(of: ">")
+			else { return nil }
+		let genericInfoSubstring = String(substring[...closeBracketIndex])
+		
+		let parsedTypeName = Composer.parseGenericType(name + genericInfoSubstring)
+		return parsedTypeName
+	}
 
     fileprivate func setterAccessibility(source: [String: SourceKitRepresentable]) -> AccessLevel? {
         if let setter = source["key.setter_accessibility"] as? String {

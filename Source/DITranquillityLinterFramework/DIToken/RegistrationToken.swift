@@ -20,7 +20,7 @@ class RegistrationToken: DIToken {
 			return nil
 		}
 		self.tokenList = tokenList
-		if let typedRegistration = invocationBody.firstMatch(RegExp.typeInfo) {
+		if let typedRegistration = invocationBody.firstMatch(RegExp.trailingTypeInfo) {
 			typeName = String(typedRegistration.dropLast(5))
 		}
 		extractClosureRegistration(substructureList: substructureList, collectedInfo: collectedInfo, content: content, file: file)
@@ -67,6 +67,10 @@ class RegistrationToken: DIToken {
 			if let forcedType = body.firstMatch(RegExp.forcedType)?.trimmingCharacters(in: .whitespacesAndNewlines) {
 				injectionModificators[argumentNumber, default: []].append(InjectionModificator.typed(forcedType))
 			}
+			if let taggedInjection = InjectionToken.parseTaggedInjection(structure: substucture, content: content) {
+				injectionModificators[argumentNumber, default: []].append(contentsOf: taggedInjection)
+			}
+			
 			signatureName += name + ":"
 			argumentNumber += 1
 		}

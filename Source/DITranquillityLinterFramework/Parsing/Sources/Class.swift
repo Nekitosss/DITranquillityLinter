@@ -26,6 +26,7 @@ import SourceKittenFramework
                          attributes: [String: Attribute] = [:],
                          annotations: [String: NSObject] = [:],
 						 isGeneric: Bool = false,
+						 genericTypeParameters: [GenericTypeParameter] = [],
 						 file: File) {
         super.init(
             name: name,
@@ -40,6 +41,7 @@ import SourceKittenFramework
             typealiases: typealiases,
             annotations: annotations,
 			isGeneric: isGeneric,
+			genericTypeParameters: genericTypeParameters,
 			file: file
         )
     }

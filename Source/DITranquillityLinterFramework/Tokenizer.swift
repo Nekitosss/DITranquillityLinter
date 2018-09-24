@@ -31,9 +31,6 @@ public class Tokenizer {
 		}
 		
 		let composed = Composer().uniqueTypes(parserResult)
-		
-		let structures = files.compactMap({ File(path: $0.path) }).compactMap(getStructure)
-		var result: [SwiftType] = []
 		let dictionary = composed.reduce(into: [String: Type]()) { $0[$1.name] = $1 }
 		
 		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: dictionary, project: project) {

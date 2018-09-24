@@ -49,6 +49,8 @@ import SourceKittenFramework
     /// Whether type is generic
     public var isGeneric: Bool
 
+	public var genericTypeParameters: [GenericTypeParameter]
+	
     /// Type name in its own scope.
     public var localName: String
 
@@ -249,6 +251,7 @@ import SourceKittenFramework
                 attributes: [String: Attribute] = [:],
                 annotations: [String: NSObject] = [:],
 				isGeneric: Bool = false,
+				genericTypeParameters: [GenericTypeParameter] = [],
 				file: File) {
 
         self.localName = name
@@ -265,6 +268,7 @@ import SourceKittenFramework
         self.attributes = attributes
         self.annotations = annotations
         self.isGeneric = isGeneric
+		self.genericTypeParameters = genericTypeParameters
 		self.file = file
 
         super.init()
@@ -319,7 +323,8 @@ import SourceKittenFramework
             self.supertype = aDecoder.decode(forKey: "supertype")
             guard let attributes: [String: Attribute] = aDecoder.decode(forKey: "attributes") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["attributes"])); fatalError() }; self.attributes = attributes
             self.__path = aDecoder.decode(forKey: "__path")
-			guard let file: File = aDecoder.decode(forKey: "file") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["containedTypes"])); fatalError() }; self.file = file
+			guard let file: File = aDecoder.decode(forKey: "file") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["file"])); fatalError() }; self.file = file
+			guard let genericTypeParameters: [GenericTypeParameter] = aDecoder.decode(forKey: "genericTypeParameters") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["genericTypeParameters"])); fatalError() }; self.genericTypeParameters = genericTypeParameters
         }
 
         /// :nodoc:

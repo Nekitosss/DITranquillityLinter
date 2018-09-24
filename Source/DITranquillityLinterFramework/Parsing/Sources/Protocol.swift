@@ -32,6 +32,7 @@ public typealias SourceryProtocol = Protocol
                          attributes: [String: Attribute] = [:],
                          annotations: [String: NSObject] = [:],
 						 isGeneric: Bool = false,
+						 genericTypeParameters: [GenericTypeParameter] = [],
 						 file: File) {
         super.init(
             name: name,
@@ -46,6 +47,7 @@ public typealias SourceryProtocol = Protocol
             typealiases: typealiases,
             annotations: annotations,
 			isGeneric: isGeneric,
+			genericTypeParameters: genericTypeParameters,
 			file: file
         )
     }
