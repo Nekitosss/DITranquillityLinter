@@ -11,18 +11,7 @@ import DITranquillity
 final class MainDIPart: DIPart {
 	
 	static func load(container: DIContainer) {
-		
-		container.register1 {
-			MyPresenter<Float>(value: by(tag: ViewController.self, on: $0),
-						by(tag: MainDIPart.self, on: $1))
-			
-			}
-			.as(MyPresenterProtocol.self)
-			.injection { $0.methodInjection(stringValue: $1) }
-			.injection(\.ss) { by(tag: ViewController.self, on: $0) as String }
-			.injection { $0.ss = $1 as String }
-		
-		container.append(part: MainDIPart.self)
+		container.register{ ParentClass.MyPresenter<Float>.init(value: $0, by(tag: ViewController.self, on: $1)) }
 	}
 	
 }

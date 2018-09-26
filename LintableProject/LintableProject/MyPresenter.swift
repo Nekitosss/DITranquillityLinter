@@ -18,19 +18,26 @@ extension Float: AnyProtocol {
 	
 }
 
-class MyPresenterParent<T: AnyProtocol> {
+class ParentClass {
 	
-	var ss: String!
-	
-	init(value: T, _ intValue: Int) {
-		
-	}
-}
-
-class MyPresenter<T: AnyProtocol>: MyPresenterParent<T>, MyPresenterProtocol {
-	
-	func methodInjection(stringValue: String) {
+	class AndAnotherClass {
 		
 	}
 	
+	class MyPresenterParent<T: AnyProtocol> {
+		
+		var ss: String!
+		
+		init(value: T, _ another: AndAnotherClass) {
+			
+		}
+	}
+	
+	class MyPresenter<T: AnyProtocol>: MyPresenterParent<T>, MyPresenterProtocol {
+		
+		func methodInjection(stringValue: String) {
+			
+		}
+		
+	}
 }

@@ -299,7 +299,8 @@ extension FileParser {
 
     internal func extractInheritedTypes(source: [String: SourceKitRepresentable]) -> [String] {
         return (source[SwiftDocKey.inheritedtypes.rawValue] as? [[String: SourceKitRepresentable]])?.compactMap { type in
-            return type[SwiftDocKey.name.rawValue] as? String
+			guard let name = type[SwiftDocKey.name.rawValue] as? String else { return nil }
+			return TypeName(name).unwrappedTypeName
         } ?? []
     }
 
@@ -315,8 +316,7 @@ extension FileParser {
 			else { return nil }
 		let genericInfoSubstring = String(substring[...closeBracketIndex])
 		
-		let parsedTypeName = Composer.parseGenericType(name + genericInfoSubstring)
-		return parsedTypeName
+		return Composer.parseGenericType(name + genericInfoSubstring)
 	}
 
     fileprivate func setterAccessibility(source: [String: SourceKitRepresentable]) -> AccessLevel? {

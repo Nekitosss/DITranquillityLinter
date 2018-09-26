@@ -21,25 +21,56 @@ class RegistrationToken: DIToken {
 		}
 		self.tokenList = tokenList
 		if let typedRegistration = invocationBody.firstMatch(RegExp.trailingTypeInfo) {
-			typeName = String(typedRegistration.dropLast(5))
+			typeName = typedRegistration.droppedDotSelf()
 		}
-		extractClosureRegistration(substructureList: substructureList, collectedInfo: collectedInfo, content: content, file: file)
+		extractPlainRegistration(substructureList: substructureList, invocationBody: invocationBody, collectedInfo: collectedInfo, content: content, file: file, bodyOffset: bodyOffset)
+		extractClosureRegistration(substructureList: substructureList, collectedInfo: collectedInfo, content: content, file: file, bodyOffset: bodyOffset)
 		fillTokenListWithInfo(collectedInfo: collectedInfo, content: content, file: file)
 	}
 	
-	private func extractClosureRegistration(substructureList: [[String : SourceKitRepresentable]], collectedInfo: [String: Type], content: NSString, file: File) {
+	private func extractPlainRegistration(substructureList: [SourceKitStructure], invocationBody: String, collectedInfo: [String: Type], content: NSString, file: File, bodyOffset: Int64) {
+		guard substructureList.isEmpty && !invocationBody.hasSuffix(".self") else { return }
+		let (typeName, fullTypeName, genericType) = self.parseTypeName(name: invocationBody)
+		guard let dotIndex = invocationBody.lastIndex(of: ".") else { return }
+		let signatureText = String(invocationBody[invocationBody.index(after: dotIndex)...])
+		let methodSignature = MethodSignature(name: signatureText, injectableArgumentInfo: [], injectionModificators: [:])
+		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: methodSignature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset) {
+			self.tokenList += methodInjection as [DIToken]
+		}
+		self.typeName = fullTypeName
+	}
+	
+	private func extractClosureRegistration(substructureList: [SourceKitStructure], collectedInfo: [String: Type], content: NSString, file: File, bodyOffset: Int64) {
 		guard substructureList.count == 1 else { return }
 		let substructure = substructureList[0]
 		guard let kind: String = substructure.get(.kind),
 			let name: String = substructure.get(.name),
-			let bodyOffset: Int64 = substructure.get(.bodyOffset),
 			kind == SwiftExpressionKind.call.rawValue
 			else { return }
-		self.typeName = name.hasSuffix(".init") ? String(name.dropLast(5)) : name
+		let (typeName, fullTypeName, genericType) = self.parseTypeName(name: name)
+		self.typeName = fullTypeName
 		let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitStructure].self) ?? []
-		let signature = RegistrationToken.restoreSignature(name: name, substructureList: argumentsSubstructure, content: content)
-		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file) {
+		let methodName = restoreMethodName(registrationName: name)
+		let signature = RegistrationToken.restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
+		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset) {
 			self.tokenList += methodInjection as [DIToken]
+		}
+	}
+	
+	func parseTypeName(name: String) -> (typeName: String, fullTypeName: String, genericType: GenericType?) {
+		let name = name.droppedDotInit()
+		if let genericType = Composer.parseGenericType(name) {
+			return (genericType.name, name, genericType)
+		} else {
+			return (name, name, nil)
+		}
+	}
+	
+	func restoreMethodName(registrationName: String) -> String {
+		if let dotIndex = registrationName.reversed().index(of: ".")?.base {
+			return String(registrationName[dotIndex...])
+		} else {
+			return ""
 		}
 	}
 	
@@ -92,13 +123,15 @@ class RegistrationToken: DIToken {
 	
 	private func findMethodTypeInfo(collectedInfo: [String: Type], content: NSString, file: File, token: InjectionToken) {
 		if let substructure = token.injectionSubstructureList.last,
-			var methodName = substructure.get(.name, of: String.self) {
+			var methodName: String = substructure.get(.name),
+			let offset: Int64 = substructure.get(.offset) {
 			if let dotIndex = methodName.index(of: ".") {
 				methodName = String(methodName[methodName.index(after: dotIndex)...])
 			}
 			let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitStructure].self) ?? []
 			let signature = RegistrationToken.restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
-			if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file) {
+			// TODO: Method generic type unwrapping
+			if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: nil, methodCallBodyOffset: offset) {
 				self.tokenList += methodInjection as [DIToken]
 			}
 		}

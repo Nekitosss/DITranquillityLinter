@@ -90,10 +90,15 @@ public protocol Typed {
                 unwrappedTypeName = name
             }
 
-            self.unwrappedTypeName = unwrappedTypeName
             self.isGeneric = (unwrappedTypeName.contains("<") && unwrappedTypeName.last == ">")
                 || unwrappedTypeName.isValidArrayName()
                 || unwrappedTypeName.isValidDictionaryName()
+			
+			if isGeneric {
+				unwrappedTypeName = String(unwrappedTypeName.prefix(upTo: unwrappedTypeName.index(of: "<") ?? unwrappedTypeName.endIndex))
+			}
+			
+			self.unwrappedTypeName = unwrappedTypeName
         }
     }
 

@@ -34,4 +34,16 @@ extension String {
 			return (self as NSString).substring(with: range)
 		}
 	}
+	
+	func droppedDotInit() -> String {
+		return droppedSuffix(".init")
+	}
+	
+	func droppedDotSelf() -> String {
+		return droppedSuffix(".self")
+	}
+	
+	func droppedSuffix(_ suffix: String) -> String {
+		return self.hasSuffix(suffix) ? String(self.dropLast(suffix.count)) : self
+	}
 }

@@ -362,20 +362,22 @@ struct Composer {
 
         var processed = [String: Bool]()
         types.forEach { type in
-            if let type = type as? Class, let supertype = type.inheritedTypes.first.flatMap({ typesByName[$0] }) as? Class {
+			let parentTypeName = type.parentName.flatMap({ $0 + "." }) ?? ""
+			
+            if let type = type as? Class, let supertype = type.inheritedTypes.first.flatMap({ typesByName[parentTypeName + $0] ?? typesByName[$0]  }) as? Class {
                 type.supertype = supertype
             }
             processed[type.name] = true
-            updateTypeRelationship(for: type, typesByName: typesByName, processed: &processed)
+            updateTypeRelationship(for: type, typesByName: typesByName, processed: &processed, parentTypeName: parentTypeName)
         }
     }
 
-    private func updateTypeRelationship(for type: Type, typesByName: [String: Type], processed: inout [String: Bool]) {
+    private func updateTypeRelationship(for type: Type, typesByName: [String: Type], processed: inout [String: Bool], parentTypeName: String) {
         type.based.keys.forEach { name in
-            guard let baseType = typesByName[name] else { return }
+            guard let baseType = typesByName[parentTypeName + name] ?? typesByName[name] else { return }
             if processed[name] != true {
                 processed[name] = true
-                updateTypeRelationship(for: baseType, typesByName: typesByName, processed: &processed)
+				updateTypeRelationship(for: baseType, typesByName: typesByName, processed: &processed, parentTypeName: parentTypeName)
             }
 
             baseType.based.keys.forEach { type.based[$0] = $0 }
