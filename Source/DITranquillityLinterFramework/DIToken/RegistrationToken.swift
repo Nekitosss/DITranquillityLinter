@@ -31,7 +31,7 @@ class RegistrationToken: DIToken {
 	private func extractPlainRegistration(substructureList: [SourceKitStructure], invocationBody: String, collectedInfo: [String: Type], content: NSString, file: File, bodyOffset: Int64) {
 		guard substructureList.isEmpty && !invocationBody.hasSuffix(".self") else { return }
 		let (typeName, fullTypeName, genericType) = self.parseTypeName(name: invocationBody)
-		guard let dotIndex = invocationBody.lastIndex(of: ".") else { return }
+		guard let dotIndex = invocationBody.reversed().index(of: ".")?.base else { return }
 		let signatureText = String(invocationBody[invocationBody.index(after: dotIndex)...])
 		let methodSignature = MethodSignature(name: signatureText, injectableArgumentInfo: [], injectionModificators: [:])
 		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: methodSignature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset) {
@@ -42,7 +42,11 @@ class RegistrationToken: DIToken {
 	
 	private func extractClosureRegistration(substructureList: [SourceKitStructure], collectedInfo: [String: Type], content: NSString, file: File, bodyOffset: Int64) {
 		guard substructureList.count == 1 else { return }
-		let substructure = substructureList[0]
+		var substructure = substructureList[0]
+		guard let closureKind: String = substructure.get(.kind), closureKind == SwiftExpressionKind.closure.rawValue else { return }
+		guard let expressionCallInitSubstructure = (substructure.substructures ?? []).first else { return }
+		substructure = expressionCallInitSubstructure
+		
 		guard let kind: String = substructure.get(.kind),
 			let name: String = substructure.get(.name),
 			kind == SwiftExpressionKind.call.rawValue
@@ -111,7 +115,7 @@ class RegistrationToken: DIToken {
 		return MethodSignature(name: signatureName, injectableArgumentInfo: injectableArguments, injectionModificators: injectionModificators)
 	}
 	
-	private func fillTokenListWithInfo(collectedInfo: [String: Type], content: NSString, file: File) {
+	func fillTokenListWithInfo(collectedInfo: [String: Type], content: NSString, file: File) {
 		let injectionTokens = tokenList.compactMap({ $0 as? InjectionToken })
 		for token in injectionTokens where token.typeName.isEmpty {
 			findArgumentTypeInfo(type: collectedInfo[typeName], token: token)

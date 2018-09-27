@@ -18,48 +18,76 @@ final class ContainerPart {
 	
 	init(substructureList: [SourceKitStructure], file: File, collectedInfo: [String: Type], currentPartName: String?) {
 		let content = file.contents.bridge()
-		var result: [DIToken] = []
 		var tmpTokenList: [DIToken] = []
+		var assignedRegistrations: [String: RegistrationToken] = [:]
+		var otherRegistrations: [DIToken] = []
+		var nextAssignee: String?
+		
 		for substructure in substructureList {
-			ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tmpTokenList, currentPartName: currentPartName)
+			tmpTokenList.removeAll()
+			let assignee = nextAssignee
+			nextAssignee = nil
+			guard let kind: String = substructure.get(.kind) else { continue }
+			switch kind {
+			case SwiftExpressionKind.call.rawValue:
+				let collectedTokens = ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, tokenList: &tmpTokenList, currentPartName: currentPartName)
+				if let registrationToken = collectedTokens.first as? RegistrationToken, collectedTokens.count == 1 {
+					if let assignee = assignee {
+						assignedRegistrations[assignee] = registrationToken
+					} else {
+						otherRegistrations.append(registrationToken)
+					}
+				} else if let name: String = substructure.get(.name), let firstDotIndex = name.firstIndex(of: "."), let registrationToken = assignedRegistrations[String(name[..<firstDotIndex])] {
+					registrationToken.tokenList.append(contentsOf: collectedTokens + tmpTokenList)
+				} else {
+					otherRegistrations.append(contentsOf: collectedTokens)
+				}
+			case SwiftDeclarationKind.varLocal.rawValue:
+				guard let name: String = substructure.get(.name)
+					else { continue }
+				if let registration = assignedRegistrations[name] {
+					otherRegistrations.append(registration)
+				}
+				nextAssignee = name
+			default:
+				break
+			}
 		}
 	
-		self.tokenList = result
+		let assignedRegistrationValues = Array(assignedRegistrations.values)
+		self.tokenList = otherRegistrations + (assignedRegistrationValues as [DIToken])
 	}
 	
-	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: Type], result: inout [DIToken], tokenList: inout [DIToken], currentPartName: String?) {
-		guard let kind: String = loadContainerBodyPart.get(.kind) else { return }
+	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: Type], tokenList: inout [DIToken], currentPartName: String?) -> [DIToken] {
+		var result: [DIToken] = []
 		
-		switch kind {
-		case SwiftExpressionKind.call.rawValue:
-			guard let name: String = loadContainerBodyPart.get(.name),
-				let bodyOffset: Int64 = loadContainerBodyPart.get(.bodyOffset),
-				let bodyLength: Int64 = loadContainerBodyPart.get(.bodyLength)
-				else { return }
-			let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength)!
-			let actualName = extractActualFuncionInvokation(name: name)
-			
-			let substructureList = loadContainerBodyPart.substructures ?? []
-			let argumentStack = argumentInfo(substructures: substructureList, content: content)
-			
-			if let alias = AliasToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
-				tokenList.append(alias)
-			} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, substructureList: substructureList) {
-				tokenList.append(injection)
-			} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
-				tokenList.removeAll()
-				result.append(registration)
-			} else if let appendContainerToken = AppendContainerToken(functionName: actualName, invocationBody: body, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
-				result.append(appendContainerToken)
-			}
-			
-			for substructure in substructureList {
-				processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, result: &result, tokenList: &tokenList, currentPartName: currentPartName)
-			}
-			
-		default:
-			break
+		guard let kind: String = loadContainerBodyPart.get(.kind),
+			let name: String = loadContainerBodyPart.get(.name),
+			let bodyOffset: Int64 = loadContainerBodyPart.get(.bodyOffset),
+			let bodyLength: Int64 = loadContainerBodyPart.get(.bodyLength),
+			kind == SwiftExpressionKind.call.rawValue
+			else { return result }
+		let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength)!
+		let actualName = extractActualFuncionInvokation(name: name)
+		
+		let substructureList = loadContainerBodyPart.substructures ?? []
+		let argumentStack = argumentInfo(substructures: substructureList, content: content)
+		
+		if let alias = AliasToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
+			tokenList.append(alias)
+		} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, substructureList: substructureList) {
+			tokenList.append(injection)
+		} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
+			tokenList.removeAll()
+			result.append(registration)
+		} else if let appendContainerToken = AppendContainerToken(functionName: actualName, invocationBody: body, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
+			result.append(appendContainerToken)
 		}
+		
+		for substructure in substructureList {
+			result += processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, tokenList: &tokenList, currentPartName: currentPartName)
+		}
+		return result
 	}
 	
 	static func argumentInfo(substructures: [SourceKitStructure], content: NSString) -> [ArgumentInfo] {
