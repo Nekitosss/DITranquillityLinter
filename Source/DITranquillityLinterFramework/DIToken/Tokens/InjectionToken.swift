@@ -34,7 +34,7 @@ class InjectionToken: DIToken {
 		
 		var argumentStack = argumentStack
 		if argumentStack.isEmpty {
-			argumentStack = AliasToken.parseArgumentList(body: invocationBody)
+			argumentStack = AliasTokenBuilder.parseArgumentList(body: invocationBody)
 		}
 		
 		for argument in argumentStack {

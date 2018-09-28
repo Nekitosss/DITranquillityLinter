@@ -12,6 +12,10 @@ protocol MyPresenterProtocol {
 	
 }
 
+protocol NotConformingPresenterProtocol {
+	
+}
+
 protocol AnyProtocol {}
 
 extension Float: AnyProtocol {

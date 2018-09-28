@@ -1,26 +1,24 @@
 //
-//  AliasToken.swift
+//  AliasTokenBuilder.swift
 //  DITranquillityLinterFramework
 //
-//  Created by Nikita on 22/08/2018.
-//  Copyright © 2018 Nikita. All rights reserved.
+//  Created by Nikita Patskov on 28/09/2018.
 //
 
 import Foundation
 import SourceKittenFramework
 
-class AliasToken: DIToken {
+final class AliasTokenBuilder {
 	
-	var typeName: String = ""
-	var tag: String = ""
-	let location: Location
-	
-	init?(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File) {
+	static func build(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File) -> AliasToken? {
 		guard functionName == DIKeywords.as.rawValue else { return nil }
+		var typeName = ""
+		var tag = ""
+		let location = Location(file: file, byteOffset: bodyOffset)
 		
 		var argumentStack = argumentStack
 		if argumentStack.isEmpty {
-			argumentStack = AliasToken.parseArgumentList(body: invocationBody)
+			argumentStack = AliasTokenBuilder.parseArgumentList(body: invocationBody)
 		}
 		
 		for argument in argumentStack {
@@ -28,14 +26,14 @@ class AliasToken: DIToken {
 			case "" where argumentStack.count == 1,
 				 "_" where argumentStack.count == 1,
 				 DIKeywords.check.rawValue:
-				self.typeName = argument.value.hasSuffix(".self") ? String(argument.value.dropLast(5)) : argument.value
+				typeName = argument.value.droppedDotSelf()
 			case DIKeywords.tag.rawValue:
-				self.tag = argument.value
+				tag = argument.value
 			default:
 				break
 			}
 		}
-		location = Location(file: file, byteOffset: bodyOffset)
+		return AliasToken(typeName: typeName, tag: tag, location: location)
 	}
 	
 	static func parseArgumentList(body: String) -> [ArgumentInfo] {

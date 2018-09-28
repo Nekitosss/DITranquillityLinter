@@ -34,7 +34,8 @@ public class Tokenizer {
 		let dictionary = composed.reduce(into: [String: Type]()) { $0[$1.name] = $1 }
 		
 		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: dictionary) {
-			print(1)
+			let validator = GraphValidator()
+			validator.validate(containerPart: initContainerStructure, collectedInfo: dictionary)
 		}
 		print("End")
 	}

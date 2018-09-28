@@ -14,7 +14,7 @@ import xcodeproj
 // DIPart, DIFramework
 final class ContainerPart {
 	
-	let tokenList: [DIToken]
+	let tokenInfo: [String: [RegistrationToken]]
 	
 	init(substructureList: [SourceKitStructure], file: File, collectedInfo: [String: Type], currentPartName: String?) {
 		let content = file.contents.bridge()
@@ -48,7 +48,10 @@ final class ContainerPart {
 					// something like:
 					// let r = container.register(_:)  (processed earlier)
 					// r.inject(_:)  (processed in that if block)
-					registrationToken.tokenList.append(contentsOf: collectedTokens + tmpTokenList)
+					let newToken = RegistrationToken(typeName: registrationToken.typeName,
+													 plainTypeName: registrationToken.plainTypeName,
+													 tokenList: registrationToken.tokenList + collectedTokens + tmpTokenList)
+					assignedRegistrations[String(name[..<firstDotIndex])] = newToken
 				} else {
 					// container.append(part:) for example
 					otherRegistrations.append(contentsOf: collectedTokens)
@@ -74,7 +77,30 @@ final class ContainerPart {
 		}
 	
 		let assignedRegistrationValues = Array(assignedRegistrations.values)
-		self.tokenList = otherRegistrations + (assignedRegistrationValues as [DIToken])
+		let tokenList = otherRegistrations + (assignedRegistrationValues as [DIToken])
+		self.tokenInfo = ContainerPart.compose(tokenList: tokenList)
+	}
+	
+	private static func compose(tokenList: [DIToken]) -> [String: [RegistrationToken]] {
+		var registrationTokens: [String: [RegistrationToken]] = [:]
+		for token in tokenList {
+			switch token {
+			case let registration as RegistrationToken:
+				registrationTokens[registration.typeName, default: []].append(registration)
+			case let appendContainer as AppendContainerToken:
+				mergeNamedRegistrations(lhs: &registrationTokens, rhs: appendContainer.containerPart.tokenInfo)
+			default:
+				// Should not be here. All another tokens should be composed in registration and appendContainer tokens
+				break
+			}
+		}
+		return registrationTokens
+	}
+	
+	private static func mergeNamedRegistrations(lhs: inout [String: [RegistrationToken]], rhs: [String: [RegistrationToken]]) {
+		for subInfo in rhs {
+			lhs[subInfo.key, default: []].append(contentsOf: subInfo.value)
+		}
 	}
 	
 	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: Type], tokenList: inout [DIToken], currentPartName: String?) -> [DIToken] {
@@ -92,14 +118,14 @@ final class ContainerPart {
 		let substructureList = loadContainerBodyPart.substructures ?? []
 		let argumentStack = argumentInfo(substructures: substructureList, content: content)
 		
-		if let alias = AliasToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
+		if let alias = AliasTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
 			tokenList.append(alias)
 		} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, substructureList: substructureList) {
 			tokenList.append(injection)
-		} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
+		} else if let registration = RegistrationTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
 			tokenList.removeAll()
 			result.append(registration)
-		} else if let appendContainerToken = AppendContainerToken(functionName: actualName, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
+		} else if let appendContainerToken = AppendContainerTokenBuilder.build(functionName: actualName, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
 			result.append(appendContainerToken)
 		}
 		
