@@ -20,4 +20,7 @@ enum DIKeywords: String {
 	case diFramework = "DIFramework"
 	case diPart = "DIPart"
 	case append = "append"
+	case diContainer = "DIContainer"
+	case initDIContainer = "DIContainer.init"
+	case appDelegate = "AppDelegate"
 }

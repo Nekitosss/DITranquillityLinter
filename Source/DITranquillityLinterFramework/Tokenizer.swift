@@ -33,7 +33,7 @@ public class Tokenizer {
 		let composed = Composer().uniqueTypes(parserResult)
 		let dictionary = composed.reduce(into: [String: Type]()) { $0[$1.name] = $1 }
 		
-		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: dictionary, project: project) {
+		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: dictionary) {
 			print(1)
 		}
 		print("End")
@@ -45,32 +45,6 @@ public class Tokenizer {
 			return (structure, file)
 		} catch {
 			return nil
-		}
-	}
-	
-	func getDIParts(values: SourceKitTuple, result: inout [SwiftType]) {
-		for ss in (values.structure.dictionary.substructures ?? []) {
-			checkDiPart(ss: ss, parentName: "", file: values.file, result: &result)
-		}
-	}
-	
-	func checkDiPart(ss: [String: SourceKitRepresentable], parentName: String, file: File, result: inout [SwiftType]) {
-		var parentName = parentName
-		if let name: String = ss.get(.name),
-			let kindString: String = ss.get(.kind) {
-			
-			if let kind = SwiftType.Kind.init(string: kindString) {
-				let inheritedTypes = (ss.get(.inheritedtypes, of: [SourceKitStructure].self) ?? []).compactMap({ $0.get(.name, of: String.self) })
-				let substructures = ss.substructures ?? []
-				let newName = parentName + (parentName.isEmpty ? "" : ".") + name
-				let swiftType = SwiftType(name: newName, kind: kind, inheritedTypes: inheritedTypes, substructure: substructures, file: file)
-				parentName += newName
-				result.append(swiftType)
-			}
-		}
-		
-		for ss in (ss.substructures ?? []) {
-			checkDiPart(ss: ss, parentName: parentName, file: file, result: &result)
 		}
 	}
 }

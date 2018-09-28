@@ -39,13 +39,16 @@ class InjectionToken: DIToken {
 		
 		for argument in argumentStack {
 			if argument.name == DIKeywords.cycle.rawValue {
+				// injection(cycle: true, ...)
 				cycle = argument.value == "\(true)"
 			} else if argument.name.isEmpty && argument.value.starts(with: RegExp.implicitKeyPath.rawValue) {
+				// injection(\.myPath)
 				name = String(argument.value.dropFirst(2))
-			} else if let dotIndex = argument.value.index(of: "."), argument.name.isEmpty && argument.value.firstMatch("\\\\[^.]") != nil  {
-				// I forgot what it is :(
+			} else if let dotIndex = argument.value.index(of: "."), argument.name.isEmpty && argument.value.firstMatch(RegExp.explicitKeyPath.rawValue) != nil  {
+				// injection(\RegistrationType.myPath)
 				name = String(argument.value[argument.value.index(after: dotIndex)...])
 			} else if let nameFromPattern = argument.value.firstMatch(RegExp.nameFromParameterInjection) {
+				// injection { $0.name = $1 }
 				name = String(nameFromPattern.dropFirst(3))
 			}
 			if let taggedModificators = InjectionToken.parseTaggedInjection(structure: argument.structure, content: file.contents.bridge()) {
@@ -53,10 +56,7 @@ class InjectionToken: DIToken {
 			}
 			if var typeFromPattern = argument.value.firstMatch(.forcedType) {
 				// $0 "as String }"
-				if let bracketIndex = typeFromPattern.index(of: "}") {
-					typeFromPattern.remove(at: bracketIndex)
-				}
-				typeFromPattern = typeFromPattern.trimmingCharacters(in: .whitespacesAndNewlines)
+				typeFromPattern = typeFromPattern.filter({ $0 != "}" }).trimmingCharacters(in: .whitespacesAndNewlines)
 				typeName = typeFromPattern
 				modificators.append(.typed(typeFromPattern))
 			}
@@ -77,7 +77,7 @@ class InjectionToken: DIToken {
 				else { continue }
 			let arguments = ContainerPart.argumentInfo(substructures: argumentsSubstructure, content: content)
 			guard let tagType = arguments.first(where: { $0.name == DIKeywords.tag.rawValue }) else { continue }
-			let tagTypeName = tagType.value.hasSuffix(".self") ? String(tagType.value.dropLast(5)) : tagType.value
+			let tagTypeName = tagType.value.droppedDotSelf()
 			result.append(.tagged(tagTypeName))
 		}
 		return result

@@ -30,22 +30,41 @@ final class ContainerPart {
 			guard let kind: String = substructure.get(.kind) else { continue }
 			switch kind {
 			case SwiftExpressionKind.call.rawValue:
-				let collectedTokens = ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, tokenList: &tmpTokenList, currentPartName: currentPartName)
-				if let registrationToken = collectedTokens.first as? RegistrationToken, collectedTokens.count == 1 {
+				// Get all tokens
+				var collectedTokens = ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, tokenList: &tmpTokenList, currentPartName: currentPartName)
+				
+				if let registrationTokenIndex = collectedTokens.index(where: { $0 is RegistrationToken }) {
+					// get registration token. Should be 0 or 1 count. Remember that container.append(part:).register() is available
+					let registrationToken = collectedTokens.remove(at: registrationTokenIndex) as! RegistrationToken
+					
 					if let assignee = assignee {
 						assignedRegistrations[assignee] = registrationToken
 					} else {
 						otherRegistrations.append(registrationToken)
 					}
+					otherRegistrations.append(contentsOf: collectedTokens)
+					
 				} else if let name: String = substructure.get(.name), let firstDotIndex = name.firstIndex(of: "."), let registrationToken = assignedRegistrations[String(name[..<firstDotIndex])] {
+					// something like:
+					// let r = container.register(_:)  (processed earlier)
+					// r.inject(_:)  (processed in that if block)
 					registrationToken.tokenList.append(contentsOf: collectedTokens + tmpTokenList)
 				} else {
+					// container.append(part:) for example
 					otherRegistrations.append(contentsOf: collectedTokens)
 				}
 			case SwiftDeclarationKind.varLocal.rawValue:
+				// for swift complex source code resolving
+				// let r = container.register(_:)
+				// "r" is assignee name
 				guard let name: String = substructure.get(.name)
 					else { continue }
+				
 				if let registration = assignedRegistrations[name] {
+					// For handling:
+					// var r = container.register(_:)
+					// r.injectSomething...
+					// r = container.register1(_:)
 					otherRegistrations.append(registration)
 				}
 				nextAssignee = name
@@ -80,7 +99,7 @@ final class ContainerPart {
 		} else if let registration = RegistrationToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
 			tokenList.removeAll()
 			result.append(registration)
-		} else if let appendContainerToken = AppendContainerToken(functionName: actualName, invocationBody: body, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
+		} else if let appendContainerToken = AppendContainerToken(functionName: actualName, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
 			result.append(appendContainerToken)
 		}
 		

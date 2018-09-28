@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	var window: UIWindow?
 
-	let container: DIContainer = {
+	static let container: DIContainer = {
 		let container = DIContainer()
 		container.append(part: MainDIPart.self)
 		return container

@@ -16,7 +16,7 @@ class AppendContainerToken: DIToken {
 	let typeName: String
 	let containerPart: ContainerPart
 	
-	init?(functionName: String, invocationBody: String, collectedInfo: [String : Type], argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File, currentPartName: String?) {
+	init?(functionName: String, collectedInfo: [String : Type], argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File, currentPartName: String?) {
 		guard functionName == DIKeywords.append.rawValue else { return nil }
 		guard let appendInfo = argumentStack.first, argumentStack.count == 1 else { return nil }
 		let value = String(appendInfo.value.dropLast(5)) // .self
