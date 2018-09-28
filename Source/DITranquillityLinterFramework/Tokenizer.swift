@@ -17,8 +17,8 @@ public class Tokenizer {
 	
 	public init() {}
 	
-	public func process(files: [URL], project: XcodeProj) {
-		let paths = files.map({ Path.init($0.path) })
+	public func process(files: [URL]) {
+		let paths = files.map({ Path($0.path) })
 		let filesParsers: [FileParser] = paths.compactMap({
 			guard let contents = File(path: $0.string)?.contents else { return nil }
 			return try? FileParser(contents: contents, path: $0, module: nil)
@@ -37,15 +37,6 @@ public class Tokenizer {
 			print(1)
 		}
 		print("End")
-	}
-	
-	private func getStructure(file: File) -> SourceKitTuple? {
-		do {
-			let structure = try Structure(file: file)
-			return (structure, file)
-		} catch {
-			return nil
-		}
 	}
 }
 
