@@ -181,6 +181,17 @@ import SourceKittenFramework
     /// Protocols this type implements
     public var implements = [String: Type]()
 
+	var inheritanceAndImplementations: [String: Type] {
+		var result: [String: Type] = [:]
+		for (_, type) in inherits {
+			result[type.name] = type
+		}
+		for (_, type) in implements {
+			result[type.name] = type
+		}
+		return result
+	}
+	
     /// Contained types
     public var containedTypes: [Type] {
         didSet {

@@ -18,4 +18,17 @@ struct InjectionToken: DIToken {
 	let modificators: [InjectionModificator]
 	let injectionSubstructureList: [SourceKitStructure]
 	let location: Location
+	
+	var registrationAccessor: RegistrationAccessor {
+		var tag: String = ""
+		for modificator in modificators {
+			switch modificator {
+			case .tagged(let aTag):
+				tag = aTag
+			default:
+				break
+			}
+		}
+		return RegistrationAccessor(typeName: typeName, tag: tag)
+	}
 }

@@ -7,37 +7,60 @@
 
 import Foundation
 
-
-class GraphValidator {
+struct GraphError: Error, Equatable {
+	let infoString: String
+	let location: Location
 	
-	@discardableResult
-	func validate(containerPart: ContainerPart, collectedInfo: [String: Type]) -> [String] {
-		var errors: [String] = []
+	var xcodeMessage: String {
+		return [
+			"\(location): ",
+			"error: ",
+			infoString
+			].joined()
+	}
+}
+
+final class GraphValidator {
+	
+	func validate(containerPart: ContainerPart, collectedInfo: [String: Type]) -> [GraphError] {
+		var errors: [GraphError] = []
 		
-		for (registrationName, registrations) in containerPart.tokenInfo {
-			if registrations.count > 1 {
-				errors.append("Too many registrations for type")
-			}
+		for (_, registrations) in containerPart.tokenInfo {
 			for registration in registrations {
-				errors += validate(registration: registration, collectedInfo: collectedInfo)
+				errors += validate(registration: registration, collectedInfo: collectedInfo, containerPart: containerPart)
+				if registrations.count > 1 {
+					let info = "Too many registrations for type: \(registration.typeName)"
+					errors.append(GraphError(infoString: info, location: registration.location))
+				}
 			}
 		}
 		
-		return errors
+		return compose(errorList: errors)
 	}
 	
-	func validate(registration: RegistrationToken, collectedInfo: [String: Type]) -> [String] {
-		var errors: [String] = []
+	
+	private func validate(registration: RegistrationToken, collectedInfo: [String: Type], containerPart: ContainerPart) -> [GraphError] {
+		var errors: [GraphError] = []
 		guard let typeInfo = collectedInfo[registration.plainTypeName] else { return errors }
 		
 		for token in registration.tokenList {
 			switch token {
 			case let alias as AliasToken:
-				if typeInfo.implements[alias.typeName] == nil && typeInfo.inherits[alias.typeName] == nil {
-					errors.append("Does not inherits or conforms to \(alias.typeName)")
+				let inheritanceAndImplementations = typeInfo.inheritanceAndImplementations
+				if alias.typeName != registration.typeName && inheritanceAndImplementations[alias.typeName] == nil && inheritanceAndImplementations[alias.plainTypeName] == nil {
+					let info = "Does not inherits from \(alias.plainTypeName) or not conforms to \(alias.typeName)"
+					errors.append(GraphError(infoString: info, location: alias.location))
 				}
 			case let injection as InjectionToken:
-				break
+				let accessor = injection.registrationAccessor
+				if containerPart.tokenInfo[accessor] == nil {
+					var info = "injection not found registration with type: \(accessor.typeName)"
+					if !accessor.tag.isEmpty {
+						info += ", tag: \(accessor.tag)"
+					}
+					errors.append(GraphError(infoString: info, location: injection.location))
+				}
+				
 			default:
 				break
 			}
@@ -46,6 +69,16 @@ class GraphValidator {
 		return errors
 	}
 	
+
+	private func compose(errorList: [GraphError]) -> [GraphError] {
+		var result: [GraphError] = []
+		for error in errorList {
+			if !result.contains(error) {
+				result.append(error)
+			}
+		}
+		return result
+	}
 	
 	
 }

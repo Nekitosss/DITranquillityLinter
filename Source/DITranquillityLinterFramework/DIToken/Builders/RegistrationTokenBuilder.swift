@@ -23,10 +23,7 @@ final class RegistrationTokenBuilder {
 		if let typedRegistration = invocationBody.firstMatch(RegExp.trailingTypeInfo) {
 			// container.register(MyClass.self)
 			info.typeName = typedRegistration.droppedDotSelf()
-			info.plainTypeName = info.typeName
-			if let genericIndex = info.typeName.firstIndex(of: "<") {
-				info.plainTypeName = String(info.typeName[info.typeName.index(after: genericIndex)...])
-			}
+			info.plainTypeName = extractPlainTypeName(typeName: info.typeName)
 		}
 		if let plainInfo = extractPlainRegistration(substructureList: substructureList, invocationBody: invocationBody, collectedInfo: collectedInfo, file: file, bodyOffset: bodyOffset) {
 			info.typeName = plainInfo.typeName
@@ -44,7 +41,15 @@ final class RegistrationTokenBuilder {
 		info.tokenList.append(aliasToken)
 		
 		info.tokenList = fillTokenListWithInfo(input: info.tokenList, typeName: info.typeName, collectedInfo: collectedInfo, content: content, file: file)
-		return RegistrationToken(typeName: info.typeName, plainTypeName: info.plainTypeName, tokenList: info.tokenList)
+		return RegistrationToken(typeName: info.typeName, plainTypeName: info.plainTypeName, location: location, tokenList: info.tokenList)
+	}
+	
+	static func extractPlainTypeName(typeName: String) -> String {
+		if let genericIndex = typeName.firstIndex(of: "<") {
+			return String(typeName[..<genericIndex])
+		} else {
+			return typeName
+		}
 	}
 	
 	private static func extractPlainRegistration(substructureList: [SourceKitStructure], invocationBody: String, collectedInfo: [String: Type], file: File, bodyOffset: Int64) -> RegistrationInfo? {

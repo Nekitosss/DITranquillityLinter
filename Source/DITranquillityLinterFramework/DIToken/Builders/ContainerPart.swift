@@ -14,7 +14,7 @@ import xcodeproj
 // DIPart, DIFramework
 final class ContainerPart {
 	
-	let tokenInfo: [String: [RegistrationToken]]
+	let tokenInfo: [RegistrationAccessor: [RegistrationToken]]
 	
 	init(substructureList: [SourceKitStructure], file: File, collectedInfo: [String: Type], currentPartName: String?) {
 		let content = file.contents.bridge()
@@ -55,6 +55,7 @@ final class ContainerPart {
 																				   file: file)
 					let newToken = RegistrationToken(typeName: registrationToken.typeName,
 													 plainTypeName: registrationToken.plainTypeName,
+													 location: registrationToken.location,
 													 tokenList: tokenList)
 					assignedRegistrations[String(name[..<firstDotIndex])] = newToken
 				} else {
@@ -86,12 +87,15 @@ final class ContainerPart {
 		self.tokenInfo = ContainerPart.compose(tokenList: tokenList)
 	}
 	
-	private static func compose(tokenList: [DIToken]) -> [String: [RegistrationToken]] {
-		var registrationTokens: [String: [RegistrationToken]] = [:]
+	private static func compose(tokenList: [DIToken]) -> [RegistrationAccessor: [RegistrationToken]] {
+		var registrationTokens: [RegistrationAccessor: [RegistrationToken]] = [:]
 		for token in tokenList {
 			switch token {
 			case let registration as RegistrationToken:
-				registrationTokens[registration.typeName, default: []].append(registration)
+				for token in registration.tokenList {
+					guard let aliasToken = token as? AliasToken else { continue }
+					registrationTokens[aliasToken.getRegistrationAccessor(), default: []].append(registration)
+				}
 			case let appendContainer as AppendContainerToken:
 				mergeNamedRegistrations(lhs: &registrationTokens, rhs: appendContainer.containerPart.tokenInfo)
 			default:
@@ -102,7 +106,7 @@ final class ContainerPart {
 		return registrationTokens
 	}
 	
-	private static func mergeNamedRegistrations(lhs: inout [String: [RegistrationToken]], rhs: [String: [RegistrationToken]]) {
+	private static func mergeNamedRegistrations(lhs: inout [RegistrationAccessor: [RegistrationToken]], rhs: [RegistrationAccessor: [RegistrationToken]]) {
 		for subInfo in rhs {
 			lhs[subInfo.key, default: []].append(contentsOf: subInfo.value)
 		}

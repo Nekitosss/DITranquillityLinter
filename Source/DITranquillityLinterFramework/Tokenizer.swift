@@ -35,7 +35,11 @@ public class Tokenizer {
 		
 		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: dictionary) {
 			let validator = GraphValidator()
-			validator.validate(containerPart: initContainerStructure, collectedInfo: dictionary)
+			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: dictionary)
+			
+			errorList.forEach {
+				print($0.xcodeMessage)
+			}
 		}
 		print("End")
 	}

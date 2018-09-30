@@ -13,5 +13,6 @@ struct RegistrationToken: DIToken {
 	let typeName: String
 	// For generics
 	let plainTypeName: String
+	let location: Location
 	let tokenList: [DIToken]
 }

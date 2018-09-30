@@ -8,18 +8,27 @@
 
 import Foundation
 
-struct AliasToken: DIToken, Hashable {
+struct AliasToken: DIToken {
 	
 	let typeName: String
+	let plainTypeName: String
 	let tag: String
 	let location: Location
 	
-	func hash(into hasher: inout Hasher) {
-		hasher.combine(typeName)
-		hasher.combine(tag)
+	init(typeName: String, tag: String, location: Location) {
+		self.typeName = typeName
+		self.tag = tag
+		self.location = location
+		self.plainTypeName = RegistrationTokenBuilder.extractPlainTypeName(typeName: typeName)
 	}
 	
-	static func ==(lhs: AliasToken, rhs: AliasToken) -> Bool {
-		return lhs.typeName == rhs.typeName && lhs.tag == rhs.tag
+	func getRegistrationAccessor() -> RegistrationAccessor {
+		return RegistrationAccessor(typeName: typeName, tag: tag)
 	}
+	
+}
+
+struct RegistrationAccessor: Hashable {
+	let typeName: String
+	let tag: String
 }
