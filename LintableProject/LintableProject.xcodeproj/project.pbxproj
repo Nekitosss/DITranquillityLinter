@@ -107,6 +107,7 @@
 				117EFFD62142FB210082EA06 /* Resources */,
 				AC407540D2C0685322503B17 /* [CP] Embed Pods Frameworks */,
 				68A158D643F6C2FE867FDC8F /* [CP] Copy Pods Resources */,
+				11666C43216152CA00CD92FD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -164,6 +165,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		11666C43216152CA00CD92FD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Scripts/ditranquillitylint\"\n";
+		};
 		2911A670807116D0AE17E663 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
