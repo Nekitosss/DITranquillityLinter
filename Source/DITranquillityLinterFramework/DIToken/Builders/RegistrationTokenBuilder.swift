@@ -23,6 +23,10 @@ final class RegistrationTokenBuilder {
 		if let typedRegistration = invocationBody.firstMatch(RegExp.trailingTypeInfo) {
 			// container.register(MyClass.self)
 			info.typeName = typedRegistration.droppedDotSelf()
+			info.plainTypeName = info.typeName
+			if let genericIndex = info.typeName.firstIndex(of: "<") {
+				info.plainTypeName = String(info.typeName[info.typeName.index(after: genericIndex)...])
+			}
 		}
 		if let plainInfo = extractPlainRegistration(substructureList: substructureList, invocationBody: invocationBody, collectedInfo: collectedInfo, file: file, bodyOffset: bodyOffset) {
 			info.typeName = plainInfo.typeName
@@ -33,6 +37,12 @@ final class RegistrationTokenBuilder {
 			info.plainTypeName = plainInfo.plainTypeName
 			info.tokenList += plainInfo.tokenList
 		}
+		
+		// Class registration by default available by its own type without tag.
+		let location = Location(file: file, byteOffset: bodyOffset)
+		let aliasToken = AliasToken(typeName: info.typeName, tag: "", location: location)
+		info.tokenList.append(aliasToken)
+		
 		info.tokenList = fillTokenListWithInfo(input: info.tokenList, typeName: info.typeName, collectedInfo: collectedInfo, content: content, file: file)
 		return RegistrationToken(typeName: info.typeName, plainTypeName: info.plainTypeName, tokenList: info.tokenList)
 	}
