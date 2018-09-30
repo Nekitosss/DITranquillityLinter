@@ -69,7 +69,6 @@ final class RegistrationTokenBuilder {
 		let methodName = restoreMethodName(registrationName: name)
 		let signature = restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
 		
-		
 		var tokenList: [DIToken] = []
 		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset) {
 			tokenList = methodInjection as [DIToken]
@@ -118,7 +117,7 @@ final class RegistrationTokenBuilder {
 			if let forcedType = body.firstMatch(RegExp.forcedType)?.trimmingCharacters(in: .whitespacesAndNewlines) {
 				injectionModificators[argumentNumber, default: []].append(InjectionModificator.typed(forcedType))
 			}
-			if let taggedInjection = InjectionToken.parseTaggedInjection(structure: substucture, content: content) {
+			if let taggedInjection = InjectionTokenBuilder.parseTaggedInjection(structure: substucture, content: content) {
 				injectionModificators[argumentNumber, default: []].append(contentsOf: taggedInjection)
 			}
 			
@@ -133,23 +132,24 @@ final class RegistrationTokenBuilder {
 	
 	static func fillTokenListWithInfo(input: [DIToken], typeName: String, collectedInfo: [String: Type], content: NSString, file: File) -> [DIToken] {
 		// Recursively walk through all classes and find injection type
-		var result = input
-		let injectionTokens = result.compactMap({ $0 as? InjectionToken })
-		for token in injectionTokens where token.typeName.isEmpty {
-			findArgumentTypeInfo(type: collectedInfo[typeName], token: token)
-		}
-		for token in injectionTokens where token.typeName.isEmpty {
-			let methodInjectedTokens = findMethodTypeInfo(typeName: typeName, collectedInfo: collectedInfo, content: content, file: file, token: token)
-			result += methodInjectedTokens
-		}
-		result = result.filter {
-			if let injectionToken = $0 as? InjectionToken {
-				// after "findMethodTypeInfo" we not input type info. We write new tokens.
-				// so we need clear old
-				return !injectionToken.typeName.isEmpty
+		var result = [DIToken]()
+		for token in input {
+			if var injectionToken = token as? InjectionToken, injectionToken.typeName.isEmpty {
+				if let (typeName, optionalInjection) = findArgumentTypeInfo(type: collectedInfo[typeName], tokenName: injectionToken.name) {
+					injectionToken.typeName = typeName
+					injectionToken.optionalInjection = optionalInjection
+					result.append(injectionToken)
+				} else {
+					// after "findMethodTypeInfo" we not input type info. We write new tokens.
+					// so we no need append old
+					let methodInjectedTokens = findMethodTypeInfo(typeName: typeName, collectedInfo: collectedInfo, content: content, file: file, token: injectionToken)
+					result += methodInjectedTokens
+				}
+			} else {
+				result.append(token)
 			}
-			return true
 		}
+		
 		return result
 	}
 	
@@ -171,20 +171,17 @@ final class RegistrationTokenBuilder {
 		return []
 	}
 	
-	@discardableResult
-	private static func findArgumentTypeInfo(type: Type?, token: InjectionToken) -> Bool {
-		guard let ownerType = type else { return false }
-		if let variable = ownerType.variables.first(where: { $0.name == token.name }) {
-			token.typeName = variable.unwrappedTypeName
-			token.optionalInjection = variable.isOptional
-			return true
+	private static func findArgumentTypeInfo(type: Type?, tokenName: String) -> (typeName: String, optionalInjection: Bool)? {
+		guard let ownerType = type else { return nil }
+		if let variable = ownerType.variables.first(where: { $0.name == tokenName }) {
+			return (variable.unwrappedTypeName, variable.isOptional)
 		}
 		for parent in ownerType.inherits {
-			if findArgumentTypeInfo(type: parent.value, token: token) {
-				return true
+			if let result = findArgumentTypeInfo(type: parent.value, tokenName: tokenName) {
+				return result
 			}
 		}
-		return false
+		return nil
 	}
 	
 }

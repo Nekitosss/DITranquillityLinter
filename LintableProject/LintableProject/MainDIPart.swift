@@ -14,6 +14,7 @@ final class MainDIPart: DIPart {
 		let r = container.register{ ParentClass.MyPresenter<Float>.init(value: $0, by(tag: ViewController.self, on: $1)) }
 			.as(check: MyPresenterProtocol.self) {$0}
 		r.as(NotConformingPresenterProtocol.self)
+		r.injection(\.ss)
 	}
 	
 }

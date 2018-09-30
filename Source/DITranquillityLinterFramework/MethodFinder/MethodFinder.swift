@@ -56,18 +56,23 @@ class MethodFinder {
 			}
 			
 			let location = Location(file: file, byteOffset: injectableArgInfo.argumentBodyOffset)
-			let injection = InjectionToken(name: parameter.name, typeName: typeName, optionalInjection: parameter.isOptional, methodInjection: true, location: location)
-			if let modificators = methodSignature.injectionModificators[argumentIndex] {
-				injection.modificators.append(contentsOf: modificators)
-				for modificator in modificators {
-					switch modificator {
-					case .typed(let forcedType):
-						injection.typeName = forcedType
-					case .tagged:
-						break
-					case .many:
-						fatalError("Not implemented")
-					}
+			let modificators = methodSignature.injectionModificators[argumentIndex] ?? []
+			var injection = InjectionToken(name: parameter.name,
+										   typeName: typeName,
+										   cycle: false,
+										   optionalInjection: parameter.isOptional,
+										   methodInjection: true,
+										   modificators: modificators,
+										   injectionSubstructureList: [],
+										   location: location)
+			for modificator in injection.modificators {
+				switch modificator {
+				case .typed(let forcedType):
+					injection.typeName = forcedType
+				case .tagged:
+					break
+				case .many:
+					fatalError("Not implemented")
 				}
 			}
 			argumentInfo.append(injection)

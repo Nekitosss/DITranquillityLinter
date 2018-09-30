@@ -48,9 +48,14 @@ final class ContainerPart {
 					// something like:
 					// let r = container.register(_:)  (processed earlier)
 					// r.inject(_:)  (processed in that if block)
+					let tokenList = RegistrationTokenBuilder.fillTokenListWithInfo(input: registrationToken.tokenList + collectedTokens + tmpTokenList,
+																				   typeName: registrationToken.plainTypeName,
+																				   collectedInfo: collectedInfo,
+																				   content: content,
+																				   file: file)
 					let newToken = RegistrationToken(typeName: registrationToken.typeName,
 													 plainTypeName: registrationToken.plainTypeName,
-													 tokenList: registrationToken.tokenList + collectedTokens + tmpTokenList)
+													 tokenList: tokenList)
 					assignedRegistrations[String(name[..<firstDotIndex])] = newToken
 				} else {
 					// container.append(part:) for example
@@ -120,7 +125,7 @@ final class ContainerPart {
 		
 		if let alias = AliasTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
 			tokenList.append(alias)
-		} else if let injection = InjectionToken(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, substructureList: substructureList) {
+		} else if let injection = InjectionTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, substructureList: substructureList) {
 			tokenList.append(injection)
 		} else if let registration = RegistrationTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
 			tokenList.removeAll()
