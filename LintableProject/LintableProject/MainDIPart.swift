@@ -15,6 +15,10 @@ final class MainDIPart: DIPart {
 			.as(check: MyPresenterProtocol.self) {$0}
 		r.as(NotConformingPresenterProtocol.self)
 		r.injection(\.ss)
+		r.default()
+		
+		container.register(ParentClass.MyPresenter<Float>.self)
+			.default()
 	}
 	
 }

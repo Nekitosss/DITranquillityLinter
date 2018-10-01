@@ -10,6 +10,7 @@ enum DIKeywords: String {
 	case register = "register"
 	case register1 = "register1"
 	case injection = "injection"
+	case `default` = "default"
 	case `as` = "as"
 	case check = "check"
 	case tag = "tag"

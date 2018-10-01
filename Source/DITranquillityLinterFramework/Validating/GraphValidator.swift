@@ -28,9 +28,8 @@ final class GraphValidator {
 		for (_, registrations) in containerPart.tokenInfo {
 			for registration in registrations {
 				errors += validate(registration: registration, collectedInfo: collectedInfo, containerPart: containerPart)
-				if registrations.count > 1 {
-					let info = "Too many registrations for type: \(registration.typeName)"
-					errors.append(GraphError(infoString: info, location: registration.location))
+				if let severalRegistrationErr = validateSeveralRegistrationsForType(registrations: registrations, validatingRegistration: registration) {
+					errors.append(severalRegistrationErr)
 				}
 			}
 		}
@@ -38,6 +37,30 @@ final class GraphValidator {
 		return compose(errorList: errors)
 	}
 	
+	private func validateSeveralRegistrationsForType(registrations: [RegistrationToken], validatingRegistration: RegistrationToken) -> GraphError? {
+		guard registrations.count > 1 else { return nil }
+		let defaultCount = registrations.filter({ registration in
+			registration.tokenList.contains(where: { $0 is IsDefaultToken })
+		}).count
+		
+		if defaultCount == 0 {
+			let info = buildTooManyRegistrationsForType(registrationName: validatingRegistration.typeName)
+			return GraphError(infoString: info, location: validatingRegistration.location)
+		} else if defaultCount > 1 {
+			let info = buildHaseMoreThanOneDefaultRegistratioinsForType(registrationName: validatingRegistration.typeName)
+			return GraphError(infoString: info, location: validatingRegistration.location)
+		} else {
+			return nil
+		}
+	}
+	
+	private func buildTooManyRegistrationsForType(registrationName: String) -> String {
+		return "Too many registrations for \(registrationName) type. Make one of registration as default or delete redundant registration."
+	}
+	
+	private func buildHaseMoreThanOneDefaultRegistratioinsForType(registrationName: String) -> String {
+		return "Too many default registrations for \(registrationName) type. Make exact one of registration as default or delete redundant registration."
+	}
 	
 	private func validate(registration: RegistrationToken, collectedInfo: [String: Type], containerPart: ContainerPart) -> [GraphError] {
 		var errors: [GraphError] = []
@@ -48,16 +71,13 @@ final class GraphValidator {
 			case let alias as AliasToken:
 				let inheritanceAndImplementations = typeInfo.inheritanceAndImplementations
 				if alias.typeName != registration.typeName && inheritanceAndImplementations[alias.typeName] == nil && inheritanceAndImplementations[alias.plainTypeName] == nil {
-					let info = "Does not inherits from \(alias.plainTypeName) or not conforms to \(alias.typeName)"
+					let info = buildNotFoundAliasMessage(alias: alias)
 					errors.append(GraphError(infoString: info, location: alias.location))
 				}
 			case let injection as InjectionToken:
 				let accessor = injection.registrationAccessor
 				if containerPart.tokenInfo[accessor] == nil {
-					var info = "injection not found registration with type: \(accessor.typeName)"
-					if !accessor.tag.isEmpty {
-						info += ", tag: \(accessor.tag)"
-					}
+					let info = buildNotFoundRegistrationMessage(injection: injection, accessor: accessor)
 					errors.append(GraphError(infoString: info, location: injection.location))
 				}
 				
@@ -67,6 +87,24 @@ final class GraphValidator {
 		}
 		
 		return errors
+	}
+	
+	private func buildNotFoundAliasMessage(alias: AliasToken) -> String {
+		if alias.plainTypeName != alias.typeName {
+			return "Does not inherits from \(alias.plainTypeName) or not conforms to \(alias.typeName)"
+		} else {
+			return "Does not inherits nor conforms to \(alias.typeName)"
+		}
+	}
+	
+	private func buildNotFoundRegistrationMessage(injection: InjectionToken, accessor: RegistrationAccessor) -> String {
+		let injectionType = injection.methodInjection ? "method" : "variable"
+		var info = "Not found registration with \(accessor.typeName) type"
+		if !accessor.tag.isEmpty {
+			info += ", tag: \(accessor.tag)"
+		}
+		info += " for \"\(injection.name)\" \(injectionType) injection"
+		return info
 	}
 	
 

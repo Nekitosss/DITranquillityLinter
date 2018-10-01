@@ -17,7 +17,7 @@ public class Tokenizer {
 	
 	public init() {}
 	
-	public func process(files: [URL]) {
+	public func process(files: [URL]) -> Bool {
 		let paths = files.map({ Path($0.path) })
 		let filesParsers: [FileParser] = paths.compactMap({
 			guard let contents = File(path: $0.string)?.contents else { return nil }
@@ -40,8 +40,10 @@ public class Tokenizer {
 			errorList.forEach {
 				print($0.xcodeMessage)
 			}
+			return errorList.isEmpty
 		}
-		print("End")
+		
+		return true
 	}
 }
 

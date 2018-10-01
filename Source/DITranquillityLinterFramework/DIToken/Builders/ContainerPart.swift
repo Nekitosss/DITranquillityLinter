@@ -136,6 +136,8 @@ final class ContainerPart {
 			result.append(registration)
 		} else if let appendContainerToken = AppendContainerTokenBuilder.build(functionName: actualName, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
 			result.append(appendContainerToken)
+		} else if let isDefaultToken = IsDefaultTokenBuilder.build(functionName: actualName, invocationBody: body, bodyOffset: bodyOffset, file: file) {
+			tokenList.append(isDefaultToken)
 		}
 		
 		for substructure in substructureList {
