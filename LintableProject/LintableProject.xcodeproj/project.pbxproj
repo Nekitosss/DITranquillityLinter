@@ -38,6 +38,9 @@
 		FD642E68216242250049E0BF /* TestDefaultMakingRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E67216242250049E0BF /* TestDefaultMakingRegistration.swift */; };
 		FD642E6A216242480049E0BF /* TestGenericArgumentVariableInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E69216242480049E0BF /* TestGenericArgumentVariableInjection.swift */; };
 		FD642E6C216242970049E0BF /* TestGenericArgumentMethodInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E6B216242970049E0BF /* TestGenericArgumentMethodInjection.swift */; };
+		FD642F79216345250049E0BF /* TestCycleRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642F78216345250049E0BF /* TestCycleRegistration.swift */; };
+		FD642F7B216345950049E0BF /* TestSeveralRegistrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642F7A216345950049E0BF /* TestSeveralRegistrations.swift */; };
+		FD642F7D216346CE0049E0BF /* TestSeveralDIParts.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642F7C216346CE0049E0BF /* TestSeveralDIParts.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +79,9 @@
 		FD642E67216242250049E0BF /* TestDefaultMakingRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDefaultMakingRegistration.swift; sourceTree = "<group>"; };
 		FD642E69216242480049E0BF /* TestGenericArgumentVariableInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestGenericArgumentVariableInjection.swift; sourceTree = "<group>"; };
 		FD642E6B216242970049E0BF /* TestGenericArgumentMethodInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestGenericArgumentMethodInjection.swift; sourceTree = "<group>"; };
+		FD642F78216345250049E0BF /* TestCycleRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCycleRegistration.swift; sourceTree = "<group>"; };
+		FD642F7A216345950049E0BF /* TestSeveralRegistrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSeveralRegistrations.swift; sourceTree = "<group>"; };
+		FD642F7C216346CE0049E0BF /* TestSeveralDIParts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSeveralDIParts.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +173,9 @@
 				FD642E67216242250049E0BF /* TestDefaultMakingRegistration.swift */,
 				FD642E69216242480049E0BF /* TestGenericArgumentVariableInjection.swift */,
 				FD642E6B216242970049E0BF /* TestGenericArgumentMethodInjection.swift */,
+				FD642F78216345250049E0BF /* TestCycleRegistration.swift */,
+				FD642F7A216345950049E0BF /* TestSeveralRegistrations.swift */,
+				FD642F7C216346CE0049E0BF /* TestSeveralDIParts.swift */,
 			);
 			path = Testable;
 			sourceTree = "<group>";
@@ -316,6 +325,8 @@
 				FD642E64216241CA0049E0BF /* TestMethodInjection.swift in Sources */,
 				FD642E66216242000049E0BF /* TestVariableUsedRegistration.swift in Sources */,
 				FD642E4021623D7E0049E0BF /* TestPlainRegistration.swift in Sources */,
+				FD642F79216345250049E0BF /* TestCycleRegistration.swift in Sources */,
+				FD642F7D216346CE0049E0BF /* TestSeveralDIParts.swift in Sources */,
 				FD642E68216242250049E0BF /* TestDefaultMakingRegistration.swift in Sources */,
 				FD642E5C216240BE0049E0BF /* TestPlainVariableInjection.swift in Sources */,
 				FD642E4621623E670049E0BF /* TestNestedGenericClassRegistration.swift in Sources */,
@@ -330,6 +341,7 @@
 				117EFFF22142FEC30082EA06 /* MyPresenter.swift in Sources */,
 				FD642E4E21623F250049E0BF /* TestExplicitGenericInitRegistration.swift in Sources */,
 				FD642E4821623E930049E0BF /* TestExplicitInitRegistration.swift in Sources */,
+				FD642F7B216345950049E0BF /* TestSeveralRegistrations.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

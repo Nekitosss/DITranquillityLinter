@@ -20,15 +20,18 @@ struct InjectionToken: DIToken {
 	let location: Location
 	
 	var registrationAccessor: RegistrationAccessor {
-		var tag: String = ""
+		return RegistrationAccessor(typeName: typeName, tag: tag)
+	}
+	
+	var tag: String {
 		for modificator in modificators {
 			switch modificator {
-			case .tagged(let aTag):
-				tag = aTag
+			case .tagged(let tag):
+				return tag
 			default:
 				break
 			}
 		}
-		return RegistrationAccessor(typeName: typeName, tag: tag)
+		return ""
 	}
 }

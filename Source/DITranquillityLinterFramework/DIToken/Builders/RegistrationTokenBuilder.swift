@@ -57,7 +57,7 @@ final class RegistrationTokenBuilder {
 		guard substructureList.isEmpty && !invocationBody.hasSuffix(".self") else { return nil }
 		let (typeName, fullTypeName, genericType) = self.parseTypeName(name: invocationBody)
 		guard let dotIndex = invocationBody.reversed().index(of: ".")?.base else { return nil }
-		let signatureText = String(invocationBody[invocationBody.index(after: dotIndex)...])
+		let signatureText = String(invocationBody[dotIndex...])
 		let methodSignature = MethodSignature(name: signatureText, injectableArgumentInfo: [], injectionModificators: [:])
 		
 		var tokenList: [DIToken] = []
@@ -81,7 +81,12 @@ final class RegistrationTokenBuilder {
 			else { return nil }
 		let (typeName, fullTypeName, genericType) = self.parseTypeName(name: name)
 		let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitStructure].self) ?? []
-		let methodName = restoreMethodName(registrationName: name)
+		
+		// Handle MyClass.NestedClass()
+		// NestedClass can be class name, but it also can be expression call. So we check is MyClass.NestedClass available class name
+		// and if if exists, adds ".init" at the end of initialization call
+		let nameWithInitializer = collectedInfo[name] != nil && !name.hasSuffix(".init") ? name + ".init" : name
+		let methodName = restoreMethodName(registrationName: nameWithInitializer)
 		let signature = restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
 		
 		var tokenList: [DIToken] = []
@@ -179,8 +184,9 @@ final class RegistrationTokenBuilder {
 		}
 		let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitStructure].self) ?? []
 		let signature = restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
-		// TODO: Method generic type unwrapping
-		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: nil, methodCallBodyOffset: offset) {
+		
+		let (plainTypeName, _, genericType) = self.parseTypeName(name: typeName)
+		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: plainTypeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: offset) {
 			return methodInjection
 		}
 		return []

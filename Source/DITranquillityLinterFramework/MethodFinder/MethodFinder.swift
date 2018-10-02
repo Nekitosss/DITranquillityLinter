@@ -42,7 +42,7 @@ class MethodFinder {
 			argumentIndex += 1
 			
 			let injectableArgInfo = methodSignature.injectableArgumentInfo.first(where: { $0.argumentCount == argumentIndex }) ?? (0, methodCallBodyOffset)
-			guard injectableArgInfo.argumentCount == 0 || injectableArgInfo.argumentCount == argumentIndex else { continue }
+			guard methodSignature.injectableArgumentInfo.count == 0 || injectableArgInfo.argumentCount == argumentIndex else { continue }
 			
 			var typeName = parameter.unwrappedTypeName
 			if let genericTypeIndex = swiftType.genericTypeParameters.index(where: { $0.typeName.unwrappedTypeName == parameter.unwrappedTypeName }),

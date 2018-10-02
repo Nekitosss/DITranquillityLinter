@@ -24,5 +24,8 @@ let package = Package(
 				"xcodeproj",
 				"PathKit",
 			]),
+		.testTarget(
+			name: "DITranquillityLinterTests",
+			dependencies: ["DITranquillityLinterFramework"]),
     ]
 )

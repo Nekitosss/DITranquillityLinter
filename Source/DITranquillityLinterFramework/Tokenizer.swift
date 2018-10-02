@@ -18,6 +18,21 @@ public class Tokenizer {
 	public init() {}
 	
 	public func process(files: [URL]) -> Bool {
+		let collectedInfo = collectInfo(files: files)
+		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: collectedInfo) {
+			let validator = GraphValidator()
+			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
+			
+			errorList.forEach {
+				print($0.xcodeMessage)
+			}
+			return errorList.isEmpty
+		}
+		
+		return true
+	}
+	
+	func collectInfo(files: [URL]) -> [String: Type] {
 		let paths = files.map({ Path($0.path) })
 		let filesParsers: [FileParser] = paths.compactMap({
 			guard let contents = File(path: $0.string)?.contents else { return nil }
@@ -31,20 +46,9 @@ public class Tokenizer {
 		}
 		
 		let composed = Composer().uniqueTypes(parserResult)
-		let dictionary = composed.reduce(into: [String: Type]()) { $0[$1.name] = $1 }
-		
-		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: dictionary) {
-			let validator = GraphValidator()
-			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: dictionary)
-			
-			errorList.forEach {
-				print($0.xcodeMessage)
-			}
-			return errorList.isEmpty
-		}
-		
-		return true
+		return composed.reduce(into: [String: Type]()) { $0[$1.name] = $1 }
 	}
+	
 }
 
 

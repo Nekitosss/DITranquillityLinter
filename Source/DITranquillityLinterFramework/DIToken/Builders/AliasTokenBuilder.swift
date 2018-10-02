@@ -18,17 +18,17 @@ final class AliasTokenBuilder {
 		
 		var argumentStack = argumentStack
 		if argumentStack.isEmpty {
-			argumentStack = AliasTokenBuilder.parseArgumentList(body: invocationBody)
+			argumentStack = AliasTokenBuilder.parseArgumentList(body: invocationBody, substructureList: [])
 		}
 		
 		for argument in argumentStack {
 			switch argument.name {
-			case "" where argumentStack.count == 1,
-				 "_" where argumentStack.count == 1,
+			case "" where argument.value.hasSuffix(".self"),
+				 "_" where argument.value.hasSuffix(".self"),
 				 DIKeywords.check.rawValue:
 				typeName = argument.value.droppedDotSelf()
 			case DIKeywords.tag.rawValue:
-				tag = argument.value
+				tag = argument.value.droppedDotSelf()
 			default:
 				break
 			}
@@ -36,7 +36,11 @@ final class AliasTokenBuilder {
 		return AliasToken(typeName: typeName, tag: tag, location: location)
 	}
 	
-	static func parseArgumentList(body: String) -> [ArgumentInfo] {
+	static func parseArgumentList(body: String, substructureList: [SourceKitStructure]) -> [ArgumentInfo] {
+		// Variable injection could also be passed here "$0.a = $1".
+		// It parses ok but we may got something with comma on right side of the assignment. Tagged injection, for example.
+		// Last used because of first substructure can be further contiguous registration "c.register(...).injection(We are here)"
+		guard !body.contains("=") else { return [ArgumentInfo(name: "_", value: body, structure: substructureList.last ?? [:])] }
 		return body.split(separator: ",").compactMap({ parseArgument(argument: String($0)) })
 	}
 	

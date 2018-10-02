@@ -23,7 +23,7 @@ private class ParsablePart: DIPart {
 	
 	static func load(container: DIContainer) {
 		container.register(MyClass.self)
-			.as(MyProtocol.self, tag: MyTag.self)
+			.as(check: MyProtocol.self, tag: MyTag.self) {$0}
 	}
 	
 }
