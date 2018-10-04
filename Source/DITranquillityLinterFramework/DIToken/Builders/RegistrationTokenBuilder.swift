@@ -155,7 +155,7 @@ final class RegistrationTokenBuilder {
 		var result = [DIToken]()
 		for token in input {
 			if var injectionToken = token as? InjectionToken, injectionToken.typeName.isEmpty {
-				if let (typeName, optionalInjection) = findArgumentTypeInfo(type: collectedInfo[typeName], tokenName: injectionToken.name) {
+				if let (typeName, optionalInjection) = findArgumentTypeInfo(typeName: typeName, tokenName: injectionToken.name, collectedInfo: collectedInfo) {
 					injectionToken.typeName = typeName
 					injectionToken.optionalInjection = optionalInjection
 					result.append(injectionToken)
@@ -192,13 +192,24 @@ final class RegistrationTokenBuilder {
 		return []
 	}
 	
-	private static func findArgumentTypeInfo(type: Type?, tokenName: String) -> (typeName: String, optionalInjection: Bool)? {
-		guard let ownerType = type else { return nil }
+	private static func findArgumentTypeInfo(typeName: String, tokenName: String, collectedInfo: [String: Type]) -> (typeName: String, optionalInjection: Bool)? {
+		let (plainTypeName, _, genericType) = self.parseTypeName(name: typeName)
+		guard let ownerType = collectedInfo[plainTypeName] else { return nil }
 		if let variable = ownerType.variables.first(where: { $0.name == tokenName }) {
-			return (variable.unwrappedTypeName, variable.isOptional)
+			var unwrappedTypeName = variable.unwrappedTypeName
+			if let genericTypeIndex = ownerType.genericTypeParameters.index(where: { $0.typeName.unwrappedTypeName == variable.unwrappedTypeName }),
+				let resolvedGenericType = genericType {
+				if ownerType.genericTypeParameters.count == resolvedGenericType.typeParameters.count {
+					let actualType = resolvedGenericType.typeParameters[genericTypeIndex]
+					unwrappedTypeName = actualType.typeName.unwrappedTypeName
+				} else {
+					// TODO: Throw error. Different generic argument counts not supported (Generic inheritance)
+				}
+			}
+			return (unwrappedTypeName, variable.isOptional)
 		}
 		for parent in ownerType.inherits {
-			if let result = findArgumentTypeInfo(type: parent.value, tokenName: tokenName) {
+			if let result = findArgumentTypeInfo(typeName: parent.value.globalName, tokenName: tokenName, collectedInfo: collectedInfo) {
 				return result
 			}
 		}

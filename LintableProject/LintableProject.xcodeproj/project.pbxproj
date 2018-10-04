@@ -41,6 +41,14 @@
 		FD642F79216345250049E0BF /* TestCycleRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642F78216345250049E0BF /* TestCycleRegistration.swift */; };
 		FD642F7B216345950049E0BF /* TestSeveralRegistrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642F7A216345950049E0BF /* TestSeveralRegistrations.swift */; };
 		FD642F7D216346CE0049E0BF /* TestSeveralDIParts.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642F7C216346CE0049E0BF /* TestSeveralDIParts.swift */; };
+		FD6E0BE421663693007AA232 /* TestExplicitClosureGenericInitializerInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BE321663693007AA232 /* TestExplicitClosureGenericInitializerInjection.swift */; };
+		FD6E0BE621663759007AA232 /* TestImplicitClosureGenericInitializerInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BE521663759007AA232 /* TestImplicitClosureGenericInitializerInjection.swift */; };
+		FD6E0BE82166378A007AA232 /* TestImplicitPlainGenericInitializerInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BE72166378A007AA232 /* TestImplicitPlainGenericInitializerInjection.swift */; };
+		FD6E0BEA21663899007AA232 /* TestTaggedInitializerInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BE921663899007AA232 /* TestTaggedInitializerInjection.swift */; };
+		FD6E0BEC21663965007AA232 /* TestTypedInitializerInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BEB21663965007AA232 /* TestTypedInitializerInjection.swift */; };
+		FD6E0BEE21663E8C007AA232 /* TestInheritedInitializerInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BED21663E8C007AA232 /* TestInheritedInitializerInjection.swift */; };
+		FD6E0BF021663F05007AA232 /* TestInheritedVariableInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BEF21663F05007AA232 /* TestInheritedVariableInjection.swift */; };
+		FD6E0BF221663F70007AA232 /* TestInheritedMethodInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BF121663F70007AA232 /* TestInheritedMethodInjection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +90,14 @@
 		FD642F78216345250049E0BF /* TestCycleRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCycleRegistration.swift; sourceTree = "<group>"; };
 		FD642F7A216345950049E0BF /* TestSeveralRegistrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSeveralRegistrations.swift; sourceTree = "<group>"; };
 		FD642F7C216346CE0049E0BF /* TestSeveralDIParts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSeveralDIParts.swift; sourceTree = "<group>"; };
+		FD6E0BE321663693007AA232 /* TestExplicitClosureGenericInitializerInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestExplicitClosureGenericInitializerInjection.swift; sourceTree = "<group>"; };
+		FD6E0BE521663759007AA232 /* TestImplicitClosureGenericInitializerInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestImplicitClosureGenericInitializerInjection.swift; sourceTree = "<group>"; };
+		FD6E0BE72166378A007AA232 /* TestImplicitPlainGenericInitializerInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestImplicitPlainGenericInitializerInjection.swift; sourceTree = "<group>"; };
+		FD6E0BE921663899007AA232 /* TestTaggedInitializerInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTaggedInitializerInjection.swift; sourceTree = "<group>"; };
+		FD6E0BEB21663965007AA232 /* TestTypedInitializerInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypedInitializerInjection.swift; sourceTree = "<group>"; };
+		FD6E0BED21663E8C007AA232 /* TestInheritedInitializerInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInheritedInitializerInjection.swift; sourceTree = "<group>"; };
+		FD6E0BEF21663F05007AA232 /* TestInheritedVariableInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInheritedVariableInjection.swift; sourceTree = "<group>"; };
+		FD6E0BF121663F70007AA232 /* TestInheritedMethodInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInheritedMethodInjection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,6 +192,14 @@
 				FD642F78216345250049E0BF /* TestCycleRegistration.swift */,
 				FD642F7A216345950049E0BF /* TestSeveralRegistrations.swift */,
 				FD642F7C216346CE0049E0BF /* TestSeveralDIParts.swift */,
+				FD6E0BE321663693007AA232 /* TestExplicitClosureGenericInitializerInjection.swift */,
+				FD6E0BE521663759007AA232 /* TestImplicitClosureGenericInitializerInjection.swift */,
+				FD6E0BE72166378A007AA232 /* TestImplicitPlainGenericInitializerInjection.swift */,
+				FD6E0BE921663899007AA232 /* TestTaggedInitializerInjection.swift */,
+				FD6E0BEB21663965007AA232 /* TestTypedInitializerInjection.swift */,
+				FD6E0BED21663E8C007AA232 /* TestInheritedInitializerInjection.swift */,
+				FD6E0BEF21663F05007AA232 /* TestInheritedVariableInjection.swift */,
+				FD6E0BF121663F70007AA232 /* TestInheritedMethodInjection.swift */,
 			);
 			path = Testable;
 			sourceTree = "<group>";
@@ -319,9 +343,13 @@
 				FD642E4421623E320049E0BF /* TestNestedClassPlainRegistration.swift in Sources */,
 				FD642E5221623FA70049E0BF /* TestNotAllVariablesInjectionInMethod.swift in Sources */,
 				FD642E60216241450049E0BF /* TestTypedAndTaggedVariableInjection.swift in Sources */,
+				FD6E0BEC21663965007AA232 /* TestTypedInitializerInjection.swift in Sources */,
 				FD642E58216240720049E0BF /* TestExplicitKeyPathInjection.swift in Sources */,
 				FD642E4A21623EC30049E0BF /* TestImplicitInitRegistration.swift in Sources */,
+				FD6E0BE421663693007AA232 /* TestExplicitClosureGenericInitializerInjection.swift in Sources */,
 				FD642E56216240350049E0BF /* TestTaggedAliasing.swift in Sources */,
+				FD6E0BE621663759007AA232 /* TestImplicitClosureGenericInitializerInjection.swift in Sources */,
+				FD6E0BEA21663899007AA232 /* TestTaggedInitializerInjection.swift in Sources */,
 				FD642E64216241CA0049E0BF /* TestMethodInjection.swift in Sources */,
 				FD642E66216242000049E0BF /* TestVariableUsedRegistration.swift in Sources */,
 				FD642E4021623D7E0049E0BF /* TestPlainRegistration.swift in Sources */,
@@ -333,12 +361,16 @@
 				FD642E5421623FF20049E0BF /* TestPlainAliasing.swift in Sources */,
 				FD642E4221623DEE0049E0BF /* TestPlainGenericRegistration.swift in Sources */,
 				FD642E5A2162409B0049E0BF /* TestImplicitKeyPathInjection.swift in Sources */,
+				FD6E0BF221663F70007AA232 /* TestInheritedMethodInjection.swift in Sources */,
 				FD642E6C216242970049E0BF /* TestGenericArgumentMethodInjection.swift in Sources */,
 				117EFFDC2142FB210082EA06 /* AppDelegate.swift in Sources */,
+				FD6E0BF021663F05007AA232 /* TestInheritedVariableInjection.swift in Sources */,
 				FD642E6A216242480049E0BF /* TestGenericArgumentVariableInjection.swift in Sources */,
 				FD642E5E216240D80049E0BF /* TestTypedVariableInjection.swift in Sources */,
+				FD6E0BEE21663E8C007AA232 /* TestInheritedInitializerInjection.swift in Sources */,
 				FD642E62216241840049E0BF /* TestTaggedModificatorKeyPathInjection.swift in Sources */,
 				117EFFF22142FEC30082EA06 /* MyPresenter.swift in Sources */,
+				FD6E0BE82166378A007AA232 /* TestImplicitPlainGenericInitializerInjection.swift in Sources */,
 				FD642E4E21623F250049E0BF /* TestExplicitGenericInitRegistration.swift in Sources */,
 				FD642E4821623E930049E0BF /* TestExplicitInitRegistration.swift in Sources */,
 				FD642F7B216345950049E0BF /* TestSeveralRegistrations.swift in Sources */,

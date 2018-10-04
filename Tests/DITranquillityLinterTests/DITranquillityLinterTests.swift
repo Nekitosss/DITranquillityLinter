@@ -249,6 +249,81 @@ final class DITranquillityLinterTests: XCTestCase {
 		XCTAssertEqual(nameSet.count, 3, "We should have 3 different registrations")
 	}
 	
+	// .register1{ MyClass<String>.init(ss: $0) }
+	func testExplicitClosureGenericInitializerInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestExplicitClosureGenericInitializerInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(registration.typeName, "MyClass<String>")
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "String")
+	}
+	
+	// .register1{ MyClass<String>(ss: $0) }
+	func testImplicitClosureGenericInitializerInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestImplicitClosureGenericInitializerInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(registration.typeName, "MyClass<String>")
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "String")
+	}
+	
+	// .register1(MyClass<String>.init)
+	func testImplicitPlainGenericInitializerInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestImplicitPlainGenericInitializerInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(registration.typeName, "MyClass<String>")
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "String")
+	}
+	
+	// .register1 { MyClass<String>.init(ss: by(tag: MyTag.self, on: $0)) }
+	func testTaggedInitializerInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestTaggedInitializerInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.tag, "MyTag")
+		XCTAssertEqual(injection.typeName, "String")
+	}
+	
+	// .register1 { MyClass(ss: $0 as MyAnotherClass) }
+	func testTypedInitializerInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestTypedInitializerInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.typeName, "MyAnotherClass")
+		XCTAssertEqual(registration.typeName, "MyClass")
+	}
+	
+	// .register1 { MyChild(ss: $0) } where .init(ss:) contains in MyParent
+	func testInheritedInitializerInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestInheritedInitializerInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(registration.typeName, "MyChild")
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "MyProtocol")
+	}
+	
+	// .injection { $0.ss = $1 } where ss contains in MyParent
+	func testInheritedVariableInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestInheritedVariableInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "String")
+	}
+	
+	func testInheritedMethodInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestInheritedMethodInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertTrue(injection.methodInjection)
+		XCTAssertEqual(injection.typeName, "String")
+	}
 	
 	
 	// Helpers
