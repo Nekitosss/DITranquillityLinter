@@ -69,11 +69,13 @@ final class GraphValidator {
 		for token in registration.tokenList {
 			switch token {
 			case let alias as AliasToken:
+				guard alias.typeName != registration.typeName else { continue }
 				let inheritanceAndImplementations = typeInfo.inheritanceAndImplementations
-				if alias.typeName != registration.typeName && inheritanceAndImplementations[alias.typeName] == nil && inheritanceAndImplementations[alias.plainTypeName] == nil {
+				for aliasType in alias.decomposedTypes where inheritanceAndImplementations[aliasType] == nil {
 					let info = buildNotFoundAliasMessage(alias: alias)
 					errors.append(GraphError(infoString: info, location: alias.location))
 				}
+				
 			case let injection as InjectionToken:
 				let accessor = injection.getRegistrationAccessor()
 				if containerPart.tokenInfo[accessor] == nil {

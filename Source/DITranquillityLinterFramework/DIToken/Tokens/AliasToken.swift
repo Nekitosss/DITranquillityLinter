@@ -15,6 +15,16 @@ struct AliasToken: DIToken {
 	let tag: String
 	let location: Location
 	
+	var decomposedTypes: [String] {
+		if plainTypeName.contains("&") {
+			return plainTypeName
+				.split(separator: "&")
+				.map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) })
+		} else {
+			return [plainTypeName]
+		}
+	}
+	
 	init(typeName: String, tag: String, location: Location) {
 		self.typeName = typeName
 		self.tag = tag
