@@ -75,7 +75,7 @@ final class GraphValidator {
 					errors.append(GraphError(infoString: info, location: alias.location))
 				}
 			case let injection as InjectionToken:
-				let accessor = injection.registrationAccessor
+				let accessor = injection.getRegistrationAccessor()
 				if containerPart.tokenInfo[accessor] == nil {
 					let info = buildNotFoundRegistrationMessage(injection: injection, accessor: accessor)
 					errors.append(GraphError(infoString: info, location: injection.location))

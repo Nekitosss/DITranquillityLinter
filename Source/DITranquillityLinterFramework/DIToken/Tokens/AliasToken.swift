@@ -31,4 +31,20 @@ struct AliasToken: DIToken {
 struct RegistrationAccessor: Hashable {
 	let typeName: String
 	let tag: String
+	
+	init(typeName: String, tag: String) {
+		var justifiedTypeName: String
+		if typeName.contains("&") {
+			justifiedTypeName = typeName
+				.split(separator: "&")
+				.map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) })
+				.sorted()
+				.joined(separator: " & ")
+		} else {
+			justifiedTypeName = typeName
+		}
+		
+		self.typeName = justifiedTypeName
+		self.tag = tag
+	}
 }

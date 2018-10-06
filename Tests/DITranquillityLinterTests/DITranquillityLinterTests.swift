@@ -393,6 +393,8 @@ final class DITranquillityLinterTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "MyProtocol & MyProtocol2")
 	}
 	
+	
+	
 	// Helpers
 	private func extractAliasInfo(registrationToken: RegistrationToken, maximumAliasCount: Int = 1) throws -> AliasToken {
 		// Aliases +1 by default cause of implicitly alias to self-registration class name. So we filter that

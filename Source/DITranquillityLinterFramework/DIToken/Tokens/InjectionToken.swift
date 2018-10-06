@@ -19,7 +19,7 @@ struct InjectionToken: DIToken {
 	let injectionSubstructureList: [SourceKitStructure]
 	let location: Location
 	
-	var registrationAccessor: RegistrationAccessor {
+	func getRegistrationAccessor() -> RegistrationAccessor {
 		return RegistrationAccessor(typeName: typeName, tag: tag)
 	}
 	
