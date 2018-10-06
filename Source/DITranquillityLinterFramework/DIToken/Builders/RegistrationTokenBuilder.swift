@@ -34,6 +34,7 @@ final class RegistrationTokenBuilder {
 			info.plainTypeName = plainInfo.plainTypeName
 			info.tokenList += plainInfo.tokenList
 		}
+		info.typeName = collectedInfo[info.typeName]?.name ?? info.typeName
 		
 		// Class registration by default available by its own type without tag.
 		let location = Location(file: file, byteOffset: bodyOffset)
@@ -41,7 +42,6 @@ final class RegistrationTokenBuilder {
 		info.tokenList.append(aliasToken)
 		
 		info.tokenList = fillTokenListWithInfo(input: info.tokenList, typeName: info.typeName, collectedInfo: collectedInfo, content: content, file: file)
-		info.typeName = collectedInfo[info.typeName]?.name ?? info.typeName
 		return RegistrationToken(typeName: info.typeName, plainTypeName: info.plainTypeName, location: location, tokenList: info.tokenList)
 	}
 	
