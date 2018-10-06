@@ -8,6 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		112BF5B6214AD4D400299AD1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112BF5B5214AD4D300299AD1 /* ViewController.swift */; };
+		112D67A6216927B700A9E6DF /* TestProtocolCompositionAliasing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67A5216927B700A9E6DF /* TestProtocolCompositionAliasing.swift */; };
+		112D67A82169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67A72169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift */; };
+		112D67AC21694EF200A9E6DF /* TestTypealiasedRegistrationAliasing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67AB21694EF200A9E6DF /* TestTypealiasedRegistrationAliasing.swift */; };
+		112D67AE2169501A00A9E6DF /* TestTypealiasedClassRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67AD2169501A00A9E6DF /* TestTypealiasedClassRegistration.swift */; };
+		112D67B02169510C00A9E6DF /* TestTypealiasedVariableInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67AF2169510C00A9E6DF /* TestTypealiasedVariableInjection.swift */; };
+		112D67B22169543A00A9E6DF /* TestTypealiasedMethodInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67B12169543A00A9E6DF /* TestTypealiasedMethodInjection.swift */; };
+		112D67B4216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67B3216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift */; };
+		112D67B62169554500A9E6DF /* TestTypealiasedCompositionedVariableInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67B52169554500A9E6DF /* TestTypealiasedCompositionedVariableInjection.swift */; };
 		117EFFDC2142FB210082EA06 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117EFFDB2142FB210082EA06 /* AppDelegate.swift */; };
 		117EFFE12142FB210082EA06 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 117EFFDF2142FB210082EA06 /* Main.storyboard */; };
 		117EFFE32142FB230082EA06 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 117EFFE22142FB230082EA06 /* Assets.xcassets */; };
@@ -53,6 +61,14 @@
 
 /* Begin PBXFileReference section */
 		112BF5B5214AD4D300299AD1 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		112D67A5216927B700A9E6DF /* TestProtocolCompositionAliasing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestProtocolCompositionAliasing.swift; sourceTree = "<group>"; };
+		112D67A72169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWrappedProtocolCompositionAliasing.swift; sourceTree = "<group>"; };
+		112D67AB21694EF200A9E6DF /* TestTypealiasedRegistrationAliasing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedRegistrationAliasing.swift; sourceTree = "<group>"; };
+		112D67AD2169501A00A9E6DF /* TestTypealiasedClassRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedClassRegistration.swift; sourceTree = "<group>"; };
+		112D67AF2169510C00A9E6DF /* TestTypealiasedVariableInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedVariableInjection.swift; sourceTree = "<group>"; };
+		112D67B12169543A00A9E6DF /* TestTypealiasedMethodInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedMethodInjection.swift; sourceTree = "<group>"; };
+		112D67B3216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedCompositionedMethodInjection.swift; sourceTree = "<group>"; };
+		112D67B52169554500A9E6DF /* TestTypealiasedCompositionedVariableInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedCompositionedVariableInjection.swift; sourceTree = "<group>"; };
 		117EFFD82142FB210082EA06 /* LintableProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LintableProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		117EFFDB2142FB210082EA06 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		117EFFE02142FB210082EA06 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -200,6 +216,14 @@
 				FD6E0BED21663E8C007AA232 /* TestInheritedInitializerInjection.swift */,
 				FD6E0BEF21663F05007AA232 /* TestInheritedVariableInjection.swift */,
 				FD6E0BF121663F70007AA232 /* TestInheritedMethodInjection.swift */,
+				112D67A5216927B700A9E6DF /* TestProtocolCompositionAliasing.swift */,
+				112D67A72169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift */,
+				112D67AB21694EF200A9E6DF /* TestTypealiasedRegistrationAliasing.swift */,
+				112D67AD2169501A00A9E6DF /* TestTypealiasedClassRegistration.swift */,
+				112D67AF2169510C00A9E6DF /* TestTypealiasedVariableInjection.swift */,
+				112D67B12169543A00A9E6DF /* TestTypealiasedMethodInjection.swift */,
+				112D67B3216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift */,
+				112D67B52169554500A9E6DF /* TestTypealiasedCompositionedVariableInjection.swift */,
 			);
 			path = Testable;
 			sourceTree = "<group>";
@@ -344,6 +368,7 @@
 				FD642E5221623FA70049E0BF /* TestNotAllVariablesInjectionInMethod.swift in Sources */,
 				FD642E60216241450049E0BF /* TestTypedAndTaggedVariableInjection.swift in Sources */,
 				FD6E0BEC21663965007AA232 /* TestTypedInitializerInjection.swift in Sources */,
+				112D67A82169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift in Sources */,
 				FD642E58216240720049E0BF /* TestExplicitKeyPathInjection.swift in Sources */,
 				FD642E4A21623EC30049E0BF /* TestImplicitInitRegistration.swift in Sources */,
 				FD6E0BE421663693007AA232 /* TestExplicitClosureGenericInitializerInjection.swift in Sources */,
@@ -353,19 +378,25 @@
 				FD642E64216241CA0049E0BF /* TestMethodInjection.swift in Sources */,
 				FD642E66216242000049E0BF /* TestVariableUsedRegistration.swift in Sources */,
 				FD642E4021623D7E0049E0BF /* TestPlainRegistration.swift in Sources */,
+				112D67B22169543A00A9E6DF /* TestTypealiasedMethodInjection.swift in Sources */,
 				FD642F79216345250049E0BF /* TestCycleRegistration.swift in Sources */,
 				FD642F7D216346CE0049E0BF /* TestSeveralDIParts.swift in Sources */,
 				FD642E68216242250049E0BF /* TestDefaultMakingRegistration.swift in Sources */,
+				112D67A6216927B700A9E6DF /* TestProtocolCompositionAliasing.swift in Sources */,
 				FD642E5C216240BE0049E0BF /* TestPlainVariableInjection.swift in Sources */,
 				FD642E4621623E670049E0BF /* TestNestedGenericClassRegistration.swift in Sources */,
+				112D67B62169554500A9E6DF /* TestTypealiasedCompositionedVariableInjection.swift in Sources */,
 				FD642E5421623FF20049E0BF /* TestPlainAliasing.swift in Sources */,
 				FD642E4221623DEE0049E0BF /* TestPlainGenericRegistration.swift in Sources */,
 				FD642E5A2162409B0049E0BF /* TestImplicitKeyPathInjection.swift in Sources */,
+				112D67AC21694EF200A9E6DF /* TestTypealiasedRegistrationAliasing.swift in Sources */,
 				FD6E0BF221663F70007AA232 /* TestInheritedMethodInjection.swift in Sources */,
 				FD642E6C216242970049E0BF /* TestGenericArgumentMethodInjection.swift in Sources */,
 				117EFFDC2142FB210082EA06 /* AppDelegate.swift in Sources */,
 				FD6E0BF021663F05007AA232 /* TestInheritedVariableInjection.swift in Sources */,
 				FD642E6A216242480049E0BF /* TestGenericArgumentVariableInjection.swift in Sources */,
+				112D67AE2169501A00A9E6DF /* TestTypealiasedClassRegistration.swift in Sources */,
+				112D67B4216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift in Sources */,
 				FD642E5E216240D80049E0BF /* TestTypedVariableInjection.swift in Sources */,
 				FD6E0BEE21663E8C007AA232 /* TestInheritedInitializerInjection.swift in Sources */,
 				FD642E62216241840049E0BF /* TestTaggedModificatorKeyPathInjection.swift in Sources */,
@@ -374,6 +405,7 @@
 				FD642E4E21623F250049E0BF /* TestExplicitGenericInitRegistration.swift in Sources */,
 				FD642E4821623E930049E0BF /* TestExplicitInitRegistration.swift in Sources */,
 				FD642F7B216345950049E0BF /* TestSeveralRegistrations.swift in Sources */,
+				112D67B02169510C00A9E6DF /* TestTypealiasedVariableInjection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

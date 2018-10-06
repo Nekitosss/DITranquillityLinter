@@ -62,45 +62,53 @@ public protocol Typed {
                 .trimmingCharacters(in: .whitespacesAndNewlines)
         }
 
-        if name.isEmpty {
-            self.unwrappedTypeName = "Void"
-            self.isImplicitlyUnwrappedOptional = false
-            self.isOptional = false
-            self.isGeneric = false
-        } else {
-            name = name.bracketsBalancing()
-            name = name.trimmingPrefix("inout ").trimmingCharacters(in: .whitespacesAndNewlines)
-            let isImplicitlyUnwrappedOptional = name.hasSuffix("!") || name.hasPrefix("ImplicitlyUnwrappedOptional<")
-            let isOptional = name.hasSuffix("?") || name.hasPrefix("Optional<") || isImplicitlyUnwrappedOptional
-            self.isImplicitlyUnwrappedOptional = isImplicitlyUnwrappedOptional
-            self.isOptional = isOptional
-
-            var unwrappedTypeName: String
-
-            if isOptional {
-                if name.hasSuffix("?") || name.hasSuffix("!") {
-                    unwrappedTypeName = String(name.dropLast())
-                } else if name.hasPrefix("Optional<") {
-                    unwrappedTypeName = name.drop(first: "Optional<".count, last: 1)
-                } else {
-                    unwrappedTypeName = name.drop(first: "ImplicitlyUnwrappedOptional<".count, last: 1)
-                }
-                unwrappedTypeName = unwrappedTypeName.bracketsBalancing()
-            } else {
-                unwrappedTypeName = name
-            }
-
-            self.isGeneric = (unwrappedTypeName.contains("<") && unwrappedTypeName.last == ">")
-                || unwrappedTypeName.isValidArrayName()
-                || unwrappedTypeName.isValidDictionaryName()
+		(self.unwrappedTypeName, self.isImplicitlyUnwrappedOptional, self.isOptional, self.isGeneric) = TypeName.unwrapTypeName(name: name)
+    }
+	
+	static func onlyUnwrappedName(name: String) -> String {
+		return unwrapTypeName(name: name).unwrappedTypeName
+	}
+	
+	static func unwrapTypeName(name: String) -> (unwrappedTypeName: String, isImplicitlyUnwrappedOptional: Bool, isOptional: Bool, isGeneric: Bool) {
+		var name = name
+		var unwrappedTypeName: String
+		var isImplicitlyUnwrappedOptional: Bool
+		var isOptional: Bool
+		var isGeneric: Bool
+		if name.isEmpty {
+			unwrappedTypeName = "Void"
+			isImplicitlyUnwrappedOptional = false
+			isOptional = false
+			isGeneric = false
+		} else {
+			name = name.bracketsBalancing()
+			name = name.trimmingPrefix("inout ").trimmingCharacters(in: .whitespacesAndNewlines)
+			isImplicitlyUnwrappedOptional = name.hasSuffix("!") || name.hasPrefix("ImplicitlyUnwrappedOptional<")
+			isOptional = name.hasSuffix("?") || name.hasPrefix("Optional<") || isImplicitlyUnwrappedOptional
+			
+			if isOptional {
+				if name.hasSuffix("?") || name.hasSuffix("!") {
+					unwrappedTypeName = String(name.dropLast())
+				} else if name.hasPrefix("Optional<") {
+					unwrappedTypeName = name.drop(first: "Optional<".count, last: 1)
+				} else {
+					unwrappedTypeName = name.drop(first: "ImplicitlyUnwrappedOptional<".count, last: 1)
+				}
+				unwrappedTypeName = unwrappedTypeName.bracketsBalancing()
+			} else {
+				unwrappedTypeName = name
+			}
+			
+			isGeneric = (unwrappedTypeName.contains("<") && unwrappedTypeName.last == ">")
+				|| unwrappedTypeName.isValidArrayName()
+				|| unwrappedTypeName.isValidDictionaryName()
 			
 			if isGeneric {
 				unwrappedTypeName = String(unwrappedTypeName.prefix(upTo: unwrappedTypeName.index(of: "<") ?? unwrappedTypeName.endIndex))
 			}
-			
-			self.unwrappedTypeName = unwrappedTypeName
-        }
-    }
+		}
+		return (unwrappedTypeName, isImplicitlyUnwrappedOptional, isOptional, isGeneric)
+	}
 
     /// Type name used in declaration
     public let name: String

@@ -15,9 +15,9 @@ class MethodFinder {
 		let isPlainSignature = !methodSignature.name.contains("(")
 		
 		let extractInfoBlock: (Method) -> [InjectionToken]? = {
-			return extractArgumentInfo(swiftType: swiftType, methodSignature: methodSignature, parameters: $0.parameters, file: file, methodCallBodyOffset: methodCallBodyOffset, genericType: genericType)
+			return extractArgumentInfo(swiftType: swiftType, methodSignature: methodSignature, parameters: $0.parameters, file: file, methodCallBodyOffset: methodCallBodyOffset, genericType: genericType, collectedInfo: collectedInfo)
 		}
-		if let method = swiftType.methods.first(where: { $0.selectorName == methodSignature.name }) {
+		if let method = swiftType.allMethods.first(where: { $0.selectorName == methodSignature.name }) {
 			return extractInfoBlock(method)
 		} else if isPlainSignature {
 			// Extracting from reg(MyClass.init) and reg(MyClass.init(foo:bar:))
@@ -29,13 +29,10 @@ class MethodFinder {
 				return extractInfoBlock(simpliestInitializer)
 			}
 		}
-		for inheritedType in swiftType.inherits {
-			return findMethodInfo(methodSignature: methodSignature, initialObjectName: inheritedType.value.name, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: methodCallBodyOffset)
-		}
 		return nil
 	}
 	
-	static func extractArgumentInfo(swiftType: Type, methodSignature: MethodSignature, parameters: [MethodParameter], file: File, methodCallBodyOffset: Int64, genericType: GenericType?) -> [InjectionToken] {
+	static func extractArgumentInfo(swiftType: Type, methodSignature: MethodSignature, parameters: [MethodParameter], file: File, methodCallBodyOffset: Int64, genericType: GenericType?, collectedInfo: [String: Type]) -> [InjectionToken] {
 		var argumentInfo: [InjectionToken] = []
 		var argumentIndex = -1
 		for parameter in parameters {
@@ -54,7 +51,7 @@ class MethodFinder {
 					// TODO: Throw error. Different generic argument counts not supported (Generic inheritance)
 				}
 			}
-			
+			typeName = collectedInfo[typeName]?.name ?? typeName
 			let location = Location(file: file, byteOffset: injectableArgInfo.argumentBodyOffset)
 			let modificators = methodSignature.injectionModificators[argumentIndex] ?? []
 			var injection = InjectionToken(name: parameter.name,

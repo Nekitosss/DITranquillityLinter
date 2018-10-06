@@ -316,6 +316,7 @@ final class DITranquillityLinterTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "String")
 	}
 	
+	// .injection { $0.inject(ss: $1) } where .inject(ss:) contains in MyParent
 	func testInheritedMethodInjection() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestInheritedMethodInjection")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
@@ -325,6 +326,72 @@ final class DITranquillityLinterTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "String")
 	}
 	
+	// .as((MyProtocol & MyProtocol2).self)
+	func testProtocolCompositionAliasing() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestProtocolCompositionAliasing")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo, maximumRegistrationCount: 2)
+		let alias = try extractAliasInfo(registrationToken: registration)
+		XCTAssertEqual(alias.typeName, "MyProtocol & MyProtocol2")
+	}
+	
+	// .as(MyProtocolComposition.self) where MyProtocolComposition = (MyProtocol & MyProtocol2)
+	func testWrappedProtocolCompositionAliasing() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestWrappedProtocolCompositionAliasing")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo, maximumRegistrationCount: 2)
+		let alias = try extractAliasInfo(registrationToken: registration)
+		XCTAssertEqual(alias.typeName, "MyProtocol & MyProtocol2")
+	}
+	
+	// .as(MyProtocolTypealias.self) where MyProtocolTypealias = MyProtocol
+	func testTypealiasedRegistrationAliasing() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestTypealiasedRegistrationAliasing")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo, maximumRegistrationCount: 2)
+		let alias = try extractAliasInfo(registrationToken: registration)
+		XCTAssertEqual(alias.typeName, "MyProtocol")
+	}
+	
+	// .register(MyClassTypealias.self) where MyClassTypealias = MyClass
+	func testTypealiasedClassRegistration() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestTypealiasedClassRegistration")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		XCTAssertEqual(registration.typeName, "MyClass")
+	}
+	
+	// .injection { $0.ss = $1 } where ss: MyTypealias, MyTypealias = AnotherClass
+	func testTypealiasedVariableInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestTypealiasedVariableInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "AnotherClass")
+	}
+	
+	// .injection { $0.injectSs(ss: $1) } where ss: MyTypealias, MyTypealias = AnotherClass
+	func testTypealiasedMethodInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestTypealiasedMethodInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "AnotherClass")
+	}
+	
+	// .injection { $0.injectSs(ss: $1) } where ss: MyTypealias, MyTypealias = (MyProtocol & MyProtocol2)
+	func testTypealiasedCompositionedMethodInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestTypealiasedCompositionedMethodInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "MyProtocol & MyProtocol2")
+	}
+	
+	// .injection { $0.ss = $1 } where ss: MyTypealias, MyTypealias = (MyProtocol & MyProtocol2)
+	func testTypealiasedCompositionedVariableInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestTypealiasedCompositionedVariableInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "MyProtocol & MyProtocol2")
+	}
 	
 	// Helpers
 	private func extractAliasInfo(registrationToken: RegistrationToken, maximumAliasCount: Int = 1) throws -> AliasToken {
@@ -367,7 +434,7 @@ final class DITranquillityLinterTests: XCTestCase {
 	}
 	
 	private func pathToSourceFile(with name: String) -> URL {
-		let pathToTestableSource = "/Users/nikitapatskov/Develop/DITranquillityLinter/LintableProject/LintableProject/Testable/"
+		let pathToTestableSource = "/Users/nikita/development/DITranquillityLinter/LintableProject/LintableProject/Testable/"
 		return URL(fileURLWithPath: pathToTestableSource + name + ".swift", isDirectory: false)
 	}
 }

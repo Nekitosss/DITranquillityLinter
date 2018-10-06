@@ -45,8 +45,7 @@ public class Tokenizer {
 			return acc
 		}
 		
-		let composed = Composer().uniqueTypes(parserResult)
-		return composed.reduce(into: [String: Type]()) { $0[$1.name] = $1 }
+		return Composer().composedTypes(parserResult)
 	}
 	
 }

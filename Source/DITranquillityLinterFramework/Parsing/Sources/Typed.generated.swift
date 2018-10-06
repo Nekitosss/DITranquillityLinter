@@ -28,7 +28,7 @@ extension MethodParameter {
     /// Whether type is implicitly unwrapped optional. Shorthand for `typeName.isImplicitlyUnwrappedOptional`
     public var isImplicitlyUnwrappedOptional: Bool { return typeName.isImplicitlyUnwrappedOptional }
     /// Type name without attributes and optional type information. Shorthand for `typeName.unwrappedTypeName`
-    public var unwrappedTypeName: String { return typeName.unwrappedTypeName }
+    public var unwrappedTypeName: String { return type?.name ?? typeName.unwrappedTypeName }
     /// Actual type name if declaration uses typealias, otherwise just a `typeName`. Shorthand for `typeName.actualTypeName`
     public var actualTypeName: TypeName? { return typeName.actualTypeName ?? typeName }
     /// Whether type is a tuple. Shorthand for `typeName.isTuple`
@@ -82,7 +82,7 @@ extension Variable {
     /// Whether type is implicitly unwrapped optional. Shorthand for `typeName.isImplicitlyUnwrappedOptional`
     public var isImplicitlyUnwrappedOptional: Bool { return typeName.isImplicitlyUnwrappedOptional }
     /// Type name without attributes and optional type information. Shorthand for `typeName.unwrappedTypeName`
-    public var unwrappedTypeName: String { return typeName.unwrappedTypeName }
+    public var unwrappedTypeName: String { return type?.name ??  typeName.unwrappedTypeName }
     /// Actual type name if declaration uses typealias, otherwise just a `typeName`. Shorthand for `typeName.actualTypeName`
     public var actualTypeName: TypeName? { return typeName.actualTypeName ?? typeName }
     /// Whether type is a tuple. Shorthand for `typeName.isTuple`

@@ -127,7 +127,7 @@ final class ContainerPart {
 		let substructureList = loadContainerBodyPart.substructures ?? []
 		let argumentStack = argumentInfo(substructures: substructureList, content: content)
 		
-		if let alias = AliasTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file) {
+		if let alias = AliasTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, collectedInfo: collectedInfo, bodyOffset: bodyOffset, file: file) {
 			tokenList.append(alias)
 		} else if let injection = InjectionTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, content: content, substructureList: substructureList) {
 			tokenList.append(injection)

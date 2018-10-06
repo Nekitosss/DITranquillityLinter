@@ -41,6 +41,7 @@ final class RegistrationTokenBuilder {
 		info.tokenList.append(aliasToken)
 		
 		info.tokenList = fillTokenListWithInfo(input: info.tokenList, typeName: info.typeName, collectedInfo: collectedInfo, content: content, file: file)
+		info.typeName = collectedInfo[info.typeName]?.name ?? info.typeName
 		return RegistrationToken(typeName: info.typeName, plainTypeName: info.plainTypeName, location: location, tokenList: info.tokenList)
 	}
 	
@@ -195,7 +196,7 @@ final class RegistrationTokenBuilder {
 	private static func findArgumentTypeInfo(typeName: String, tokenName: String, collectedInfo: [String: Type]) -> (typeName: String, optionalInjection: Bool)? {
 		let (plainTypeName, _, genericType) = self.parseTypeName(name: typeName)
 		guard let ownerType = collectedInfo[plainTypeName] else { return nil }
-		if let variable = ownerType.variables.first(where: { $0.name == tokenName }) {
+		if let variable = ownerType.allVariables.first(where: { $0.name == tokenName }) {
 			var unwrappedTypeName = variable.unwrappedTypeName
 			if let genericTypeIndex = ownerType.genericTypeParameters.index(where: { $0.typeName.unwrappedTypeName == variable.unwrappedTypeName }),
 				let resolvedGenericType = genericType {
@@ -206,12 +207,8 @@ final class RegistrationTokenBuilder {
 					// TODO: Throw error. Different generic argument counts not supported (Generic inheritance)
 				}
 			}
+			unwrappedTypeName = collectedInfo[unwrappedTypeName]?.name ?? unwrappedTypeName
 			return (unwrappedTypeName, variable.isOptional)
-		}
-		for parent in ownerType.inherits {
-			if let result = findArgumentTypeInfo(typeName: parent.value.globalName, tokenName: tokenName, collectedInfo: collectedInfo) {
-				return result
-			}
 		}
 		return nil
 	}

@@ -18,7 +18,7 @@ struct Composer {
     ///
     /// - Parameter parserResult: Result of parsing source code.
     /// - Returns: Final types and extensions of unknown types.
-    func uniqueTypes(_ parserResult: FileParserResult) -> [Type] {
+	func composedTypes(_ parserResult: FileParserResult) -> [String: Type] {
         var unique = [String: Type]()
         var modules = [String: [String: Type]]()
         let types = parserResult.types
@@ -79,9 +79,13 @@ struct Composer {
             return self.resolveType(typeName: typeName, containingType: containingType, unique: unique, modules: modules, typealiases: typealiases)
         }
 
+		var result = unique
         for (_, type) in unique {
             type.typealiases.forEach { (_, alias) in
-                alias.type = resolveType(alias.typeName, type)
+				if let resolvedType = resolveType(alias.typeName, type) {
+					alias.type = resolvedType
+					result[alias.name] = resolvedType
+				}
             }
             type.variables.forEach {
                 resolveVariableTypes($0, of: type, resolve: resolveType)
@@ -97,9 +101,31 @@ struct Composer {
                 resolveEnumTypes(enumeration, types: unique, resolve: resolveType)
             }
         }
-
-        updateTypeRelationships(types: Array(unique.values))
-        return unique.values.sorted { $0.name < $1.name }
+		
+		for globalTypealias in parserResult.typealiases {
+			if let resolvedType = resolveType(globalTypealias.typeName, nil) {
+				result[globalTypealias.name] = resolvedType
+			}
+		}
+		
+		updateTypeRelationships(types: Array(unique.values))
+		
+		for globalTypealias in parserResult.typealiases where globalTypealias.unwrappedTypeName.contains("&") {
+			// Type composition
+			let containingTypeNames = globalTypealias.unwrappedTypeName.split(separator: "&").map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) })
+			let containingTypes = containingTypeNames.compactMap({ result[$0] })
+			let typeComposition = TypeComposition(name: globalTypealias.unwrappedTypeName,
+												  variables: containingTypes.flatMap({ $0.variables }),
+												  methods: containingTypes.flatMap({ $0.methods }),
+												  subscripts: containingTypes.flatMap({ $0.subscripts }),
+												  inheritedTypes: containingTypes.flatMap({ $0.inheritedTypes }),
+												  containedTypes: containingTypes.flatMap({ $0.containedTypes }),
+												  typealiases: containingTypes.flatMap({ $0.typealiases.values }),
+												  file: globalTypealias.file)
+			result[globalTypealias.unwrappedTypeName] = typeComposition
+			result[globalTypealias.name] = typeComposition
+		}
+		return result
     }
 
     private func resolveType(typeName: TypeName, containingType: Type?, unique: [String: Type], modules: [String: [String: Type]], typealiases: [String: Typealias]) -> Type? {

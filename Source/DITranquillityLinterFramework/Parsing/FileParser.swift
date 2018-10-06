@@ -152,7 +152,7 @@ final class FileParser {
             case .varParameter:
                 return parseParameter(source)
             case .typealias:
-                guard let `typealias` = parseTypealias(source, containingType: definedIn as? Type) else { return nil }
+                guard let `typealias` = parseTypealias(source, containingType: definedIn as? Type, file: file) else { return nil }
                 if definedIn == nil {
                     typealiases.append(`typealias`)
                 }
@@ -703,13 +703,13 @@ extension FileParser {
 // MARK: - Typealiases
 extension FileParser {
 
-    fileprivate func parseTypealias(_ source: [String: SourceKitRepresentable], containingType: Type?) -> Typealias? {
+	fileprivate func parseTypealias(_ source: [String: SourceKitRepresentable], containingType: Type?, file: File) -> Typealias? {
         guard let (name, _, _) = parseTypeRequirements(source),
             let nameSuffix = extract(.nameSuffix, from: source)?
                 .trimmingCharacters(in: CharacterSet.init(charactersIn: "=").union(.whitespacesAndNewlines))
             else { return nil }
 
-        return Typealias(aliasName: name, typeName: TypeName(nameSuffix), parent: containingType)
+		return Typealias(aliasName: name, typeName: TypeName(nameSuffix), parent: containingType, file: file)
     }
 
 }
