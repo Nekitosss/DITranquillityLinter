@@ -55,11 +55,11 @@ final class GraphValidator {
 	}
 	
 	private func buildTooManyRegistrationsForType(registrationName: String) -> String {
-		return "Too many registrations for \(registrationName) type. Make one of registration as default or delete redundant registration."
+		return "Too many registrations for \"\(registrationName)\" type. Make one of registration as default or delete redundant registration."
 	}
 	
 	private func buildHaseMoreThanOneDefaultRegistratioinsForType(registrationName: String) -> String {
-		return "Too many default registrations for \(registrationName) type. Make exact one of registration as default or delete redundant registration."
+		return "Too many default registrations for \"\(registrationName)\" type. Make exact one of registration as default or delete redundant registration."
 	}
 	
 	private func validate(registration: RegistrationToken, collectedInfo: [String: Type], containerPart: ContainerPart) -> [GraphError] {
@@ -93,19 +93,19 @@ final class GraphValidator {
 	
 	private func buildNotFoundAliasMessage(alias: AliasToken) -> String {
 		if alias.plainTypeName != alias.typeName {
-			return "Does not inherits from \(alias.plainTypeName) or not conforms to \(alias.typeName)"
+			return "Does not inherits from \"\(alias.plainTypeName)\" or not conforms to \"\(alias.typeName)\""
 		} else {
-			return "Does not inherits nor conforms to \(alias.typeName)"
+			return "Does not inherits nor conforms to \"\(alias.typeName)\""
 		}
 	}
 	
 	private func buildNotFoundRegistrationMessage(injection: InjectionToken, accessor: RegistrationAccessor) -> String {
 		let injectionType = injection.methodInjection ? "method" : "variable"
-		var info = "Not found registration with \(accessor.typeName) type"
+		var info = "Not found registration with \"\(accessor.typeName)\" type"
 		if !accessor.tag.isEmpty {
-			info += ", tag: \(accessor.tag)"
+			info += ", tag: \"\(accessor.tag)\""
 		}
-		info += " for \"\(injection.name)\" \(injectionType) injection"
+		info += " for \"\(injection.name)\" \"\(injectionType)\" injection"
 		return info
 	}
 	

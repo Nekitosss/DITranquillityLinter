@@ -17,6 +17,7 @@
 		11264020216A5D7C008ED24C /* TestFullTypealiasedComposedAliasingSuccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126401F216A5D7C008ED24C /* TestFullTypealiasedComposedAliasingSuccess.swift */; };
 		11264022216A5DB4008ED24C /* TestComposedTypealiasFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264021216A5DB4008ED24C /* TestComposedTypealiasFailure.swift */; };
 		11264024216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264023216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift */; };
+		11264026216A640A008ED24C /* TestPlainInjectionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264025216A640A008ED24C /* TestPlainInjectionValidation.swift */; };
 		112BF5B6214AD4D400299AD1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112BF5B5214AD4D300299AD1 /* ViewController.swift */; };
 		112D67A6216927B700A9E6DF /* TestProtocolCompositionAliasing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67A5216927B700A9E6DF /* TestProtocolCompositionAliasing.swift */; };
 		112D67A82169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67A72169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift */; };
@@ -80,6 +81,7 @@
 		1126401F216A5D7C008ED24C /* TestFullTypealiasedComposedAliasingSuccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFullTypealiasedComposedAliasingSuccess.swift; sourceTree = "<group>"; };
 		11264021216A5DB4008ED24C /* TestComposedTypealiasFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestComposedTypealiasFailure.swift; sourceTree = "<group>"; };
 		11264023216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedComposedAliasingFailure.swift; sourceTree = "<group>"; };
+		11264025216A640A008ED24C /* TestPlainInjectionValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPlainInjectionValidation.swift; sourceTree = "<group>"; };
 		112BF5B5214AD4D300299AD1 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		112D67A5216927B700A9E6DF /* TestProtocolCompositionAliasing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestProtocolCompositionAliasing.swift; sourceTree = "<group>"; };
 		112D67A72169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWrappedProtocolCompositionAliasing.swift; sourceTree = "<group>"; };
@@ -254,6 +256,7 @@
 				11264021216A5DB4008ED24C /* TestComposedTypealiasFailure.swift */,
 				11264023216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift */,
 				112D67B52169554500A9E6DF /* TestTypealiasedCompositionedVariableInjection.swift */,
+				11264025216A640A008ED24C /* TestPlainInjectionValidation.swift */,
 			);
 			path = Testable;
 			sourceTree = "<group>";
@@ -429,6 +432,7 @@
 				FD6E0BF221663F70007AA232 /* TestInheritedMethodInjection.swift in Sources */,
 				FD642E6C216242970049E0BF /* TestGenericArgumentMethodInjection.swift in Sources */,
 				11264016216A5C07008ED24C /* TestTypealiasedAliasingSuccess.swift in Sources */,
+				11264026216A640A008ED24C /* TestPlainInjectionValidation.swift in Sources */,
 				117EFFDC2142FB210082EA06 /* AppDelegate.swift in Sources */,
 				FD6E0BF021663F05007AA232 /* TestInheritedVariableInjection.swift in Sources */,
 				1126401E216A5D26008ED24C /* TestTypealiasedComposedTypealiasSuccess.swift in Sources */,

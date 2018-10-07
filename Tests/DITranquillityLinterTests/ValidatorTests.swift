@@ -4,13 +4,8 @@ import XCTest
 class ValidatorTests: XCTestCase {
 
 	static var allTests = [
-		("testExample", testExample),
+		("testValidateAliasingSuccess", testValidateAliasingSuccess),
 		]
-	
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
 
 	func testValidateAliasingSuccess() throws {
 		let errorList = try validateGraph(fileName: "TestValidateAliasingSuccess")
@@ -60,6 +55,11 @@ class ValidatorTests: XCTestCase {
 	func testTypealiasedComposedAliasingFailure() throws {
 		let errorList = try validateGraph(fileName: "TestTypealiasedComposedAliasingFailure")
 		XCTAssertFalse(errorList.isEmpty)
+	}
+	
+	func testPlainInjectionValidation() throws {
+		let errorList = try validateGraph(fileName: "TestPlainInjectionValidation")
+		XCTAssertTrue(errorList.isEmpty)
 	}
 	
 }
