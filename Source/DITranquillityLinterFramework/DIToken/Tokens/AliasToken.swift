@@ -16,12 +16,16 @@ struct AliasToken: DIToken {
 	let location: Location
 	
 	var decomposedTypes: [String] {
-		if plainTypeName.contains("&") {
-			return plainTypeName
+		return AliasToken.decompose(name: plainTypeName)
+	}
+	
+	static func decompose(name: String) -> [String] {
+		if name.contains("&") {
+			return name
 				.split(separator: "&")
 				.map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) })
 		} else {
-			return [plainTypeName]
+			return [name]
 		}
 	}
 	
@@ -43,18 +47,7 @@ struct RegistrationAccessor: Hashable {
 	let tag: String
 	
 	init(typeName: String, tag: String) {
-		var justifiedTypeName: String
-		if typeName.contains("&") {
-			justifiedTypeName = typeName
-				.split(separator: "&")
-				.map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) })
-				.sorted()
-				.joined(separator: " & ")
-		} else {
-			justifiedTypeName = typeName
-		}
-		
-		self.typeName = justifiedTypeName
+		self.typeName = AliasToken.decompose(name: typeName).sorted().joined(separator: " & ")
 		self.tag = tag
 	}
 }

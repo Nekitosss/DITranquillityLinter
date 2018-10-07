@@ -54,7 +54,7 @@ struct Composer {
 
         //extend all types with their extensions
         types.forEach { type in
-            type.inheritedTypes = type.inheritedTypes.map { actualTypeName(for: TypeName($0), typealiases: typealiases) ?? $0 }
+            type.inheritedTypes = type.inheritedTypes.flatMap { actualTypeName(for: TypeName($0), typealiases: typealiases).flatMap({ AliasToken.decompose(name: $0) }) ?? [$0] }
 
             let uniqueType = unique[type.name] ?? typeFromModule(type.name, modules: modules)
 

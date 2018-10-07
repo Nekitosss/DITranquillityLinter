@@ -1,7 +1,7 @@
 import XCTest
 @testable import DITranquillityLinterFramework
 
-final class DITranquillityLinterTests: XCTestCase {
+final class ParserTests: XCTestCase {
 	
 	
 	static var allTests = [
@@ -393,50 +393,4 @@ final class DITranquillityLinterTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "MyProtocol & MyProtocol2")
 	}
 	
-	
-	
-	// Helpers
-	private func extractAliasInfo(registrationToken: RegistrationToken, maximumAliasCount: Int = 1) throws -> AliasToken {
-		// Aliases +1 by default cause of implicitly alias to self-registration class name. So we filter that
-		let aliases = registrationToken.tokenList.compactMap({ $0 as? AliasToken }).filter({ $0.typeName != registrationToken.typeName || !$0.tag.isEmpty })
-		XCTAssertEqual(aliases.count, maximumAliasCount)
-		guard let alias = aliases.first else {
-			throw TestError.aliasTokenNotFound
-		}
-		return alias
-	}
-	
-	private func extractInjectionInfo(registrationToken: RegistrationToken, maximumInjectionCount: Int = 1) throws -> InjectionToken {
-		let injections = registrationToken.tokenList.compactMap({ $0 as? InjectionToken })
-		XCTAssertLessThanOrEqual(injections.count, maximumInjectionCount)
-		guard let firstInjection = injections.first else {
-			throw TestError.injectionTokenNotFound
-		}
-		return firstInjection
-	}
-	
-	private func extractRegistrationInfo(containerInfo: ContainerPart, maximumRegistrationCount: Int = 1) throws -> RegistrationToken {
-		XCTAssertEqual(containerInfo.tokenInfo.count, maximumRegistrationCount)
-		guard let registrationList = containerInfo.tokenInfo.first?.value else {
-			throw TestError.registrationTokenNotFound
-		}
-		XCTAssertEqual(registrationList.count, 1)
-		guard let registration = registrationList.first else {
-			throw TestError.registrationTokenNotFound
-		}
-		return registration
-	}
-	
-	private func findContainerStructure(fileName: String) throws -> ContainerPart {
-		let fileURL = pathToSourceFile(with: fileName)
-		guard let containerInfo = ContainerInitializatorFinder.findContainerStructure(dictionary: Tokenizer().collectInfo(files: [fileURL])) else {
-			throw TestError.containerInfoNotFound
-		}
-		return containerInfo
-	}
-	
-	private func pathToSourceFile(with name: String) -> URL {
-		let pathToTestableSource = "/Users/nikita/development/DITranquillityLinter/LintableProject/LintableProject/Testable/"
-		return URL(fileURLWithPath: pathToTestableSource + name + ".swift", isDirectory: false)
-	}
 }

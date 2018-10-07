@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11264012216A58A2008ED24C /* TestValidateAliasingSuccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264011216A58A2008ED24C /* TestValidateAliasingSuccess.swift */; };
+		11264014216A5B8B008ED24C /* TestValidatePlainAliasingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264013216A5B8B008ED24C /* TestValidatePlainAliasingError.swift */; };
+		11264016216A5C07008ED24C /* TestTypealiasedAliasingSuccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264015216A5C07008ED24C /* TestTypealiasedAliasingSuccess.swift */; };
+		11264018216A5C68008ED24C /* TestFullTypealiasedAliasingSuccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264017216A5C68008ED24C /* TestFullTypealiasedAliasingSuccess.swift */; };
+		1126401A216A5CB6008ED24C /* TestComposedTypealiasSuccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264019216A5CB6008ED24C /* TestComposedTypealiasSuccess.swift */; };
+		1126401C216A5CF6008ED24C /* TestComposedTypealiasError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126401B216A5CF6008ED24C /* TestComposedTypealiasError.swift */; };
+		1126401E216A5D26008ED24C /* TestTypealiasedComposedTypealiasSuccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126401D216A5D26008ED24C /* TestTypealiasedComposedTypealiasSuccess.swift */; };
+		11264020216A5D7C008ED24C /* TestFullTypealiasedComposedAliasingSuccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126401F216A5D7C008ED24C /* TestFullTypealiasedComposedAliasingSuccess.swift */; };
+		11264022216A5DB4008ED24C /* TestComposedTypealiasFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264021216A5DB4008ED24C /* TestComposedTypealiasFailure.swift */; };
+		11264024216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11264023216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift */; };
 		112BF5B6214AD4D400299AD1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112BF5B5214AD4D300299AD1 /* ViewController.swift */; };
 		112D67A6216927B700A9E6DF /* TestProtocolCompositionAliasing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67A5216927B700A9E6DF /* TestProtocolCompositionAliasing.swift */; };
 		112D67A82169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D67A72169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift */; };
@@ -60,6 +70,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		11264011216A58A2008ED24C /* TestValidateAliasingSuccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestValidateAliasingSuccess.swift; sourceTree = "<group>"; };
+		11264013216A5B8B008ED24C /* TestValidatePlainAliasingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestValidatePlainAliasingError.swift; sourceTree = "<group>"; };
+		11264015216A5C07008ED24C /* TestTypealiasedAliasingSuccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedAliasingSuccess.swift; sourceTree = "<group>"; };
+		11264017216A5C68008ED24C /* TestFullTypealiasedAliasingSuccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFullTypealiasedAliasingSuccess.swift; sourceTree = "<group>"; };
+		11264019216A5CB6008ED24C /* TestComposedTypealiasSuccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestComposedTypealiasSuccess.swift; sourceTree = "<group>"; };
+		1126401B216A5CF6008ED24C /* TestComposedTypealiasError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestComposedTypealiasError.swift; sourceTree = "<group>"; };
+		1126401D216A5D26008ED24C /* TestTypealiasedComposedTypealiasSuccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedComposedTypealiasSuccess.swift; sourceTree = "<group>"; };
+		1126401F216A5D7C008ED24C /* TestFullTypealiasedComposedAliasingSuccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFullTypealiasedComposedAliasingSuccess.swift; sourceTree = "<group>"; };
+		11264021216A5DB4008ED24C /* TestComposedTypealiasFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestComposedTypealiasFailure.swift; sourceTree = "<group>"; };
+		11264023216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTypealiasedComposedAliasingFailure.swift; sourceTree = "<group>"; };
 		112BF5B5214AD4D300299AD1 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		112D67A5216927B700A9E6DF /* TestProtocolCompositionAliasing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestProtocolCompositionAliasing.swift; sourceTree = "<group>"; };
 		112D67A72169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWrappedProtocolCompositionAliasing.swift; sourceTree = "<group>"; };
@@ -223,6 +243,16 @@
 				112D67AF2169510C00A9E6DF /* TestTypealiasedVariableInjection.swift */,
 				112D67B12169543A00A9E6DF /* TestTypealiasedMethodInjection.swift */,
 				112D67B3216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift */,
+				11264011216A58A2008ED24C /* TestValidateAliasingSuccess.swift */,
+				11264013216A5B8B008ED24C /* TestValidatePlainAliasingError.swift */,
+				11264015216A5C07008ED24C /* TestTypealiasedAliasingSuccess.swift */,
+				11264017216A5C68008ED24C /* TestFullTypealiasedAliasingSuccess.swift */,
+				11264019216A5CB6008ED24C /* TestComposedTypealiasSuccess.swift */,
+				1126401B216A5CF6008ED24C /* TestComposedTypealiasError.swift */,
+				1126401D216A5D26008ED24C /* TestTypealiasedComposedTypealiasSuccess.swift */,
+				1126401F216A5D7C008ED24C /* TestFullTypealiasedComposedAliasingSuccess.swift */,
+				11264021216A5DB4008ED24C /* TestComposedTypealiasFailure.swift */,
+				11264023216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift */,
 				112D67B52169554500A9E6DF /* TestTypealiasedCompositionedVariableInjection.swift */,
 			);
 			path = Testable;
@@ -360,6 +390,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11264020216A5D7C008ED24C /* TestFullTypealiasedComposedAliasingSuccess.swift in Sources */,
 				112BF5B6214AD4D400299AD1 /* ViewController.swift in Sources */,
 				FD642E4C21623EFD0049E0BF /* TestImplicitDroppedInitRegistration.swift in Sources */,
 				117EFFF42142FEF40082EA06 /* MainDIPart.swift in Sources */,
@@ -382,21 +413,30 @@
 				FD642F79216345250049E0BF /* TestCycleRegistration.swift in Sources */,
 				FD642F7D216346CE0049E0BF /* TestSeveralDIParts.swift in Sources */,
 				FD642E68216242250049E0BF /* TestDefaultMakingRegistration.swift in Sources */,
+				1126401C216A5CF6008ED24C /* TestComposedTypealiasError.swift in Sources */,
 				112D67A6216927B700A9E6DF /* TestProtocolCompositionAliasing.swift in Sources */,
 				FD642E5C216240BE0049E0BF /* TestPlainVariableInjection.swift in Sources */,
 				FD642E4621623E670049E0BF /* TestNestedGenericClassRegistration.swift in Sources */,
 				112D67B62169554500A9E6DF /* TestTypealiasedCompositionedVariableInjection.swift in Sources */,
+				1126401A216A5CB6008ED24C /* TestComposedTypealiasSuccess.swift in Sources */,
+				11264018216A5C68008ED24C /* TestFullTypealiasedAliasingSuccess.swift in Sources */,
+				11264012216A58A2008ED24C /* TestValidateAliasingSuccess.swift in Sources */,
 				FD642E5421623FF20049E0BF /* TestPlainAliasing.swift in Sources */,
 				FD642E4221623DEE0049E0BF /* TestPlainGenericRegistration.swift in Sources */,
 				FD642E5A2162409B0049E0BF /* TestImplicitKeyPathInjection.swift in Sources */,
 				112D67AC21694EF200A9E6DF /* TestTypealiasedRegistrationAliasing.swift in Sources */,
+				11264014216A5B8B008ED24C /* TestValidatePlainAliasingError.swift in Sources */,
 				FD6E0BF221663F70007AA232 /* TestInheritedMethodInjection.swift in Sources */,
 				FD642E6C216242970049E0BF /* TestGenericArgumentMethodInjection.swift in Sources */,
+				11264016216A5C07008ED24C /* TestTypealiasedAliasingSuccess.swift in Sources */,
 				117EFFDC2142FB210082EA06 /* AppDelegate.swift in Sources */,
 				FD6E0BF021663F05007AA232 /* TestInheritedVariableInjection.swift in Sources */,
+				1126401E216A5D26008ED24C /* TestTypealiasedComposedTypealiasSuccess.swift in Sources */,
 				FD642E6A216242480049E0BF /* TestGenericArgumentVariableInjection.swift in Sources */,
 				112D67AE2169501A00A9E6DF /* TestTypealiasedClassRegistration.swift in Sources */,
 				112D67B4216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift in Sources */,
+				11264022216A5DB4008ED24C /* TestComposedTypealiasFailure.swift in Sources */,
+				11264024216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift in Sources */,
 				FD642E5E216240D80049E0BF /* TestTypedVariableInjection.swift in Sources */,
 				FD6E0BEE21663E8C007AA232 /* TestInheritedInitializerInjection.swift in Sources */,
 				FD642E62216241840049E0BF /* TestTaggedModificatorKeyPathInjection.swift in Sources */,
