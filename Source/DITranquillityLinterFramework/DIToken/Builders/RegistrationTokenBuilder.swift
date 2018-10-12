@@ -75,28 +75,42 @@ final class RegistrationTokenBuilder {
 		guard substructureList.count == 1 else { return nil }
 		var substructure = substructureList[0]
 		guard let closureKind: String = substructure.get(.kind), closureKind == SwiftExpressionKind.closure.rawValue else { return nil }
-		guard let expressionCallInitSubstructure = (substructure.substructures ?? []).first else { return nil }
-		substructure = expressionCallInitSubstructure
-		
-		guard let kind: String = substructure.get(.kind),
-			let name: String = substructure.get(.name),
-			kind == SwiftExpressionKind.call.rawValue
-			else { return nil }
-		let (typeName, fullTypeName, genericType) = self.parseTypeName(name: name)
-		let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitStructure].self) ?? []
-		
-		// Handle MyClass.NestedClass()
-		// NestedClass can be class name, but it also can be expression call. So we check is MyClass.NestedClass available class name
-		// and if if exists, adds ".init" at the end of initialization call
-		let nameWithInitializer = collectedInfo[name] != nil && !name.hasSuffix(".init") ? name + ".init" : name
-		let methodName = restoreMethodName(registrationName: nameWithInitializer)
-		let signature = restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
-		
-		var tokenList: [DIToken] = []
-		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset, forcedAllInjection: false) {
-			tokenList = methodInjection as [DIToken]
+		if let expressionCallInitSubstructure = (substructure.substructures ?? []).first {
+			substructure = expressionCallInitSubstructure
+			
+			guard let kind: String = substructure.get(.kind),
+				let name: String = substructure.get(.name),
+				kind == SwiftExpressionKind.call.rawValue
+				else { return nil }
+			let (typeName, fullTypeName, genericType) = self.parseTypeName(name: name)
+			let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitStructure].self) ?? []
+			
+			// Handle MyClass.NestedClass()
+			// NestedClass can be class name, but it also can be expression call. So we check is MyClass.NestedClass available class name
+			// and if if exists, adds ".init" at the end of initialization call
+			let nameWithInitializer = collectedInfo[name] != nil && !name.hasSuffix(".init") ? name + ".init" : name
+			let methodName = restoreMethodName(registrationName: nameWithInitializer)
+			let signature = restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
+			
+			var tokenList: [DIToken] = []
+			if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset, forcedAllInjection: false) {
+				tokenList = methodInjection as [DIToken]
+			}
+			return (fullTypeName, typeName, tokenList)
+			
+		} else if let bodyOffset: Int64 = substructure.get(.bodyOffset),
+			let bodyLength: Int64 = substructure.get(.bodyLength),
+			let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength)?.trimmingCharacters(in: .whitespacesAndNewlines),
+			let lastDotIndex = body.lastIndex(of: ".") {
+			
+			let typeContainerName = String(body[..<lastDotIndex])
+			let staticVariableName = String(body[body.index(after: lastDotIndex)...])
+			if let (typeName, plainTypeName, _) = findArgumentTypeInfo(typeName: typeContainerName, tokenName: staticVariableName, collectedInfo: collectedInfo) {
+				return (typeName, plainTypeName, [])
+			}
 		}
-		return (fullTypeName, typeName, tokenList)
+		
+		return nil
 	}
 	
 	private static func parseTypeName(name: String) -> (typeName: String, fullTypeName: String, genericType: GenericType?) {

@@ -35,6 +35,7 @@
 		117EFFF42142FEF40082EA06 /* MainDIPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117EFFF32142FEF40082EA06 /* MainDIPart.swift */; };
 		11E6F7DE21709D3700C591F6 /* TestGenericVariableInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E6F7DD21709D3700C591F6 /* TestGenericVariableInjection.swift */; };
 		11E6F7E021709DEA00C591F6 /* TestGenericMethodInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E6F7DF21709DEA00C591F6 /* TestGenericMethodInjection.swift */; };
+		11E6F7E22170D99100C591F6 /* TestStaticVariableRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E6F7E12170D99100C591F6 /* TestStaticVariableRegistration.swift */; };
 		D9702440A11CC123D48D7EAB /* Pods_LintableProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 90DD9BCF1810B25E7A234F34 /* Pods_LintableProject.framework */; };
 		FD642E4021623D7E0049E0BF /* TestPlainRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E3F21623D7E0049E0BF /* TestPlainRegistration.swift */; };
 		FD642E4221623DEE0049E0BF /* TestPlainGenericRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E4121623DEE0049E0BF /* TestPlainGenericRegistration.swift */; };
@@ -103,6 +104,7 @@
 		117EFFF32142FEF40082EA06 /* MainDIPart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainDIPart.swift; sourceTree = "<group>"; };
 		11E6F7DD21709D3700C591F6 /* TestGenericVariableInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestGenericVariableInjection.swift; sourceTree = "<group>"; };
 		11E6F7DF21709DEA00C591F6 /* TestGenericMethodInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestGenericMethodInjection.swift; sourceTree = "<group>"; };
+		11E6F7E12170D99100C591F6 /* TestStaticVariableRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestStaticVariableRegistration.swift; sourceTree = "<group>"; };
 		6A58C79706F5DD0C467ADB0F /* Pods-LintableProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LintableProject.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject.debug.xcconfig"; sourceTree = "<group>"; };
 		90DD9BCF1810B25E7A234F34 /* Pods_LintableProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LintableProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B155841C5469E9BB60055504 /* Pods-LintableProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LintableProject.release.xcconfig"; path = "Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject.release.xcconfig"; sourceTree = "<group>"; };
@@ -263,6 +265,7 @@
 				11264025216A640A008ED24C /* TestPlainInjectionValidation.swift */,
 				11E6F7DD21709D3700C591F6 /* TestGenericVariableInjection.swift */,
 				11E6F7DF21709DEA00C591F6 /* TestGenericMethodInjection.swift */,
+				11E6F7E12170D99100C591F6 /* TestStaticVariableRegistration.swift */,
 			);
 			path = Testable;
 			sourceTree = "<group>";
@@ -406,6 +409,7 @@
 				FD642E5021623F500049E0BF /* TestNestedExplicitGenericInitRegistration.swift in Sources */,
 				FD642E4421623E320049E0BF /* TestNestedClassPlainRegistration.swift in Sources */,
 				FD642E5221623FA70049E0BF /* TestNotAllVariablesInjectionInMethod.swift in Sources */,
+				11E6F7E22170D99100C591F6 /* TestStaticVariableRegistration.swift in Sources */,
 				FD642E60216241450049E0BF /* TestTypedAndTaggedVariableInjection.swift in Sources */,
 				FD6E0BEC21663965007AA232 /* TestTypedInitializerInjection.swift in Sources */,
 				112D67A82169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift in Sources */,

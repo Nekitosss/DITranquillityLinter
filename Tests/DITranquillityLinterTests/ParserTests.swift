@@ -411,4 +411,10 @@ final class ParserTests: XCTestCase {
 		XCTAssertEqual(injection.plainTypeName, "MyGeneric")
 	}
 	
+	func testStaticVariableRegistration() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestStaticVariableRegistration")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		XCTAssertEqual(registration.typeName, "MyClass")
+	}
+	
 }
