@@ -393,4 +393,22 @@ final class ParserTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "MyProtocol & MyProtocol2")
 	}
 	
+	func testGenericVariableInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestGenericVariableInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "MyGeneric<String>")
+		XCTAssertEqual(injection.plainTypeName, "MyGeneric")
+	}
+	
+	func testGenericMethodInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestGenericMethodInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "MyGeneric<String>")
+		XCTAssertEqual(injection.plainTypeName, "MyGeneric")
+	}
+	
 }

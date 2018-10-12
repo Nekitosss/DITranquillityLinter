@@ -26,7 +26,7 @@ final class AliasTokenBuilder {
 			case "" where argument.value.hasSuffix(".self"),
 				 "_" where argument.value.hasSuffix(".self"),
 				 DIKeywords.check.rawValue:
-				typeName = TypeName.onlyUnwrappedName(name:  argument.value.droppedDotSelf())
+				typeName = argument.value.droppedDotSelf().bracketsBalancing()
 				if let type = collectedInfo[typeName] {
 					typeName = type.name
 				}

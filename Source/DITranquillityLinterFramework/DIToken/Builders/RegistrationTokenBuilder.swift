@@ -35,6 +35,8 @@ final class RegistrationTokenBuilder {
 			info.tokenList += plainInfo.tokenList
 		}
 		info.typeName = collectedInfo[info.typeName]?.name ?? info.typeName
+		info.typeName = info.typeName.trimmingCharacters(in: .whitespacesAndNewlines)
+		info.plainTypeName = info.plainTypeName.trimmingCharacters(in: .whitespacesAndNewlines)
 		
 		// Class registration by default available by its own type without tag.
 		let location = Location(file: file, byteOffset: bodyOffset)
@@ -62,7 +64,7 @@ final class RegistrationTokenBuilder {
 		let methodSignature = MethodSignature(name: signatureText, injectableArgumentInfo: [], injectionModificators: [:])
 		
 		var tokenList: [DIToken] = []
-		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: methodSignature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset) {
+		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: methodSignature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset, forcedAllInjection: true) {
 			tokenList = methodInjection as [DIToken]
 		}
 		return (fullTypeName, typeName, tokenList)
@@ -91,7 +93,7 @@ final class RegistrationTokenBuilder {
 		let signature = restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
 		
 		var tokenList: [DIToken] = []
-		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset) {
+		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset, forcedAllInjection: false) {
 			tokenList = methodInjection as [DIToken]
 		}
 		return (fullTypeName, typeName, tokenList)
@@ -129,7 +131,7 @@ final class RegistrationTokenBuilder {
 				let bodyLenght: Int64 = substucture.get(.bodyLength),
 				let bodyOffset: Int64 = substucture.get(.bodyOffset),
 				kind == SwiftExpressionKind.argument.rawValue,
-				let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLenght)
+				let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLenght)?.bracketsBalancing()
 				else { continue }
 			
 			if body.firstMatch(RegExp.implicitClosureArgument) != nil {
@@ -156,8 +158,9 @@ final class RegistrationTokenBuilder {
 		var result = [DIToken]()
 		for token in input {
 			if var injectionToken = token as? InjectionToken, injectionToken.typeName.isEmpty {
-				if let (typeName, optionalInjection) = findArgumentTypeInfo(typeName: typeName, tokenName: injectionToken.name, collectedInfo: collectedInfo) {
+				if let (typeName, plainTypeName, optionalInjection) = findArgumentTypeInfo(typeName: typeName, tokenName: injectionToken.name, collectedInfo: collectedInfo) {
 					injectionToken.typeName = typeName
+					injectionToken.plainTypeName = plainTypeName
 					injectionToken.optionalInjection = optionalInjection
 					result.append(injectionToken)
 				} else {
@@ -187,28 +190,36 @@ final class RegistrationTokenBuilder {
 		let signature = restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
 		
 		let (plainTypeName, _, genericType) = self.parseTypeName(name: typeName)
-		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: plainTypeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: offset) {
+		if let methodInjection = MethodFinder.findMethodInfo(methodSignature: signature, initialObjectName: plainTypeName, collectedInfo: collectedInfo, file: file, genericType: genericType, methodCallBodyOffset: offset, forcedAllInjection: false) {
 			return methodInjection
 		}
 		return []
 	}
 	
-	private static func findArgumentTypeInfo(typeName: String, tokenName: String, collectedInfo: [String: Type]) -> (typeName: String, optionalInjection: Bool)? {
+	private static func findArgumentTypeInfo(typeName: String, tokenName: String, collectedInfo: [String: Type]) -> (typeName: String, plainTypeName: String, optionalInjection: Bool)? {
 		let (plainTypeName, _, genericType) = self.parseTypeName(name: typeName)
 		guard let ownerType = collectedInfo[plainTypeName] else { return nil }
 		if let variable = ownerType.allVariables.first(where: { $0.name == tokenName }) {
-			var unwrappedTypeName = variable.unwrappedTypeName
+			var plainTypeName = variable.unwrappedTypeName
+			var typeName = TypeName.onlyDroppedOptional(name: variable.typeName.name)
 			if let genericTypeIndex = ownerType.genericTypeParameters.index(where: { $0.typeName.unwrappedTypeName == variable.unwrappedTypeName }),
 				let resolvedGenericType = genericType {
 				if ownerType.genericTypeParameters.count == resolvedGenericType.typeParameters.count {
 					let actualType = resolvedGenericType.typeParameters[genericTypeIndex]
-					unwrappedTypeName = actualType.typeName.unwrappedTypeName
+					plainTypeName = actualType.typeName.unwrappedTypeName
+					typeName = TypeName.onlyDroppedOptional(name: actualType.typeName.name)
 				} else {
 					// TODO: Throw error. Different generic argument counts not supported (Generic inheritance)
 				}
 			}
-			unwrappedTypeName = collectedInfo[unwrappedTypeName]?.name ?? unwrappedTypeName
-			return (unwrappedTypeName, variable.isOptional)
+			if let typealiased = collectedInfo[plainTypeName]?.name {
+				if !typeName.contains("<") {
+					// Type name should not be only if its typealias, not generic
+					typeName = TypeName.onlyDroppedOptional(name: typealiased)
+				}
+				plainTypeName = typealiased
+			}
+			return (typeName, plainTypeName, variable.isOptional)
 		}
 		return nil
 	}

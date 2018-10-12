@@ -58,7 +58,7 @@ final class InjectionTokenBuilder {
 			}
 		}
 		
-		return InjectionToken(name: name, typeName: typeName, cycle: cycle, optionalInjection: false, methodInjection: false, modificators: modificators, injectionSubstructureList: substructureList.last?.substructures ?? substructureList, location: location)
+		return InjectionToken(name: name, typeName: typeName, plainTypeName: typeName, cycle: cycle, optionalInjection: false, methodInjection: false, modificators: modificators, injectionSubstructureList: substructureList.last?.substructures ?? substructureList, location: location)
 //		return InjectionToken(name: name, typeName: typeName, cycle: cycle, optionalInjection: false, methodInjection: false, modificators: modificators, injectionSubstructureList: substructureList, location: location)
 	}
 	

@@ -22,6 +22,8 @@ struct GraphError: Error, Equatable {
 
 final class GraphValidator {
 	
+	let autoimplementedTypes: Set<String> = ["AnyObject", "Any"]
+	
 	func validate(containerPart: ContainerPart, collectedInfo: [String: Type]) -> [GraphError] {
 		var errors: [GraphError] = []
 		
@@ -44,8 +46,8 @@ final class GraphValidator {
 		}).count
 		
 		if defaultCount == 0 {
-			let info = buildTooManyRegistrationsForType(registrationName: validatingRegistration.typeName)
-			return GraphError(infoString: info, location: validatingRegistration.location)
+			// Its ok to have just many registrations for one type. Error can be thrown in not many injection
+			return nil
 		} else if defaultCount > 1 {
 			let info = buildHaseMoreThanOneDefaultRegistratioinsForType(registrationName: validatingRegistration.typeName)
 			return GraphError(infoString: info, location: validatingRegistration.location)
@@ -69,7 +71,11 @@ final class GraphValidator {
 		for token in registration.tokenList {
 			switch token {
 			case let alias as AliasToken:
-				guard alias.typeName != registration.typeName else { continue }
+				if !alias.tag.isEmpty && collectedInfo[alias.tag] == nil {
+					let info = buildTagTypeNotFoundMessage(tagName: alias.tag)
+					errors.append(GraphError(infoString: info, location: alias.location))
+				}
+				guard alias.typeName != registration.typeName && !autoimplementedTypes.contains(alias.typeName) else { continue }
 				let inheritanceAndImplementations = typeInfo.inheritanceAndImplementations
 				for aliasType in alias.decomposedTypes where inheritanceAndImplementations[aliasType] == nil {
 					let info = buildNotFoundAliasMessage(alias: alias)
@@ -78,7 +84,18 @@ final class GraphValidator {
 				
 			case let injection as InjectionToken:
 				let accessor = injection.getRegistrationAccessor()
-				if containerPart.tokenInfo[accessor] == nil {
+				if !accessor.tag.isEmpty && collectedInfo[accessor.tag] == nil {
+					let info = buildTagTypeNotFoundMessage(tagName: accessor.tag)
+					errors.append(GraphError(infoString: info, location: injection.location))
+				} else if let registrations = containerPart.tokenInfo[accessor] {
+					let defaultCount = registrations.filter({ registration in
+						registration.tokenList.contains(where: { $0 is IsDefaultToken })
+					}).count
+					if registrations.count > 1 && !injection.isMany && defaultCount != 1 {
+						let info = buildTooManyRegistrationsForType(injection: injection, accessor: accessor)
+						errors.append(GraphError(infoString: info, location: injection.location))
+					}
+				} else {
 					let info = buildNotFoundRegistrationMessage(injection: injection, accessor: accessor)
 					errors.append(GraphError(infoString: info, location: injection.location))
 				}
@@ -89,6 +106,10 @@ final class GraphValidator {
 		}
 		
 		return errors
+	}
+	
+	private func buildTagTypeNotFoundMessage(tagName: String) -> String {
+		return "Could not resolve \"\(tagName)\" type"
 	}
 	
 	private func buildNotFoundAliasMessage(alias: AliasToken) -> String {
@@ -109,6 +130,16 @@ final class GraphValidator {
 		return info
 	}
 	
+	
+	private func buildTooManyRegistrationsForType(injection: InjectionToken, accessor: RegistrationAccessor) -> String {
+		let injectionType = injection.methodInjection ? "method" : "variable"
+		var info = "Too many registration with \"\(accessor.typeName)\" type"
+		if !accessor.tag.isEmpty {
+			info += ", tag: \"\(accessor.tag)\""
+		}
+		info += " for \"\(injection.name)\" \"\(injectionType)\" injection"
+		return info
+	}
 
 	private func compose(errorList: [GraphError]) -> [GraphError] {
 		var result: [GraphError] = []

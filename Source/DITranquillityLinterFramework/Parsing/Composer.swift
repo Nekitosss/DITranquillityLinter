@@ -534,7 +534,7 @@ struct Composer {
     static func parseGenericType(_ unwrappedTypeName: String) -> GenericType? {
         let genericComponents = unwrappedTypeName
             .split(separator: "<", maxSplits: 1)
-            .map({ String($0).stripped() })
+            .map({ String($0).trimmingCharacters(in: .whitespacesAndNewlines) })
 
         guard genericComponents.count == 2 else {
             return nil

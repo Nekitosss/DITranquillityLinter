@@ -493,7 +493,7 @@ extension FileParser {
 
         let variable = Variable(name: name, typeName: typeName, accessLevel: accessLevel, isComputed: computed, isStatic: isStatic, defaultValue: defaultValue, attributes: parseDeclarationAttributes(source), annotations: annotations.from(source), definedInTypeName: definedInTypeName)
         variable.setSource(source)
-
+		
         return variable
     }
 
@@ -640,7 +640,7 @@ extension FileParser {
         var rawValue: String? = nil
 
         guard let keyString = extract(.key, from: source), let nameRange = keyString.range(of: name) else {
-            Log.warning("\(logPrefix)parseEnumCase: Unable to extract enum body from \(source)")
+            Log.info("\(logPrefix)parseEnumCase: Unable to extract enum body from \(source)")
             return nil
         }
 
@@ -656,7 +656,7 @@ extension FileParser {
         case (nil, nil):
             break
         default:
-             Log.warning("\(logPrefix)parseEnumCase: Unknown enum case body format \(wrappedBody)")
+             Log.info("\(logPrefix)parseEnumCase: Unknown enum case body format \(wrappedBody)")
         }
 
         let enumCase = EnumCase(name: name, rawValue: rawValue, associatedValues: associatedValues, annotations: annotations.from(source))

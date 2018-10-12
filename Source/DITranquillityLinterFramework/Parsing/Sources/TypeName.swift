@@ -69,6 +69,25 @@ public protocol Typed {
 		return unwrapTypeName(name: name).unwrappedTypeName
 	}
 	
+	static func onlyDroppedOptional(name: String) -> String {
+		let isImplicitlyUnwrappedOptional = name.hasSuffix("!") || name.hasPrefix("ImplicitlyUnwrappedOptional<")
+		let isOptional = name.hasSuffix("?") || name.hasPrefix("Optional<") || isImplicitlyUnwrappedOptional
+		var unwrappedTypeName = name
+		if isOptional {
+			if name.hasSuffix("?") || name.hasSuffix("!") {
+				unwrappedTypeName = String(name.dropLast())
+			} else if name.hasPrefix("Optional<") {
+				unwrappedTypeName = name.drop(first: "Optional<".count, last: 1)
+			} else {
+				unwrappedTypeName = name.drop(first: "ImplicitlyUnwrappedOptional<".count, last: 1)
+			}
+			unwrappedTypeName = unwrappedTypeName.bracketsBalancing()
+		} else {
+			unwrappedTypeName = name
+		}
+		return unwrappedTypeName
+	}
+	
 	static func unwrapTypeName(name: String) -> (unwrappedTypeName: String, isImplicitlyUnwrappedOptional: Bool, isOptional: Bool, isGeneric: Bool) {
 		var name = name
 		var unwrappedTypeName: String

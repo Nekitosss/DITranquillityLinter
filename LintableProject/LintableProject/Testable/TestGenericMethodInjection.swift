@@ -1,19 +1,16 @@
 //
-//  TestTypealiasedVariableInjection.swift
+//  TestGenericMethodInjection.swift
 //  LintableProject
 //
-//  Created by Nikita on 06/10/2018.
+//  Created by Nikita on 12/10/2018.
 //  Copyright © 2018 Nikita. All rights reserved.
 //
 
-import Foundation
-
 import DITranquillity
 
-private class AnotherClass<T> {}
-private typealias MyTypealias = AnotherClass
+private class MyGeneric<T> {}
 private class MyClass {
-	var ss: MyTypealias!
+	func inject(ss: MyGeneric<String>!) {}
 }
 
 private class ParsablePart: DIPart {
@@ -26,7 +23,7 @@ private class ParsablePart: DIPart {
 	
 	static func load(container: DIContainer) {
 		container.register(MyClass.self)
-			.injection { $0.ss = $1 }
+			.injection { $0.inject(ss: $1) }
 	}
 	
 }

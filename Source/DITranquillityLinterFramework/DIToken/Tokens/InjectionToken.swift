@@ -12,6 +12,7 @@ struct InjectionToken: DIToken {
 	
 	let name: String
 	var typeName: String
+	var plainTypeName: String
 	let cycle: Bool
 	var optionalInjection: Bool
 	let methodInjection: Bool
@@ -20,7 +21,21 @@ struct InjectionToken: DIToken {
 	let location: Location
 	
 	func getRegistrationAccessor() -> RegistrationAccessor {
-		return RegistrationAccessor(typeName: typeName, tag: tag)
+		// Select typeName if its generic. Plain typeName otherwise. TODO: Refactor and make typeName actual
+		let preferredType = typeName.contains("<") ? typeName : plainTypeName
+		return RegistrationAccessor(typeName: preferredType, tag: tag)
+	}
+	
+	var isMany: Bool {
+		for modificator in modificators {
+			switch modificator {
+			case .many:
+				return true
+			default:
+				continue
+			}
+		}
+		return false
 	}
 	
 	var tag: String {
