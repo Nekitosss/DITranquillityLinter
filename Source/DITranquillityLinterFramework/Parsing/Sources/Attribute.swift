@@ -43,6 +43,17 @@ extension Structure: Codable {
 	}
 }
 
+extension File: Codable {
+	
+	public convenience init(from decoder: Decoder) throws {
+		fatalError()
+	}
+	
+	public func encode(to encoder: Encoder) throws {
+		fatalError()
+	}
+}
+
 typealias AttributeArguments = [String: AttributeArgumentValue]
 /// Describes Swift attribute
 @objcMembers class Attribute: NSObject, AutoCoding, AutoEquatable, AutoDiffable, AutoJSExport, Codable {

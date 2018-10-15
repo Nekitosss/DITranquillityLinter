@@ -5,7 +5,7 @@ import SourceKittenFramework
 typealias SourceryMethod = Method
 
 /// Describes method parameter
-@objcMembers final class MethodParameter: NSObject, SourceryModel, Typed, Annotated {
+@objcMembers final class MethodParameter: NSObject, SourceryModel, Typed, Annotated, Codable {
     /// Parameter external name
     var argumentLabel: String?
 
@@ -86,7 +86,7 @@ typealias SourceryMethod = Method
 }
 
 /// Describes method
-@objc(SwiftMethod) @objcMembers final class Method: NSObject, SourceryModel, Annotated, Definition {
+@objc(SwiftMethod) @objcMembers final class Method: NSObject, SourceryModel, Annotated, Definition, Codable {
 
     /// Full method name, including generic constraints, i.e. `foo<T>(bar: T)`
     let name: String

@@ -3,7 +3,7 @@ import SourceKittenFramework
 
 // sourcery: skipJSExport
 /// :nodoc:
-@objcMembers final class Typealias: NSObject, Typed, SourceryModel {
+@objcMembers final class Typealias: NSObject, Typed, SourceryModel, Codable {
     // New typealias name
     let aliasName: String
 

@@ -7,7 +7,7 @@ import Foundation
 import SourceKittenFramework
 
 /// Defines Swift type
-@objcMembers class Type: NSObject, SourceryModel, Annotated {
+@objcMembers class Type: NSObject, SourceryModel, Annotated, Codable {
 
     /// :nodoc:
     var module: String?

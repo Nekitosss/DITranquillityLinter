@@ -30,7 +30,7 @@ protocol Typed {
 }
 
 /// Describes name of the type used in typed declaration (variable, method parameter or return value etc.)
-@objcMembers final class TypeName: NSObject, AutoCoding, AutoEquatable, AutoDiffable, AutoJSExport, LosslessStringConvertible {
+@objcMembers final class TypeName: NSObject, AutoCoding, AutoEquatable, AutoDiffable, AutoJSExport, LosslessStringConvertible, Codable {
 
     /// :nodoc:
     init(_ name: String,
@@ -265,7 +265,7 @@ protocol Typed {
 }
 
 /// Descibes Swift generic type parameter
-@objcMembers final class GenericTypeParameter: NSObject, SourceryModel {
+@objcMembers final class GenericTypeParameter: NSObject, SourceryModel, Codable {
 
     /// Generic parameter type name
     let typeName: TypeName
@@ -297,7 +297,7 @@ protocol Typed {
 }
 
 /// Descibes Swift generic type
-@objcMembers final class GenericType: NSObject, SourceryModel {
+@objcMembers final class GenericType: NSObject, SourceryModel, Codable {
     /// The name of the base type, i.e. `Array` for `Array<Int>`
     let name: String
 
@@ -327,7 +327,7 @@ protocol Typed {
 }
 
 /// Describes tuple type element
-@objcMembers final class TupleElement: NSObject, SourceryModel, Typed {
+@objcMembers final class TupleElement: NSObject, SourceryModel, Typed, Codable {
 
     /// Tuple element name
     let name: String
@@ -364,7 +364,7 @@ protocol Typed {
 }
 
 /// Describes tuple type
-@objcMembers final class TupleType: NSObject, SourceryModel {
+@objcMembers final class TupleType: NSObject, SourceryModel, Codable {
 
     /// Type name used in declaration
     let name: String
@@ -394,7 +394,7 @@ protocol Typed {
 }
 
 /// Describes array type
-@objcMembers final class ArrayType: NSObject, SourceryModel {
+@objcMembers final class ArrayType: NSObject, SourceryModel, Codable {
 
     /// Type name used in declaration
     let name: String
@@ -431,7 +431,7 @@ protocol Typed {
 }
 
 /// Describes dictionary type
-@objcMembers final class DictionaryType: NSObject, SourceryModel {
+@objcMembers final class DictionaryType: NSObject, SourceryModel, Codable {
 
     /// Type name used in declaration
     let name: String
@@ -481,7 +481,7 @@ protocol Typed {
 }
 
 /// Describes closure type
-@objcMembers final class ClosureType: NSObject, SourceryModel {
+@objcMembers final class ClosureType: NSObject, SourceryModel, Codable {
 
     /// Type name used in declaration with stripped whitespaces and new lines
     let name: String

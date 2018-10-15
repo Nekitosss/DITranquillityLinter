@@ -2,7 +2,7 @@ import Foundation
 import SourceKittenFramework
 
 /// Describes subscript
-@objcMembers final class Subscript: NSObject, SourceryModel, Annotated, Definition {
+@objcMembers final class Subscript: NSObject, SourceryModel, Annotated, Definition, Codable {
 
     /// Method parameters
     var parameters: [MethodParameter]

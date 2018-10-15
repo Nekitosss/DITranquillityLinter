@@ -7,7 +7,7 @@ import Foundation
 import SourceKittenFramework
 
 /// Defines enum case associated value
-@objcMembers final class AssociatedValue: NSObject, SourceryModel, AutoDescription, Typed, Annotated {
+@objcMembers final class AssociatedValue: NSObject, SourceryModel, AutoDescription, Typed, Annotated, Codable {
 
     /// Associated value local name.
     /// This is a name to be used to construct enum case value
@@ -63,7 +63,7 @@ import SourceKittenFramework
 }
 
 /// Defines enum case
-@objcMembers final class EnumCase: NSObject, SourceryModel, AutoDescription, Annotated {
+@objcMembers final class EnumCase: NSObject, SourceryModel, AutoDescription, Annotated, Codable {
 
     /// Enum case name
     let name: String
@@ -189,6 +189,16 @@ import SourceKittenFramework
             self.inheritedTypes.remove(at: index)
         }
     }
+	
+	required init(from decoder: Decoder) throws {
+		self.cases = []
+		self.hasRawType = false
+		try super.init(from: decoder)
+	}
+	
+	override func encode(to encoder: Encoder) throws {
+		try super.encode(to: encoder)
+	}
 
     // sourcery:inline:Enum.AutoCoding
         /// :nodoc:
@@ -199,7 +209,7 @@ import SourceKittenFramework
             self.rawType = aDecoder.decode(forKey: "rawType")
             super.init(coder: aDecoder)
         }
-
+	
         /// :nodoc:
         override func encode(with aCoder: NSCoder) {
             super.encode(with: aCoder)
