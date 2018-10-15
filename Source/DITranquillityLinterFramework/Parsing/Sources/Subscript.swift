@@ -77,7 +77,7 @@ import SourceKittenFramework
     // Underlying parser data, never to be used by anything else
     // sourcery: skipEquality, skipDescription, skipCoding, skipJSExport
     /// :nodoc:
-    var __parserData: Structure?
+    var parserData: Structure?
 
     /// :nodoc:
     init(parameters: [MethodParameter] = [],
@@ -95,33 +95,5 @@ import SourceKittenFramework
         self.annotations = annotations
         self.definedInTypeName = definedInTypeName
     }
-
-    // sourcery:inline:Subscript.AutoCoding
-        /// :nodoc:
-        required init?(coder aDecoder: NSCoder) {
-            guard let parameters: [MethodParameter] = aDecoder.decode(forKey: "parameters") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["parameters"])); fatalError() }; self.parameters = parameters
-            guard let returnTypeName: TypeName = aDecoder.decode(forKey: "returnTypeName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["returnTypeName"])); fatalError() }; self.returnTypeName = returnTypeName
-            self.returnType = aDecoder.decode(forKey: "returnType")
-            guard let readAccess: String = aDecoder.decode(forKey: "readAccess") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["readAccess"])); fatalError() }; self.readAccess = readAccess
-            guard let writeAccess: String = aDecoder.decode(forKey: "writeAccess") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["writeAccess"])); fatalError() }; self.writeAccess = writeAccess
-            guard let annotations: Annotations = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
-            self.definedInTypeName = aDecoder.decode(forKey: "definedInTypeName")
-            self.definedInType = aDecoder.decode(forKey: "definedInType")
-            guard let attributes: [String: Attribute] = aDecoder.decode(forKey: "attributes") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["attributes"])); fatalError() }; self.attributes = attributes
-        }
-
-        /// :nodoc:
-        func encode(with aCoder: NSCoder) {
-            aCoder.encode(self.parameters, forKey: "parameters")
-            aCoder.encode(self.returnTypeName, forKey: "returnTypeName")
-            aCoder.encode(self.returnType, forKey: "returnType")
-            aCoder.encode(self.readAccess, forKey: "readAccess")
-            aCoder.encode(self.writeAccess, forKey: "writeAccess")
-            aCoder.encode(self.annotations, forKey: "annotations")
-            aCoder.encode(self.definedInTypeName, forKey: "definedInTypeName")
-            aCoder.encode(self.definedInType, forKey: "definedInType")
-            aCoder.encode(self.attributes, forKey: "attributes")
-        }
-    // sourcery:end
 
 }

@@ -85,7 +85,7 @@ import SourceKittenFramework
     // Underlying parser data, never to be used by anything else
     // sourcery: skipEquality, skipDescription, skipCoding, skipJSExport
     /// :nodoc:
-    var __parserData: Structure?
+    var parserData: Structure?
 
     /// :nodoc:
     init(name: String, rawValue: String? = nil, associatedValues: [AssociatedValue] = [], annotations: Annotations = [:]) {
@@ -200,23 +200,4 @@ import SourceKittenFramework
 		try super.encode(to: encoder)
 	}
 
-    // sourcery:inline:Enum.AutoCoding
-        /// :nodoc:
-        required init?(coder aDecoder: NSCoder) {
-            guard let cases: [EnumCase] = aDecoder.decode(forKey: "cases") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["cases"])); fatalError() }; self.cases = cases
-            self.rawTypeName = aDecoder.decode(forKey: "rawTypeName")
-            self.hasRawType = aDecoder.decode(forKey: "hasRawType")
-            self.rawType = aDecoder.decode(forKey: "rawType")
-            super.init(coder: aDecoder)
-        }
-	
-        /// :nodoc:
-        override func encode(with aCoder: NSCoder) {
-            super.encode(with: aCoder)
-            aCoder.encode(self.cases, forKey: "cases")
-            aCoder.encode(self.rawTypeName, forKey: "rawTypeName")
-            aCoder.encode(self.hasRawType, forKey: "hasRawType")
-            aCoder.encode(self.rawType, forKey: "rawType")
-        }
-     // sourcery:end
 }

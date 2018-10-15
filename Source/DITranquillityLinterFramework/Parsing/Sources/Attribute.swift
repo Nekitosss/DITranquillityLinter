@@ -56,7 +56,7 @@ extension File: Codable {
 
 typealias AttributeArguments = [String: AttributeArgumentValue]
 /// Describes Swift attribute
-@objcMembers class Attribute: NSObject, AutoCoding, AutoEquatable, AutoDiffable, AutoJSExport, Codable {
+@objcMembers class Attribute: NSObject, AutoEquatable, AutoDiffable, Codable {
 
     /// Attribute name
     let name: String
@@ -69,7 +69,7 @@ typealias AttributeArguments = [String: AttributeArgumentValue]
 
     // sourcery: skipEquality, skipDescription, skipCoding, skipJSExport
     /// :nodoc:
-    var __parserData: Structure?
+    var parserData: Structure?
 
     /// :nodoc:
     init(name: String, arguments: AttributeArguments = [:], description: String? = nil) {
@@ -194,21 +194,4 @@ typealias AttributeArguments = [String: AttributeArgumentValue]
             }
         }
     }
-
-    // sourcery:inline:sourcery:.AutoCoding
-        /// :nodoc:
-        required init?(coder aDecoder: NSCoder) {
-			fatalError()
-        }
-
-        /// :nodoc:
-        func encode(with aCoder: NSCoder) {
-
-            aCoder.encode(self.name, forKey: "name")
-            aCoder.encode(self.arguments, forKey: "arguments")
-            aCoder.encode(self._description, forKey: "_description")
-
-        }
-        // sourcery:end
-
 }

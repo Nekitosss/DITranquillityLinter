@@ -8,18 +8,18 @@ import SourceKittenFramework
 import PathKit
 
 protocol Parsable: AnyObject {
-    var __parserData: Structure? { get set }
+    var parserData: Structure? { get set }
 }
 
 extension Parsable {
     /// Source structure used by the parser
     fileprivate var __underlyingSource: [String: SourceKitRepresentable] {
-        return __parserData?.dictionary ?? [:]
+        return parserData?.dictionary ?? [:]
     }
 
     /// sets underlying source
     fileprivate func setSource(_ source: [String: SourceKitRepresentable]) {
-        __parserData = Structure(sourceKitResponse: source)
+        parserData = Structure(sourceKitResponse: source)
     }
 }
 

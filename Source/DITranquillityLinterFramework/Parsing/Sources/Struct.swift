@@ -57,16 +57,4 @@ import SourceKittenFramework
 	override func encode(to encoder: Encoder) throws {
 		try super.encode(to: encoder)
 	}
-
-    // sourcery:inline:Struct.AutoCoding
-        /// :nodoc:
-        required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-        }
-
-        /// :nodoc:
-        override func encode(with aCoder: NSCoder) {
-            super.encode(with: aCoder)
-        }
-        // sourcery:end
 }

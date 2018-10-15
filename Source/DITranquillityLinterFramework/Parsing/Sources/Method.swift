@@ -36,7 +36,7 @@ typealias SourceryMethod = Method
     /// Underlying parser data, never to be used by anything else
     // sourcery: skipEquality, skipDescription, skipCoding, skipJSExport
     /// :nodoc:
-    var __parserData: Structure?
+    var parserData: Structure?
 
     /// :nodoc:
     init(argumentLabel: String?, name: String = "", typeName: TypeName, type: Type? = nil, defaultValue: String? = nil, annotations: Annotations = [:], isInout: Bool = false) {
@@ -230,7 +230,7 @@ typealias SourceryMethod = Method
     // Underlying parser data, never to be used by anything else
     // sourcery: skipEquality, skipDescription, skipCoding, skipJSExport
     /// :nodoc:
-    var __parserData: Structure?
+    var parserData: Structure?
 
     /// :nodoc:
     init(name: String,
@@ -261,44 +261,4 @@ typealias SourceryMethod = Method
         self.annotations = annotations
         self.definedInTypeName = definedInTypeName
     }
-
-    // sourcery:inline:Method.AutoCoding
-        /// :nodoc:
-        required init?(coder aDecoder: NSCoder) {
-            guard let name: String = aDecoder.decode(forKey: "name") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["name"])); fatalError() }; self.name = name
-            guard let selectorName: String = aDecoder.decode(forKey: "selectorName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["selectorName"])); fatalError() }; self.selectorName = selectorName
-            guard let parameters: [MethodParameter] = aDecoder.decode(forKey: "parameters") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["parameters"])); fatalError() }; self.parameters = parameters
-            guard let returnTypeName: TypeName = aDecoder.decode(forKey: "returnTypeName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["returnTypeName"])); fatalError() }; self.returnTypeName = returnTypeName
-            self.returnType = aDecoder.decode(forKey: "returnType")
-            self.`throws` = aDecoder.decode(forKey: "`throws`")
-            self.`rethrows` = aDecoder.decode(forKey: "`rethrows`")
-            guard let accessLevel: String = aDecoder.decode(forKey: "accessLevel") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["accessLevel"])); fatalError() }; self.accessLevel = accessLevel
-            self.isStatic = aDecoder.decode(forKey: "isStatic")
-            self.isClass = aDecoder.decode(forKey: "isClass")
-            self.isFailableInitializer = aDecoder.decode(forKey: "isFailableInitializer")
-            guard let annotations: Annotations = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
-            self.definedInTypeName = aDecoder.decode(forKey: "definedInTypeName")
-            self.definedInType = aDecoder.decode(forKey: "definedInType")
-            guard let attributes: [String: Attribute] = aDecoder.decode(forKey: "attributes") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["attributes"])); fatalError() }; self.attributes = attributes
-        }
-
-        /// :nodoc:
-        func encode(with aCoder: NSCoder) {
-            aCoder.encode(self.name, forKey: "name")
-            aCoder.encode(self.selectorName, forKey: "selectorName")
-            aCoder.encode(self.parameters, forKey: "parameters")
-            aCoder.encode(self.returnTypeName, forKey: "returnTypeName")
-            aCoder.encode(self.returnType, forKey: "returnType")
-            aCoder.encode(self.`throws`, forKey: "`throws`")
-            aCoder.encode(self.`rethrows`, forKey: "`rethrows`")
-            aCoder.encode(self.accessLevel, forKey: "accessLevel")
-            aCoder.encode(self.isStatic, forKey: "isStatic")
-            aCoder.encode(self.isClass, forKey: "isClass")
-            aCoder.encode(self.isFailableInitializer, forKey: "isFailableInitializer")
-            aCoder.encode(self.annotations, forKey: "annotations")
-            aCoder.encode(self.definedInTypeName, forKey: "definedInTypeName")
-            aCoder.encode(self.definedInType, forKey: "definedInType")
-            aCoder.encode(self.attributes, forKey: "attributes")
-        }
-     // sourcery:end
 }
