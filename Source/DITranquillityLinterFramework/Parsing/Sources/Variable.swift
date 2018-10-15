@@ -44,7 +44,7 @@ typealias SourceryVariable = Variable
     var defaultValue: String?
 
     /// Annotations, that were created with // sourcery: annotation1, other = "annotation value", alterantive = 2
-    var annotations: [String: NSObject] = [:]
+    var annotations: Annotations = [:]
 
     /// Variable attributes, i.e. `@IBOutlet`, `@IBInspectable`
     var attributes: [String: Attribute]
@@ -82,7 +82,7 @@ typealias SourceryVariable = Variable
                 isStatic: Bool = false,
                 defaultValue: String? = nil,
                 attributes: [String: Attribute] = [:],
-                annotations: [String: NSObject] = [:],
+                annotations: Annotations = [:],
                 definedInTypeName: TypeName? = nil) {
 
         self.name = name
@@ -109,7 +109,7 @@ typealias SourceryVariable = Variable
             guard let readAccess: String = aDecoder.decode(forKey: "readAccess") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["readAccess"])); fatalError() }; self.readAccess = readAccess
             guard let writeAccess: String = aDecoder.decode(forKey: "writeAccess") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["writeAccess"])); fatalError() }; self.writeAccess = writeAccess
             self.defaultValue = aDecoder.decode(forKey: "defaultValue")
-            guard let annotations: [String: NSObject] = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
+            guard let annotations: Annotations = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
             guard let attributes: [String: Attribute] = aDecoder.decode(forKey: "attributes") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["attributes"])); fatalError() }; self.attributes = attributes
             self.definedInTypeName = aDecoder.decode(forKey: "definedInTypeName")
             self.definedInType = aDecoder.decode(forKey: "definedInType")

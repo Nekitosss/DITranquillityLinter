@@ -6,7 +6,58 @@
 import Foundation
 import SourceKittenFramework
 
-internal typealias Annotations = [String: NSObject]
+enum AnnotationStructure: Codable, Equatable {
+	case floatValue(Float)
+	case boolValue(Bool)
+	case stringValue(String)
+	indirect case arrayValue([AnnotationStructure])
+	indirect case dictionaryValue(Annotations)
+	
+	
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		
+		if let leftValue = try? container.decode(String.self, forKey: .stringValue) {
+			self = .stringValue(leftValue)
+		} else if let rightValue = try? container.decode(Bool.self, forKey: .boolValue) {
+			self = .boolValue(rightValue)
+		} else if let rightValue = try? container.decode(Float.self, forKey: .floatValue) {
+			self = .floatValue(rightValue)
+		} else if let rightValue = try? container.decode([AnnotationStructure].self, forKey: .arrayValue) {
+			self = .arrayValue(rightValue)
+		} else {
+			let rightValue = try container.decode(Annotations.self, forKey: .dictionaryValue)
+			self = .dictionaryValue(rightValue)
+		}
+	}
+	
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		switch self {
+		case .stringValue(let value):
+			try container.encode(value, forKey: .stringValue)
+		case .boolValue(let value):
+			try container.encode(value, forKey: .boolValue)
+		case .floatValue(let value):
+			try container.encode(value, forKey: .boolValue)
+		case .arrayValue(let value):
+			try container.encode(value, forKey: .boolValue)
+		case .dictionaryValue(let value):
+			try container.encode(value, forKey: .boolValue)
+		}
+	}
+	
+	enum CodingKeys: String, CodingKey {
+		case stringValue
+		case boolValue
+		case floatValue
+		case arrayValue
+		case dictionaryValue
+	}
+	
+}
+typealias AnnotationValue = AnnotationStructure
+internal typealias Annotations = [String: AnnotationValue]
 
 /// Parser for annotations
 internal struct AnnotationsParser {
@@ -249,18 +300,18 @@ internal struct AnnotationsParser {
             if let name = parts.first, !name.isEmpty {
 
                 guard parts.count > 1, var value = parts.last, value.isEmpty == false else {
-                    append(key: name, value: NSNumber(value: true), to: &annotations)
+                    append(key: name, value: .boolValue(true), to: &annotations)
                     return
                 }
 
                 if let number = Float(value) {
-                    append(key: name, value: NSNumber(value: number), to: &annotations)
+                    append(key: name, value: .floatValue(number), to: &annotations)
                 } else {
                     if (value.hasPrefix("'") && value.hasSuffix("'")) || (value.hasPrefix("\"") && value.hasSuffix("\"")) {
                         value = String(value[value.index(after: value.startIndex) ..< value.index(before: value.endIndex)])
                         value = value.trimmingCharacters(in: .whitespaces)
                     }
-                    append(key: name, value: value as NSString, to: &annotations)
+					append(key: name, value: .stringValue(value), to: &annotations)
                 }
             }
         }
@@ -270,7 +321,7 @@ internal struct AnnotationsParser {
         } else {
             var namespaced = Annotations()
             for namespace in namespaces.reversed() {
-                namespaced[namespace] = annotations as NSObject
+                namespaced[namespace] = .dictionaryValue(annotations)
                 annotations = namespaced
                 namespaced = Annotations()
             }
@@ -278,21 +329,27 @@ internal struct AnnotationsParser {
         }
     }
 
-    static func append(key: String, value: NSObject, to annotations: inout Annotations) {
+    static func append(key: String, value: AnnotationValue, to annotations: inout Annotations) {
         if let oldValue = annotations[key] {
-            if var array = oldValue as? [NSObject] {
-                if !array.contains(value) {
-                    array.append(value)
-                    annotations[key] = array as NSObject
-                }
-            } else if var oldDict = oldValue as? [String: NSObject], let newDict = value as? [String: NSObject] {
-                newDict.forEach({ (key, value) in
-                    append(key: key, value: value, to: &oldDict)
-                })
-                annotations[key] = oldDict as NSObject
-            } else if oldValue != value {
-                annotations[key] = [oldValue, value] as NSObject
-            }
+			switch oldValue {
+			case .arrayValue(var current):
+				current.append(value)
+				annotations[key] = .arrayValue(current)
+			case .dictionaryValue(var current):
+				switch value {
+				case .dictionaryValue(let new):
+					new.forEach {
+						append(key: $0, value: $1, to: &current)
+					}
+				default:
+					break
+				}
+				annotations[key] = .dictionaryValue(current)
+			default:
+				if oldValue != value {
+					annotations[key] = .arrayValue([oldValue, value])
+				}
+			}
         } else {
             annotations[key] = value
         }

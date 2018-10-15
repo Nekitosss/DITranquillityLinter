@@ -25,10 +25,10 @@ import SourceKittenFramework
     var type: Type?
 
     /// Annotations, that were created with // sourcery: annotation1, other = "annotation value", alterantive = 2
-    var annotations: [String: NSObject] = [:]
+    var annotations: Annotations = [:]
 
     /// :nodoc:
-    init(localName: String?, externalName: String?, typeName: TypeName, type: Type? = nil, annotations: [String: NSObject] = [:]) {
+    init(localName: String?, externalName: String?, typeName: TypeName, type: Type? = nil, annotations: Annotations = [:]) {
         self.localName = localName
         self.externalName = externalName
         self.typeName = typeName
@@ -36,7 +36,7 @@ import SourceKittenFramework
         self.annotations = annotations
     }
 
-    convenience init(name: String? = nil, typeName: TypeName, type: Type? = nil, annotations: [String: NSObject] = [:]) {
+    convenience init(name: String? = nil, typeName: TypeName, type: Type? = nil, annotations: Annotations = [:]) {
         self.init(localName: name, externalName: name, typeName: typeName, type: type, annotations: annotations)
     }
 
@@ -47,7 +47,7 @@ import SourceKittenFramework
             self.externalName = aDecoder.decode(forKey: "externalName")
             guard let typeName: TypeName = aDecoder.decode(forKey: "typeName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["typeName"])); fatalError() }; self.typeName = typeName
             self.type = aDecoder.decode(forKey: "type")
-            guard let annotations: [String: NSObject] = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
+            guard let annotations: Annotations = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
         }
 
         /// :nodoc:
@@ -75,7 +75,7 @@ import SourceKittenFramework
     let associatedValues: [AssociatedValue]
 
     /// Enum case annotations
-    var annotations: [String: NSObject] = [:]
+    var annotations: Annotations = [:]
 
     /// Whether enum case has associated value
     var hasAssociatedValue: Bool {
@@ -88,7 +88,7 @@ import SourceKittenFramework
     var __parserData: Structure?
 
     /// :nodoc:
-    init(name: String, rawValue: String? = nil, associatedValues: [AssociatedValue] = [], annotations: [String: NSObject] = [:]) {
+    init(name: String, rawValue: String? = nil, associatedValues: [AssociatedValue] = [], annotations: Annotations = [:]) {
         self.name = name
         self.rawValue = rawValue
         self.associatedValues = associatedValues
@@ -101,7 +101,7 @@ import SourceKittenFramework
             guard let name: String = aDecoder.decode(forKey: "name") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["name"])); fatalError() }; self.name = name
             self.rawValue = aDecoder.decode(forKey: "rawValue")
             guard let associatedValues: [AssociatedValue] = aDecoder.decode(forKey: "associatedValues") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["associatedValues"])); fatalError() }; self.associatedValues = associatedValues
-            guard let annotations: [String: NSObject] = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
+            guard let annotations: Annotations = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
         }
 
         /// :nodoc:
@@ -175,7 +175,7 @@ import SourceKittenFramework
                 containedTypes: [Type] = [],
                 typealiases: [Typealias] = [],
                 attributes: [String: Attribute] = [:],
-                annotations: [String: NSObject] = [:],
+                annotations: Annotations = [:],
                 isGeneric: Bool = false,
 				file: File) {
 

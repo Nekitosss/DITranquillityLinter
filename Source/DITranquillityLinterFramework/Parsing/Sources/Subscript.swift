@@ -55,7 +55,7 @@ import SourceKittenFramework
     }
 
     /// Annotations, that were created with // sourcery: annotation1, other = "annotation value", alterantive = 2
-    let annotations: [String: NSObject]
+    let annotations: Annotations
 
     /// Reference to type name where the method is defined,
     /// nil if defined outside of any `enum`, `struct`, `class` etc
@@ -84,7 +84,7 @@ import SourceKittenFramework
                 returnTypeName: TypeName,
                 accessLevel: (read: AccessLevel, write: AccessLevel) = (.internal, .internal),
                 attributes: [String: Attribute] = [:],
-                annotations: [String: NSObject] = [:],
+                annotations: Annotations = [:],
                 definedInTypeName: TypeName? = nil) {
 
         self.parameters = parameters
@@ -104,7 +104,7 @@ import SourceKittenFramework
             self.returnType = aDecoder.decode(forKey: "returnType")
             guard let readAccess: String = aDecoder.decode(forKey: "readAccess") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["readAccess"])); fatalError() }; self.readAccess = readAccess
             guard let writeAccess: String = aDecoder.decode(forKey: "writeAccess") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["writeAccess"])); fatalError() }; self.writeAccess = writeAccess
-            guard let annotations: [String: NSObject] = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
+            guard let annotations: Annotations = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
             self.definedInTypeName = aDecoder.decode(forKey: "definedInTypeName")
             self.definedInType = aDecoder.decode(forKey: "definedInType")
             guard let attributes: [String: Attribute] = aDecoder.decode(forKey: "attributes") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["attributes"])); fatalError() }; self.attributes = attributes

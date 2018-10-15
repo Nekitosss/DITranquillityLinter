@@ -20,5 +20,5 @@ protocol Annotated {
      ]
      ```
     */
-    var annotations: [String: NSObject] { get }
+    var annotations: Annotations { get }
 }

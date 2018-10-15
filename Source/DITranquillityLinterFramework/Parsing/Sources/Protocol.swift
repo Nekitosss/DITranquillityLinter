@@ -30,7 +30,7 @@ typealias SourceryProtocol = Protocol
                          containedTypes: [Type] = [],
                          typealiases: [Typealias] = [],
                          attributes: [String: Attribute] = [:],
-                         annotations: [String: NSObject] = [:],
+                         annotations: Annotations = [:],
 						 isGeneric: Bool = false,
 						 genericTypeParameters: [GenericTypeParameter] = [],
 						 file: File) {
