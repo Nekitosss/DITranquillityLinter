@@ -189,16 +189,6 @@ extension Subscript {
         return string
     }
 }
-extension TemplateContext {
-    /// :nodoc:
-    override var description: String {
-        var string = "\(Swift.type(of: self)): "
-        string += "types = \(String(describing: self.types)), "
-        string += "arguments = \(String(describing: self.arguments)), "
-        string += "stencilContext = \(String(describing: self.stencilContext))"
-        return string
-    }
-}
 extension TupleElement {
     /// :nodoc:
     override var description: String {
@@ -257,14 +247,6 @@ extension Typealias {
         string += "typeName = \(String(describing: self.typeName)), "
         string += "parentName = \(String(describing: self.parentName)), "
         string += "name = \(String(describing: self.name))"
-        return string
-    }
-}
-extension Types {
-    /// :nodoc:
-    override var description: String {
-        var string = "\(Swift.type(of: self)): "
-        string += "types = \(String(describing: self.types))"
         return string
     }
 }

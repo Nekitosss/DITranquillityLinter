@@ -72,8 +72,6 @@ extension MethodParameter: NSCoding {}
 
 extension Subscript: NSCoding {}
 
-extension TemplateContext: NSCoding {}
-
 extension TupleElement: NSCoding {}
 
 extension TupleType: NSCoding {}
@@ -83,8 +81,6 @@ extension Type: NSCoding {}
 extension TypeName: NSCoding {}
 
 extension Typealias: NSCoding {}
-
-extension Types: NSCoding {}
 
 extension Variable: NSCoding {}
 

@@ -1,14 +1,57 @@
 import Foundation
 import SourceKittenFramework
 
+enum AttributeArgumentValue: Equatable, Codable {
+	case stringValue(String)
+	case boolValue(Bool)
+	
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		do {
+			let leftValue = try container.decode(String.self, forKey: .stringValue)
+			self = .stringValue(leftValue)
+		} catch {
+			let rightValue = try container.decode(Bool.self, forKey: .boolValue)
+			self = .boolValue(rightValue)
+		}
+	}
+	
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		switch self {
+		case .stringValue(let value):
+			try container.encode(value, forKey: .stringValue)
+		case .boolValue(let value):
+			try container.encode(value, forKey: .boolValue)
+		}
+	}
+	
+	enum CodingKeys: String, CodingKey {
+		case stringValue
+		case boolValue
+	}
+}
+
+extension Structure: Codable {
+	
+	public init(from decoder: Decoder) throws {
+		fatalError()
+	}
+	
+	public func encode(to encoder: Encoder) throws {
+		fatalError()
+	}
+}
+
+typealias AttributeArguments = [String: AttributeArgumentValue]
 /// Describes Swift attribute
-@objcMembers class Attribute: NSObject, AutoCoding, AutoEquatable, AutoDiffable, AutoJSExport {
+@objcMembers class Attribute: NSObject, AutoCoding, AutoEquatable, AutoDiffable, AutoJSExport, Codable {
 
     /// Attribute name
     let name: String
 
     /// Attribute arguments
-    let arguments: [String: NSObject]
+    let arguments: AttributeArguments
 
     // sourcery: skipJSExport
     let _description: String
@@ -18,7 +61,7 @@ import SourceKittenFramework
     var __parserData: Structure?
 
     /// :nodoc:
-    init(name: String, arguments: [String: NSObject] = [:], description: String? = nil) {
+    init(name: String, arguments: AttributeArguments = [:], description: String? = nil) {
         self.name = name
         self.arguments = arguments
         self._description = description ?? "@\(name)"
@@ -30,7 +73,7 @@ import SourceKittenFramework
     }
 
     /// :nodoc:
-    enum Identifier: String {
+    enum Identifier: String, Codable {
         case convenience
         case required
         case available
@@ -144,10 +187,7 @@ import SourceKittenFramework
     // sourcery:inline:sourcery:.AutoCoding
         /// :nodoc:
         required init?(coder aDecoder: NSCoder) {
-            guard let name: String = aDecoder.decode(forKey: "name") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["name"])); fatalError() }; self.name = name
-            guard let arguments: [String: NSObject] = aDecoder.decode(forKey: "arguments") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["arguments"])); fatalError() }; self.arguments = arguments
-            guard let _description: String = aDecoder.decode(forKey: "_description") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["_description"])); fatalError() }; self._description = _description
-
+			fatalError()
         }
 
         /// :nodoc:

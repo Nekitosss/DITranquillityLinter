@@ -237,18 +237,6 @@ extension Subscript: Diffable {
         return results
     }
 }
-extension TemplateContext: Diffable {
-    @objc func diffAgainst(_ object: Any?) -> DiffableResult {
-        let results = DiffableResult()
-        guard let castObject = object as? TemplateContext else {
-            results.append("Incorrect type <expected: TemplateContext, received: \(Swift.type(of: object))>")
-            return results
-        }
-        results.append(contentsOf: DiffableResult(identifier: "types").trackDifference(actual: self.types, expected: castObject.types))
-        results.append(contentsOf: DiffableResult(identifier: "arguments").trackDifference(actual: self.arguments, expected: castObject.arguments))
-        return results
-    }
-}
 extension TupleElement: Diffable {
     @objc func diffAgainst(_ object: Any?) -> DiffableResult {
         let results = DiffableResult()
@@ -325,17 +313,6 @@ extension Typealias: Diffable {
         results.append(contentsOf: DiffableResult(identifier: "aliasName").trackDifference(actual: self.aliasName, expected: castObject.aliasName))
         results.append(contentsOf: DiffableResult(identifier: "typeName").trackDifference(actual: self.typeName, expected: castObject.typeName))
         results.append(contentsOf: DiffableResult(identifier: "parentName").trackDifference(actual: self.parentName, expected: castObject.parentName))
-        return results
-    }
-}
-extension Types: Diffable {
-    @objc func diffAgainst(_ object: Any?) -> DiffableResult {
-        let results = DiffableResult()
-        guard let castObject = object as? Types else {
-            results.append("Incorrect type <expected: Types, received: \(Swift.type(of: object))>")
-            return results
-        }
-        results.append(contentsOf: DiffableResult(identifier: "types").trackDifference(actual: self.types, expected: castObject.types))
         return results
     }
 }

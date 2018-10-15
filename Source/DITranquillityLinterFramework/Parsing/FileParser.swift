@@ -772,20 +772,20 @@ extension FileParser {
         }
     }
 
-    private func parseAttributeArguments(_ string: String, attribute: String) -> [String: NSObject] {
-        var arguments = [String: NSObject]()
+    private func parseAttributeArguments(_ string: String, attribute: String) -> AttributeArguments {
+        var arguments = AttributeArguments()
         string.components(separatedBy: ",", excludingDelimiterBetween: ("\"", "\""))
             .map({ $0.trimmingCharacters(in: .whitespaces) })
             .forEach { argument in
                 // TODO: @objc can be used only for getter or settor of computed property
                 if attribute == "objc" {
-                    arguments["name"] = argument as NSString
+                    arguments["name"] = .stringValue(argument)
                     return
                 }
 
                 guard argument.contains("\"") else {
                     if argument != "*" {
-                        arguments[argument.replacingOccurrences(of: " ", with: "_")] = NSNumber(value: true)
+                        arguments[argument.replacingOccurrences(of: " ", with: "_")] = .boolValue(true)
                     }
                     return
                 }
@@ -794,7 +794,7 @@ extension FileParser {
                     .components(separatedBy: ":", excludingDelimiterBetween: ("\"", "\""))
                     .map({ $0.trimmingCharacters(in: CharacterSet(charactersIn: "\"").union(.whitespaces)) })
                 if nameAndValue.count != 1 {
-                    arguments[nameAndValue[0].replacingOccurrences(of: " ", with: "_")] = nameAndValue[1] as NSString
+                    arguments[nameAndValue[0].replacingOccurrences(of: " ", with: "_")] = .stringValue(nameAndValue[1])
                 }
         }
         return arguments

@@ -191,15 +191,6 @@ extension Subscript {
         return true
     }
 }
-extension TemplateContext {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? TemplateContext else { return false }
-        if self.types != rhs.types { return false }
-        if self.arguments != rhs.arguments { return false }
-        return true
-    }
-}
 extension TupleElement {
     /// :nodoc:
     override func isEqual(_ object: Any?) -> Bool {
@@ -262,14 +253,6 @@ extension Typealias {
         if self.aliasName != rhs.aliasName { return false }
         if self.typeName != rhs.typeName { return false }
         if self.parentName != rhs.parentName { return false }
-        return true
-    }
-}
-extension Types {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? Types else { return false }
-        if self.types != rhs.types { return false }
         return true
     }
 }
