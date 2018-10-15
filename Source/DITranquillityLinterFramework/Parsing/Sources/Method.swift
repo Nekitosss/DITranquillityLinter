@@ -59,30 +59,6 @@ typealias SourceryMethod = Method
         self.annotations = annotations
         self.`inout` = isInout
     }
-
-    // sourcery:inline:MethodParameter.AutoCoding
-        /// :nodoc:
-        required init?(coder aDecoder: NSCoder) {
-            self.argumentLabel = aDecoder.decode(forKey: "argumentLabel")
-            guard let name: String = aDecoder.decode(forKey: "name") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["name"])); fatalError() }; self.name = name
-            guard let typeName: TypeName = aDecoder.decode(forKey: "typeName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["typeName"])); fatalError() }; self.typeName = typeName
-            self.`inout` = aDecoder.decode(forKey: "`inout`")
-            self.type = aDecoder.decode(forKey: "type")
-            self.defaultValue = aDecoder.decode(forKey: "defaultValue")
-            guard let annotations: Annotations = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
-        }
-
-        /// :nodoc:
-        func encode(with aCoder: NSCoder) {
-            aCoder.encode(self.argumentLabel, forKey: "argumentLabel")
-            aCoder.encode(self.name, forKey: "name")
-            aCoder.encode(self.typeName, forKey: "typeName")
-            aCoder.encode(self.`inout`, forKey: "`inout`")
-            aCoder.encode(self.type, forKey: "type")
-            aCoder.encode(self.defaultValue, forKey: "defaultValue")
-            aCoder.encode(self.annotations, forKey: "annotations")
-        }
-        // sourcery:end
 }
 
 /// Describes method
