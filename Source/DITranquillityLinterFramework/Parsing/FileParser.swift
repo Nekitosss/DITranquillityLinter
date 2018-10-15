@@ -109,10 +109,13 @@ final class FileParser {
         }
         let file = File(contents: contents)
         let source = try Structure(file: file).dictionary
-
-		let (types, typealiases) = try parseTypes(source, file: file)
-        return FileParserResult(path: path, module: module, types: types, typealiases: typealiases, inlineRanges: inlineRanges)
+		return try parse(source: source, file: file)
     }
+	
+	func parse(source: [String: SourceKitRepresentable], file: File) throws -> FileParserResult {
+		let (types, typealiases) = try parseTypes(source, file: file)
+		return FileParserResult(path: path, module: module, types: types, typealiases: typealiases, inlineRanges: inlineRanges)
+	}
 
 	internal func parseTypes(_ source: [String: SourceKitRepresentable], file: File) throws -> ([Type], [Typealias]) {
         var types = [Type]()

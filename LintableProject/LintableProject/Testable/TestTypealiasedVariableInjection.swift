@@ -10,7 +10,7 @@ import Foundation
 
 import DITranquillity
 
-private class AnotherClass<T> {}
+private class AnotherClass {}
 private typealias MyTypealias = AnotherClass
 private class MyClass {
 	var ss: MyTypealias!

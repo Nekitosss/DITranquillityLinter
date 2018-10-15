@@ -10,6 +10,7 @@ import Foundation
 import SourceKittenFramework
 import xcodeproj
 import PathKit
+import SourceKit
 
 public class Tokenizer {
 	
@@ -18,6 +19,7 @@ public class Tokenizer {
 	public init() {}
 	
 	public func process(files: [URL]) -> Bool {
+		
 		let collectedInfo = collectInfo(files: files)
 		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: collectedInfo) {
 			let validator = GraphValidator()
@@ -32,13 +34,93 @@ public class Tokenizer {
 		return true
 	}
 	
+	func parseBinaryModules() -> [FileParserResult] {
+		let enironment = ProcessInfo.processInfo.environment
+		var target = "x86_64-apple-ios11.4"
+		var sdk = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk"
+		
+		if let arch = enironment["PLATFORM_PREFERRED_ARCH"],
+			let targetPrefix = enironment["SWIFT_PLATFORM_TARGET_PREFIX"],
+			let deploymentTarget = enironment["IPHONEOS_DEPLOYMENT_TARGET"] {
+			//		"${PLATFORM_PREFERRED_ARCH}-apple-${SWIFT_PLATFORM_TARGET_PREFIX}${IPHONEOS_DEPLOYMENT_TARGET}"
+			target = "\(arch)-apple-\(targetPrefix)\(deploymentTarget)"
+			print("Found environment info.")
+		} else {
+			print("Environment info not found. Will be used default")
+		}
+		if let sdkRoot = enironment["SDKROOT"] {
+			sdk = sdkRoot
+		}
+		let frameworksPath = sdk + "/System/Library/Frameworks"
+		
+		let compilerArguments = [
+			"-target",
+			target,
+			"-sdk",
+			sdk,
+			"-F",
+			frameworksPath,
+			]
+		
+		var commonFrameworkNames = [String]()
+		if sdk.range(of: "iPhoneSimulator") != nil || sdk.range(of: "iPhoneOS") != nil {
+			commonFrameworkNames = ["UIKit", "Foundation"]
+		}
+		if sdk.range(of: "MacOSX") != nil {
+			commonFrameworkNames = ["Cocoa", "Foundation"]
+		}
+		return commonFrameworkNames.flatMap {
+			parseModule(moduleName: $0, frameworksPath: frameworksPath, compilerArguments: compilerArguments)
+		}
+	}
+	
+	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String]) -> [FileParserResult] {
+		print("Parse module: \(moduleName)")
+		let frameworksURL = URL(fileURLWithPath: frameworksPath + "/\(moduleName).framework/Headers", isDirectory: true)
+		guard let frameworks = try? collectFrameworkNames(frameworksURL: frameworksURL) else { return [] }
+		var parsedFilesResults: [FileParserResult] = []
+		for frameworkName in frameworks {
+			print("Parse framework: \(frameworkName)")
+			do {
+				let toolchains = ["com.apple.dt.toolchain.XcodeDefault"]
+				let fullFrameworkName = self.fullFrameworkName(moduleName: moduleName, frameworkName: frameworkName)
+				let skObject: SourceKitObject = [
+					"key.request": UID("source.request.editor.open.interface"),
+					"key.name": UUID().uuidString,
+					"key.compilerargs": compilerArguments,
+					"key.modulename": fullFrameworkName,
+					"key.toolchains": toolchains,
+					"key.synthesizedextensions": 1
+				]
+				let request = Request.customRequest(request: skObject)
+				let result = try request.send()
+				guard let contents = result["key.sourcetext"] as? String else { continue }
+				let fileParserResult = try FileParser(contents: contents, module: moduleName).parse()
+				parsedFilesResults.append(fileParserResult)
+			} catch {
+				print(error)
+				continue
+			}
+		}
+		return parsedFilesResults
+	}
+	
+	private func fullFrameworkName(moduleName: String, frameworkName: String) -> String {
+		return moduleName == frameworkName ? frameworkName : moduleName + "." + frameworkName
+	}
+	
+	private func collectFrameworkNames(frameworksURL: URL) throws -> [String] {
+		let fileURLs = try FileManager.default.contentsOfDirectory(at: frameworksURL, includingPropertiesForKeys: nil)
+		return fileURLs.filter({ $0.pathExtension == "h" }).map({ $0.lastPathComponent }).map({ $0.droppedSuffix(".h") })
+	}
+	
 	func collectInfo(files: [URL]) -> [String: Type] {
 		let paths = files.map({ Path($0.path) })
 		let filesParsers: [FileParser] = paths.compactMap({
 			guard let contents = File(path: $0.string)?.contents else { return nil }
 			return try? FileParser(contents: contents, path: $0, module: nil)
 		})
-		let allResults = filesParsers.map({ try! $0.parse() })
+		let allResults = filesParsers.map({ try! $0.parse() }) + parseBinaryModules()
 		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [])) { acc, next in
 			acc.typealiases += next.typealiases
 			acc.types += next.types
