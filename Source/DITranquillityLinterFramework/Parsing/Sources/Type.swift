@@ -7,15 +7,15 @@ import Foundation
 import SourceKittenFramework
 
 /// Defines Swift type
-@objcMembers public class Type: NSObject, SourceryModel, Annotated {
+@objcMembers class Type: NSObject, SourceryModel, Annotated {
 
     /// :nodoc:
-    public var module: String?
+    var module: String?
 
     // All local typealiases
     // sourcery: skipJSExport
     /// :nodoc:
-    public var typealiases: [String: Typealias] {
+    var typealiases: [String: Typealias] {
         didSet {
             typealiases.values.forEach { $0.parent = self }
         }
@@ -23,19 +23,19 @@ import SourceKittenFramework
 
     // sourcery: skipJSExport
     /// Whether declaration is an extension of some type
-    public var isExtension: Bool
+    var isExtension: Bool
 
     // sourcery: forceEquality
     /// Kind of type declaration, i.e. `enum`, `struct`, `class`, `protocol` or `extension`
-    public var kind: String { return isExtension ? "extension" : "unknown" }
+    var kind: String { return isExtension ? "extension" : "unknown" }
 
     /// Type access level, i.e. `internal`, `private`, `fileprivate`, `public`, `open`
-    public let accessLevel: String
+    let accessLevel: String
 	
 	let file: File
 
     /// Type name in global scope. For inner types includes the name of its containing type, i.e. `Type.Inner`
-    public var name: String {
+    var name: String {
         guard let parentName = parent?.name else { return localName }
         return "\(parentName).\(localName)"
     }
@@ -47,21 +47,21 @@ import SourceKittenFramework
     }
 
     /// Whether type is generic
-    public var isGeneric: Bool
+    var isGeneric: Bool
 
-	public var genericTypeParameters: [GenericTypeParameter]
+	var genericTypeParameters: [GenericTypeParameter]
 	
     /// Type name in its own scope.
-    public var localName: String
+    var localName: String
 
     /// Variables defined in this type only, inluding variables defined in its extensions,
     /// but not including variables inherited from superclasses (for classes only) and protocols
-    public var variables: [Variable]
+    var variables: [Variable]
 
     // sourcery: skipEquality, skipDescription
     /// All variables defined for this type, including variables defined in extensions,
     /// in superclasses (for classes only) and protocols
-    public var allVariables: [Variable] {
+    var allVariables: [Variable] {
         return flattenAll({
             return $0.variables
         }, filter: { all, extracted in
@@ -71,29 +71,29 @@ import SourceKittenFramework
 
     /// Methods defined in this type only, inluding methods defined in its extensions,
     /// but not including methods inherited from superclasses (for classes only) and protocols
-    public var methods: [Method]
+    var methods: [Method]
 
     // sourcery: skipEquality, skipDescription
     /// All methods defined for this type, including methods defined in extensions,
     /// in superclasses (for classes only) and protocols
-    public var allMethods: [Method] {
+    var allMethods: [Method] {
         return flattenAll({ $0.methods })
     }
 
     /// Subscripts defined in this type only, inluding subscripts defined in its extensions,
     /// but not including subscripts inherited from superclasses (for classes only) and protocols
-    public var subscripts: [Subscript]
+    var subscripts: [Subscript]
 
     // sourcery: skipEquality, skipDescription
     /// All subscripts defined for this type, including subscripts defined in extensions,
     /// in superclasses (for classes only) and protocols
-    public var allSubscripts: [Subscript] {
+    var allSubscripts: [Subscript] {
         return flattenAll({ $0.subscripts })
     }
 
     // sourcery: skipEquality, skipDescription, skipJSExport
     /// Bytes position of the body of this type in its declaration file if available.
-    public var bodyBytesRange: BytesRange?
+    var bodyBytesRange: BytesRange?
 
     private func flattenAll<T>(_ extraction: @escaping (Type) -> [T], filter: (([T], T) -> Bool)? = nil) -> [T] {
         let all = NSMutableOrderedSet()
@@ -117,50 +117,50 @@ import SourceKittenFramework
     }
 
     /// All initializers defined in this type
-    public var initializers: [Method] {
+    var initializers: [Method] {
         return methods.filter { $0.isInitializer }
     }
 
     /// All annotations for this type
-    public var annotations: [String: NSObject] = [:]
+    var annotations: [String: NSObject] = [:]
 
     /// Static variables defined in this type
-    public var staticVariables: [Variable] {
+    var staticVariables: [Variable] {
         return variables.filter { $0.isStatic }
     }
 
     /// Static methods defined in this type
-    public var staticMethods: [Method] {
+    var staticMethods: [Method] {
         return methods.filter { $0.isStatic }
     }
 
     /// Class methods defined in this type
-    public var classMethods: [Method] {
+    var classMethods: [Method] {
         return methods.filter { $0.isClass }
     }
 
     /// Instance variables defined in this type
-    public var instanceVariables: [Variable] {
+    var instanceVariables: [Variable] {
         return variables.filter { !$0.isStatic }
     }
 
     /// Instance methods defined in this type
-    public var instanceMethods: [Method] {
+    var instanceMethods: [Method] {
         return methods.filter { !$0.isStatic && !$0.isClass }
     }
 
     /// Computed instance variables defined in this type
-    public var computedVariables: [Variable] {
+    var computedVariables: [Variable] {
         return variables.filter { $0.isComputed && !$0.isStatic }
     }
 
     /// Stored instance variables defined in this type
-    public var storedVariables: [Variable] {
+    var storedVariables: [Variable] {
         return variables.filter { !$0.isComputed && !$0.isStatic }
     }
 
     /// Names of types this type inherits from (for classes only) and protocols it implements, in order of definition
-    public var inheritedTypes: [String] {
+    var inheritedTypes: [String] {
         didSet {
             based.removeAll()
             inheritedTypes.forEach { name in
@@ -171,15 +171,15 @@ import SourceKittenFramework
 
     // sourcery: skipEquality, skipDescription
     /// Names of types or protocols this type inherits from, including unknown (not scanned) types
-    public var based = [String: String]()
+    var based = [String: String]()
 
     // sourcery: skipEquality, skipDescription
     /// Types this type inherits from (only for classes)
-    public var inherits = [String: Type]()
+    var inherits = [String: Type]()
 
     // sourcery: skipEquality, skipDescription
     /// Protocols this type implements
-    public var implements = [String: Type]()
+    var implements = [String: Type]()
 
 	var inheritanceAndImplementations: [String: Type] {
 		var result: [String: Type] = [:]
@@ -193,7 +193,7 @@ import SourceKittenFramework
 	}
 	
     /// Contained types
-    public var containedTypes: [Type] {
+    var containedTypes: [Type] {
         didSet {
             containedTypes.forEach {
                 containedType[$0.localName] = $0
@@ -204,14 +204,14 @@ import SourceKittenFramework
 
     // sourcery: skipEquality, skipDescription
     /// Contained types groupd by their names
-    public private(set) var containedType: [String: Type] = [:]
+    private(set) var containedType: [String: Type] = [:]
 
     /// Name of parent type (for contained types only)
-    public private(set) var parentName: String?
+    private(set) var parentName: String?
 
     // sourcery: skipEquality, skipDescription
     /// Parent type, if known (for contained types only)
-    public var parent: Type? {
+    var parent: Type? {
         didSet {
             parentName = parent?.name
         }
@@ -219,7 +219,7 @@ import SourceKittenFramework
 
     // sourcery: skipJSExport
     /// :nodoc:
-    public var parentTypes: AnyIterator<Type> {
+    var parentTypes: AnyIterator<Type> {
         var next: Type? = self
         return AnyIterator {
             next = next?.parent
@@ -229,27 +229,27 @@ import SourceKittenFramework
 
     // sourcery: skipEquality, skipDescription
     /// Superclass type, if known (only for classes)
-    public var supertype: Type?
+    var supertype: Type?
 
     /// Type attributes, i.e. `@objc`
-    public var attributes: [String: Attribute]
+    var attributes: [String: Attribute]
 
 	var substructure: [SourceKitStructure] {
-		guard let structure = (__parserData as? SourceKitStructure)?.substructures else { return [] }
+		guard let structure = __parserData?.dictionary.substructures else { return [] }
 		return structure
 	}
 	
     // Underlying parser data, never to be used by anything else
     // sourcery: skipDescription, skipEquality, skipCoding, skipJSExport
     /// :nodoc:
-    public var __parserData: Any?
+    var __parserData: Structure?
     // Path to file where the type is defined
     // sourcery: skipDescription, skipEquality, skipJSExport
     /// :nodoc:
-    public var __path: String?
+    var __path: String?
 
     /// :nodoc:
-    public init(name: String = "",
+    init(name: String = "",
                 parent: Type? = nil,
                 accessLevel: AccessLevel = .internal,
                 isExtension: Bool = false,
@@ -297,7 +297,7 @@ import SourceKittenFramework
     }
 
     /// :nodoc:
-    public func extend(_ type: Type) {
+    func extend(_ type: Type) {
         self.variables += type.variables
         self.methods += type.methods
         self.subscripts += type.subscripts
@@ -311,7 +311,7 @@ import SourceKittenFramework
 
     // sourcery:inline:Type.AutoCoding
         /// :nodoc:
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             self.module = aDecoder.decode(forKey: "module")
             guard let typealiases: [String: Typealias] = aDecoder.decode(forKey: "typealiases") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["typealiases"])); fatalError() }; self.typealiases = typealiases
             self.isExtension = aDecoder.decode(forKey: "isExtension")
@@ -339,7 +339,7 @@ import SourceKittenFramework
         }
 
         /// :nodoc:
-        public func encode(with aCoder: NSCoder) {
+        func encode(with aCoder: NSCoder) {
             aCoder.encode(self.module, forKey: "module")
             aCoder.encode(self.typealiases, forKey: "typealiases")
             aCoder.encode(self.isExtension, forKey: "isExtension")

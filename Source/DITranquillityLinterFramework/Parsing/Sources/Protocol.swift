@@ -10,16 +10,16 @@ import Foundation
 import SourceKittenFramework
 
 /// :nodoc:
-public typealias SourceryProtocol = Protocol
+typealias SourceryProtocol = Protocol
 
 /// Describes Swift protocol
-@objcMembers public final class Protocol: Type {
+@objcMembers final class Protocol: Type {
 
     /// Returns "protocol"
-    public override var kind: String { return "protocol" }
+    override var kind: String { return "protocol" }
 
     /// :nodoc:
-    public override init(name: String = "",
+    override init(name: String = "",
                          parent: Type? = nil,
                          accessLevel: AccessLevel = .internal,
                          isExtension: Bool = false,
@@ -53,7 +53,7 @@ public typealias SourceryProtocol = Protocol
     }
 
     /// :nodoc:
-    override public func extend(_ type: Type) {
+    override func extend(_ type: Type) {
         type.variables = type.variables.filter({ v in !variables.contains(where: { $0.name == v.name && $0.isStatic == v.isStatic }) })
         type.methods = type.methods.filter({ !methods.contains($0) })
         super.extend(type)
@@ -61,12 +61,12 @@ public typealias SourceryProtocol = Protocol
 
     // sourcery:inline:Protocol.AutoCoding
         /// :nodoc:
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             super.init(coder: aDecoder)
         }
 
         /// :nodoc:
-        override public func encode(with aCoder: NSCoder) {
+        override func encode(with aCoder: NSCoder) {
             super.encode(with: aCoder)
         }
         // sourcery:end

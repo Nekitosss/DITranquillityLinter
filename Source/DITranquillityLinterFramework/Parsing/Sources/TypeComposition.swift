@@ -10,13 +10,13 @@ import SourceKittenFramework
 
 // sourcery: skipDescription
 /// Descibes Swift class
-@objc(TypeComposition) @objcMembers public final class TypeComposition: Type {
+@objc(TypeComposition) @objcMembers final class TypeComposition: Type {
 	/// Returns "class"
-	public override var kind: String { return "composed" }
+	override var kind: String { return "composed" }
 	
 	
 	/// :nodoc:
-	public override init(name: String = "",
+	override init(name: String = "",
 						 parent: Type? = nil,
 						 accessLevel: AccessLevel = .internal,
 						 isExtension: Bool = false,
@@ -51,12 +51,12 @@ import SourceKittenFramework
 	
 	// sourcery:inline:Class.AutoCoding
 	/// :nodoc:
-	required public init?(coder aDecoder: NSCoder) {
+	required init?(coder aDecoder: NSCoder) {
 		super.init(coder: aDecoder)
 	}
 	
 	/// :nodoc:
-	override public func encode(with aCoder: NSCoder) {
+	override func encode(with aCoder: NSCoder) {
 		super.encode(with: aCoder)
 	}
 	// sourcery:end

@@ -1,85 +1,86 @@
 import Foundation
+import SourceKittenFramework
 
 /// Describes subscript
-@objcMembers public final class Subscript: NSObject, SourceryModel, Annotated, Definition {
+@objcMembers final class Subscript: NSObject, SourceryModel, Annotated, Definition {
 
     /// Method parameters
-    public var parameters: [MethodParameter]
+    var parameters: [MethodParameter]
 
     /// Return value type name used in declaration, including generic constraints, i.e. `where T: Equatable`
-    public var returnTypeName: TypeName
+    var returnTypeName: TypeName
 
     /// Actual return value type name if declaration uses typealias, otherwise just a `returnTypeName`
-    public var actualReturnTypeName: TypeName {
+    var actualReturnTypeName: TypeName {
         return returnTypeName.actualTypeName ?? returnTypeName
     }
 
     // sourcery: skipEquality, skipDescription
     /// Actual return value type, if known
-    public var returnType: Type?
+    var returnType: Type?
 
     // sourcery: skipEquality, skipDescription
     /// Whether return value type is optional
-    public var isOptionalReturnType: Bool {
+    var isOptionalReturnType: Bool {
         return returnTypeName.isOptional
     }
 
     // sourcery: skipEquality, skipDescription
     /// Whether return value type is implicitly unwrapped optional
-    public var isImplicitlyUnwrappedOptionalReturnType: Bool {
+    var isImplicitlyUnwrappedOptionalReturnType: Bool {
         return returnTypeName.isImplicitlyUnwrappedOptional
     }
 
     // sourcery: skipEquality, skipDescription
     /// Return value type name without attributes and optional type information
-    public var unwrappedReturnTypeName: String {
+    var unwrappedReturnTypeName: String {
         return returnTypeName.unwrappedTypeName
     }
 
     /// Whether method is final
-    public var isFinal: Bool {
+    var isFinal: Bool {
         return attributes[Attribute.Identifier.final.name] != nil
     }
 
     /// Variable read access level, i.e. `internal`, `private`, `fileprivate`, `public`, `open`
-    public let readAccess: String
+    let readAccess: String
 
     /// Variable write access, i.e. `internal`, `private`, `fileprivate`, `public`, `open`.
     /// For immutable variables this value is empty string
-    public var writeAccess: String
+    var writeAccess: String
 
     /// Whether variable is mutable or not
-    public var isMutable: Bool {
+    var isMutable: Bool {
         return writeAccess != AccessLevel.none.rawValue
     }
 
     /// Annotations, that were created with // sourcery: annotation1, other = "annotation value", alterantive = 2
-    public let annotations: [String: NSObject]
+    let annotations: [String: NSObject]
 
     /// Reference to type name where the method is defined,
     /// nil if defined outside of any `enum`, `struct`, `class` etc
-    public let definedInTypeName: TypeName?
+    let definedInTypeName: TypeName?
 
     /// Reference to actual type name where the method is defined if declaration uses typealias, otherwise just a `definedInTypeName`
-    public var actualDefinedInTypeName: TypeName? {
+    var actualDefinedInTypeName: TypeName? {
         return definedInTypeName?.actualTypeName ?? definedInTypeName
     }
 
     // sourcery: skipEquality, skipDescription
     /// Reference to actual type where the object is defined,
     /// nil if defined outside of any `enum`, `struct`, `class` etc or type is unknown
-    public var definedInType: Type?
+    var definedInType: Type?
 
     /// Method attributes, i.e. `@discardableResult`
-    public let attributes: [String: Attribute]
+    let attributes: [String: Attribute]
 
     // Underlying parser data, never to be used by anything else
     // sourcery: skipEquality, skipDescription, skipCoding, skipJSExport
     /// :nodoc:
-    public var __parserData: Any?
+    var __parserData: Structure?
 
     /// :nodoc:
-    public init(parameters: [MethodParameter] = [],
+    init(parameters: [MethodParameter] = [],
                 returnTypeName: TypeName,
                 accessLevel: (read: AccessLevel, write: AccessLevel) = (.internal, .internal),
                 attributes: [String: Attribute] = [:],
@@ -97,7 +98,7 @@ import Foundation
 
     // sourcery:inline:Subscript.AutoCoding
         /// :nodoc:
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             guard let parameters: [MethodParameter] = aDecoder.decode(forKey: "parameters") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["parameters"])); fatalError() }; self.parameters = parameters
             guard let returnTypeName: TypeName = aDecoder.decode(forKey: "returnTypeName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["returnTypeName"])); fatalError() }; self.returnTypeName = returnTypeName
             self.returnType = aDecoder.decode(forKey: "returnType")
@@ -110,7 +111,7 @@ import Foundation
         }
 
         /// :nodoc:
-        public func encode(with aCoder: NSCoder) {
+        func encode(with aCoder: NSCoder) {
             aCoder.encode(self.parameters, forKey: "parameters")
             aCoder.encode(self.returnTypeName, forKey: "returnTypeName")
             aCoder.encode(self.returnType, forKey: "returnType")

@@ -4,76 +4,77 @@
 //
 
 import Foundation
+import SourceKittenFramework
 
 /// :nodoc:
-public typealias SourceryVariable = Variable
+typealias SourceryVariable = Variable
 
 /// Defines variable
-@objcMembers public final class Variable: NSObject, SourceryModel, Typed, Annotated, Definition {
+@objcMembers final class Variable: NSObject, SourceryModel, Typed, Annotated, Definition {
     /// Variable name
-    public let name: String
+    let name: String
 
     /// Variable type name
-    public let typeName: TypeName
+    let typeName: TypeName
 
     // sourcery: skipEquality, skipDescription
     /// Variable type, if known, i.e. if the type is declared in the scanned sources.
     /// For explanation, see <https://cdn.rawgit.com/krzysztofzablocki/Sourcery/master/docs/writing-templates.html#what-are-em-known-em-and-em-unknown-em-types>
-    public var type: Type?
+    var type: Type?
 
     /// Whether variable is computed and not stored
-    public let isComputed: Bool
+    let isComputed: Bool
 
     /// Whether variable is static
-    public let isStatic: Bool
+    let isStatic: Bool
 
     /// Variable read access level, i.e. `internal`, `private`, `fileprivate`, `public`, `open`
-    public let readAccess: String
+    let readAccess: String
 
     /// Variable write access, i.e. `internal`, `private`, `fileprivate`, `public`, `open`.
     /// For immutable variables this value is empty string
-    public let writeAccess: String
+    let writeAccess: String
 
     /// Whether variable is mutable or not
-    public var isMutable: Bool {
+    var isMutable: Bool {
         return writeAccess != AccessLevel.none.rawValue
     }
 
     /// Variable default value expression
-    public var defaultValue: String?
+    var defaultValue: String?
 
     /// Annotations, that were created with // sourcery: annotation1, other = "annotation value", alterantive = 2
-    public var annotations: [String: NSObject] = [:]
+    var annotations: [String: NSObject] = [:]
 
     /// Variable attributes, i.e. `@IBOutlet`, `@IBInspectable`
-    public var attributes: [String: Attribute]
+    var attributes: [String: Attribute]
 
     /// Whether variable is final or not
-    public var isFinal: Bool {
+    var isFinal: Bool {
         return attributes[Attribute.Identifier.final.name] != nil
     }
 
     /// Reference to type name where the variable is defined,
     /// nil if defined outside of any `enum`, `struct`, `class` etc
-    public let definedInTypeName: TypeName?
+    let definedInTypeName: TypeName?
 
     /// Reference to actual type name where the method is defined if declaration uses typealias, otherwise just a `definedInTypeName`
-    public var actualDefinedInTypeName: TypeName? {
+    var actualDefinedInTypeName: TypeName? {
         return definedInTypeName?.actualTypeName ?? definedInTypeName
     }
 
     // sourcery: skipEquality, skipDescription
     /// Reference to actual type where the object is defined,
     /// nil if defined outside of any `enum`, `struct`, `class` etc or type is unknown
-    public var definedInType: Type?
+    var definedInType: Type?
 
     // Underlying parser data, never to be used by anything else
     // sourcery: skipEquality, skipDescription, skipCoding, skipJSExport
     /// :nodoc:
-    public var __parserData: Any?
+    var __parserData: Structure?
 
     /// :nodoc:
-    public init(name: String = "",
+    init(name: String = "",
                 typeName: TypeName,
                 type: Type? = nil,
                 accessLevel: (read: AccessLevel, write: AccessLevel) = (.internal, .internal),
@@ -99,7 +100,7 @@ public typealias SourceryVariable = Variable
 
     // sourcery:inline:Variable.AutoCoding
         /// :nodoc:
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             guard let name: String = aDecoder.decode(forKey: "name") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["name"])); fatalError() }; self.name = name
             guard let typeName: TypeName = aDecoder.decode(forKey: "typeName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["typeName"])); fatalError() }; self.typeName = typeName
             self.type = aDecoder.decode(forKey: "type")
@@ -115,7 +116,7 @@ public typealias SourceryVariable = Variable
         }
 
         /// :nodoc:
-        public func encode(with aCoder: NSCoder) {
+        func encode(with aCoder: NSCoder) {
             aCoder.encode(self.name, forKey: "name")
             aCoder.encode(self.typeName, forKey: "typeName")
             aCoder.encode(self.type, forKey: "type")

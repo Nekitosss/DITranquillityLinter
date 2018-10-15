@@ -11,13 +11,13 @@ import SourceKittenFramework
 
 // sourcery: skipDescription
 /// Describes Swift struct
-@objcMembers public final class Struct: Type {
+@objcMembers final class Struct: Type {
 
     /// Returns "struct"
-    public override var kind: String { return "struct" }
+    override var kind: String { return "struct" }
 
     /// :nodoc:
-    public override init(name: String = "",
+    override init(name: String = "",
                          parent: Type? = nil,
                          accessLevel: AccessLevel = .internal,
                          isExtension: Bool = false,
@@ -52,12 +52,12 @@ import SourceKittenFramework
 
     // sourcery:inline:Struct.AutoCoding
         /// :nodoc:
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             super.init(coder: aDecoder)
         }
 
         /// :nodoc:
-        override public func encode(with aCoder: NSCoder) {
+        override func encode(with aCoder: NSCoder) {
             super.encode(with: aCoder)
         }
         // sourcery:end

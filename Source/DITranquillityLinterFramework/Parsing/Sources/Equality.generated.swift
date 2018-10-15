@@ -6,7 +6,7 @@
 
 extension ArrayType {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? ArrayType else { return false }
         if self.name != rhs.name { return false }
         if self.elementTypeName != rhs.elementTypeName { return false }
@@ -15,7 +15,7 @@ extension ArrayType {
 }
 extension AssociatedValue {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? AssociatedValue else { return false }
         if self.localName != rhs.localName { return false }
         if self.externalName != rhs.externalName { return false }
@@ -26,7 +26,7 @@ extension AssociatedValue {
 }
 extension Attribute {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Attribute else { return false }
         if self.name != rhs.name { return false }
         if self.arguments != rhs.arguments { return false }
@@ -36,7 +36,7 @@ extension Attribute {
 }
 extension BytesRange {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? BytesRange else { return false }
         if self.offset != rhs.offset { return false }
         if self.length != rhs.length { return false }
@@ -45,14 +45,14 @@ extension BytesRange {
 }
 extension Class {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Class else { return false }
         return super.isEqual(rhs)
     }
 }
 extension ClosureType {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? ClosureType else { return false }
         if self.name != rhs.name { return false }
         if self.parameters != rhs.parameters { return false }
@@ -63,7 +63,7 @@ extension ClosureType {
 }
 extension DictionaryType {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? DictionaryType else { return false }
         if self.name != rhs.name { return false }
         if self.valueTypeName != rhs.valueTypeName { return false }
@@ -81,7 +81,7 @@ extension DiffableResult {
 }
 extension Enum {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Enum else { return false }
         if self.cases != rhs.cases { return false }
         if self.rawTypeName != rhs.rawTypeName { return false }
@@ -90,7 +90,7 @@ extension Enum {
 }
 extension EnumCase {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? EnumCase else { return false }
         if self.name != rhs.name { return false }
         if self.rawValue != rhs.rawValue { return false }
@@ -101,7 +101,7 @@ extension EnumCase {
 }
 extension FileParserResult {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? FileParserResult else { return false }
         if self.path != rhs.path { return false }
         if self.module != rhs.module { return false }
@@ -115,7 +115,7 @@ extension FileParserResult {
 }
 extension GenericType {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? GenericType else { return false }
         if self.name != rhs.name { return false }
         if self.typeParameters != rhs.typeParameters { return false }
@@ -124,7 +124,7 @@ extension GenericType {
 }
 extension GenericTypeParameter {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? GenericTypeParameter else { return false }
         if self.typeName != rhs.typeName { return false }
         return true
@@ -132,7 +132,7 @@ extension GenericTypeParameter {
 }
 extension Method {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Method else { return false }
         if self.name != rhs.name { return false }
         if self.selectorName != rhs.selectorName { return false }
@@ -152,7 +152,7 @@ extension Method {
 }
 extension MethodParameter {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? MethodParameter else { return false }
         if self.argumentLabel != rhs.argumentLabel { return false }
         if self.name != rhs.name { return false }
@@ -165,21 +165,21 @@ extension MethodParameter {
 }
 extension Protocol {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Protocol else { return false }
         return super.isEqual(rhs)
     }
 }
 extension Struct {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Struct else { return false }
         return super.isEqual(rhs)
     }
 }
 extension Subscript {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Subscript else { return false }
         if self.parameters != rhs.parameters { return false }
         if self.returnTypeName != rhs.returnTypeName { return false }
@@ -193,7 +193,7 @@ extension Subscript {
 }
 extension TemplateContext {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? TemplateContext else { return false }
         if self.types != rhs.types { return false }
         if self.arguments != rhs.arguments { return false }
@@ -202,7 +202,7 @@ extension TemplateContext {
 }
 extension TupleElement {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? TupleElement else { return false }
         if self.name != rhs.name { return false }
         if self.typeName != rhs.typeName { return false }
@@ -211,7 +211,7 @@ extension TupleElement {
 }
 extension TupleType {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? TupleType else { return false }
         if self.name != rhs.name { return false }
         if self.elements != rhs.elements { return false }
@@ -220,7 +220,7 @@ extension TupleType {
 }
 extension Type {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Type else { return false }
         if self.module != rhs.module { return false }
         if self.typealiases != rhs.typealiases { return false }
@@ -242,7 +242,7 @@ extension Type {
 }
 extension TypeName {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? TypeName else { return false }
         if self.name != rhs.name { return false }
         if self.generic != rhs.generic { return false }
@@ -257,7 +257,7 @@ extension TypeName {
 }
 extension Typealias {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Typealias else { return false }
         if self.aliasName != rhs.aliasName { return false }
         if self.typeName != rhs.typeName { return false }
@@ -267,7 +267,7 @@ extension Typealias {
 }
 extension Types {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Types else { return false }
         if self.types != rhs.types { return false }
         return true
@@ -275,7 +275,7 @@ extension Types {
 }
 extension Variable {
     /// :nodoc:
-    override public func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? Variable else { return false }
         if self.name != rhs.name { return false }
         if self.typeName != rhs.typeName { return false }

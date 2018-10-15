@@ -1,35 +1,36 @@
 import Foundation
+import SourceKittenFramework
 
 /// Describes Swift attribute
-@objcMembers public class Attribute: NSObject, AutoCoding, AutoEquatable, AutoDiffable, AutoJSExport {
+@objcMembers class Attribute: NSObject, AutoCoding, AutoEquatable, AutoDiffable, AutoJSExport {
 
     /// Attribute name
-    public let name: String
+    let name: String
 
     /// Attribute arguments
-    public let arguments: [String: NSObject]
+    let arguments: [String: NSObject]
 
     // sourcery: skipJSExport
     let _description: String
 
     // sourcery: skipEquality, skipDescription, skipCoding, skipJSExport
     /// :nodoc:
-    public var __parserData: Any?
+    var __parserData: Structure?
 
     /// :nodoc:
-    public init(name: String, arguments: [String: NSObject] = [:], description: String? = nil) {
+    init(name: String, arguments: [String: NSObject] = [:], description: String? = nil) {
         self.name = name
         self.arguments = arguments
         self._description = description ?? "@\(name)"
     }
 
     /// Attribute description that can be used in a template.
-    public override var description: String {
+    override var description: String {
         return _description
     }
 
     /// :nodoc:
-    public enum Identifier: String {
+    enum Identifier: String {
         case convenience
         case required
         case available
@@ -60,7 +61,7 @@ import Foundation
         case privateSetter = "setter_access.private"
         case fileprivateSetter = "setter_access.fileprivate"
 
-        public init?(identifier: String) {
+        init?(identifier: String) {
             let identifier = identifier.trimmingPrefix("source.decl.attribute.")
             if identifier == "objc.name" {
                 self.init(rawValue: "objc")
@@ -69,7 +70,7 @@ import Foundation
             }
         }
 
-        public static func from(string: String) -> Identifier? {
+        static func from(string: String) -> Identifier? {
             switch string {
             case "GKInspectable":
                 return Identifier.GKInspectable
@@ -86,7 +87,7 @@ import Foundation
             }
         }
 
-        public var name: String {
+        var name: String {
             switch self {
             case .GKInspectable:
                 return "GKInspectable"
@@ -111,11 +112,11 @@ import Foundation
             }
         }
 
-        public var description: String {
+        var description: String {
             return hasAtPrefix ? "@\(name)" : name
         }
 
-        public var hasAtPrefix: Bool {
+        var hasAtPrefix: Bool {
             switch self {
             case .available,
                  .discardableResult,
@@ -142,7 +143,7 @@ import Foundation
 
     // sourcery:inline:sourcery:.AutoCoding
         /// :nodoc:
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             guard let name: String = aDecoder.decode(forKey: "name") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["name"])); fatalError() }; self.name = name
             guard let arguments: [String: NSObject] = aDecoder.decode(forKey: "arguments") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["arguments"])); fatalError() }; self.arguments = arguments
             guard let _description: String = aDecoder.decode(forKey: "_description") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["_description"])); fatalError() }; self._description = _description
@@ -150,7 +151,7 @@ import Foundation
         }
 
         /// :nodoc:
-        public func encode(with aCoder: NSCoder) {
+        func encode(with aCoder: NSCoder) {
 
             aCoder.encode(self.name, forKey: "name")
             aCoder.encode(self.arguments, forKey: "arguments")

@@ -20,7 +20,7 @@ protocol Diffable {
 /// :nodoc:
 extension NSRange: Diffable {
     /// :nodoc:
-    public static func == (lhs: NSRange, rhs: NSRange) -> Bool {
+    static func == (lhs: NSRange, rhs: NSRange) -> Bool {
         return NSEqualRanges(lhs, rhs)
     }
 

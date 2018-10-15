@@ -120,7 +120,7 @@ public class Tokenizer {
 			guard let contents = File(path: $0.string)?.contents else { return nil }
 			return try? FileParser(contents: contents, path: $0, module: nil)
 		})
-		let allResults = filesParsers.map({ try! $0.parse() }) + parseBinaryModules()
+		let allResults = filesParsers.map({ try! $0.parse() }) // + parseBinaryModules()
 		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [])) { acc, next in
 			acc.typealiases += next.typealiases
 			acc.types += next.types

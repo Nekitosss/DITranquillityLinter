@@ -3,20 +3,20 @@ import SourceKittenFramework
 
 // sourcery: skipJSExport
 /// :nodoc:
-@objcMembers public final class Typealias: NSObject, Typed, SourceryModel {
+@objcMembers final class Typealias: NSObject, Typed, SourceryModel {
     // New typealias name
-    public let aliasName: String
+    let aliasName: String
 
     // Target name
-    public let typeName: TypeName
+    let typeName: TypeName
 
     // sourcery: skipEquality, skipDescription
-    public var type: Type?
+    var type: Type?
 	
 	var file: File
 
     // sourcery: skipEquality, skipDescription
-    public var parent: Type? {
+    var parent: Type? {
         didSet {
             parentName = parent?.name
         }
@@ -24,7 +24,7 @@ import SourceKittenFramework
 
     var parentName: String?
 
-    public var name: String {
+    var name: String {
         if let parentName = parent?.name {
             return "\(parentName).\(aliasName)"
         } else {
@@ -34,7 +34,7 @@ import SourceKittenFramework
 
     // TODO: access level
 
-    public init(aliasName: String = "", typeName: TypeName, parent: Type? = nil, file: File) {
+    init(aliasName: String = "", typeName: TypeName, parent: Type? = nil, file: File) {
         self.aliasName = aliasName
         self.typeName = typeName
         self.parent = parent
@@ -44,7 +44,7 @@ import SourceKittenFramework
 
     // sourcery:inline:Typealias.AutoCoding
         /// :nodoc:
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             guard let aliasName: String = aDecoder.decode(forKey: "aliasName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["aliasName"])); fatalError() }; self.aliasName = aliasName
             guard let typeName: TypeName = aDecoder.decode(forKey: "typeName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["typeName"])); fatalError() }; self.typeName = typeName
 			guard let file: File = aDecoder.decode(forKey: "file") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["file"])); fatalError() }; self.file = file
@@ -54,7 +54,7 @@ import SourceKittenFramework
         }
 
         /// :nodoc:
-        public func encode(with aCoder: NSCoder) {
+        func encode(with aCoder: NSCoder) {
             aCoder.encode(self.aliasName, forKey: "aliasName")
             aCoder.encode(self.typeName, forKey: "typeName")
             aCoder.encode(self.type, forKey: "type")

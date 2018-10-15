@@ -8,18 +8,18 @@ import SourceKittenFramework
 import PathKit
 
 protocol Parsable: AnyObject {
-    var __parserData: Any? { get set }
+    var __parserData: Structure? { get set }
 }
 
 extension Parsable {
     /// Source structure used by the parser
     fileprivate var __underlyingSource: [String: SourceKitRepresentable] {
-        return (__parserData as? [String: SourceKitRepresentable]) ?? [:]
+        return __parserData?.dictionary ?? [:]
     }
 
     /// sets underlying source
     fileprivate func setSource(_ source: [String: SourceKitRepresentable]) {
-        __parserData = source
+        __parserData = Structure(sourceKitResponse: source)
     }
 }
 
@@ -85,7 +85,7 @@ final class FileParser {
 
     // MARK: - Processing
 
-    public func parseContentsIfNeeded() -> String {
+    func parseContentsIfNeeded() -> String {
         guard annotations == nil else {
             // already loaded
             return contents
@@ -101,7 +101,7 @@ final class FileParser {
     /// Parses given file context.
     ///
     /// - Returns: All types we could find.
-    public func parse() throws -> FileParserResult {
+    func parse() throws -> FileParserResult {
         _ = parseContentsIfNeeded()
 
         if let path = path {

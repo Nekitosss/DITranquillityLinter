@@ -17,7 +17,7 @@ enum Verifier {
         case approved
     }
 
-    public static func canParse(content: String,
+    static func canParse(content: String,
                                 path: Path,
                                 forceParse: [String] = []) -> Result {
         guard !content.isEmpty else { return .approved }

@@ -10,10 +10,10 @@ import Foundation
 
 // sourcery: skipJSExport
 /// :nodoc:
-@objcMembers public final class FileParserResult: NSObject, SourceryModel {
-    public let path: String?
-    public let module: String?
-    public var types = [Type]() {
+@objcMembers final class FileParserResult: NSObject, SourceryModel {
+    let path: String?
+    let module: String?
+    var types = [Type]() {
         didSet {
             types.forEach { type in
                 guard type.module == nil, type.kind != "extensions" else { return }
@@ -21,13 +21,13 @@ import Foundation
             }
         }
     }
-    public var typealiases = [Typealias]()
-    public var inlineRanges = [String: NSRange]()
+    var typealiases = [Typealias]()
+    var inlineRanges = [String: NSRange]()
 
-    public var contentSha: String?
-    public var sourceryVersion: String
+    var contentSha: String?
+    var sourceryVersion: String
 
-    public init(path: String?, module: String?, types: [Type], typealiases: [Typealias] = [], inlineRanges: [String: NSRange] = [:], contentSha: String = "", sourceryVersion: String = "") {
+    init(path: String?, module: String?, types: [Type], typealiases: [Typealias] = [], inlineRanges: [String: NSRange] = [:], contentSha: String = "", sourceryVersion: String = "") {
         self.path = path
         self.module = module
         self.types = types
@@ -41,7 +41,7 @@ import Foundation
 
     // sourcery:inline:FileParserResult.AutoCoding
         /// :nodoc:
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             self.path = aDecoder.decode(forKey: "path")
             self.module = aDecoder.decode(forKey: "module")
             guard let types: [Type] = aDecoder.decode(forKey: "types") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["types"])); fatalError() }; self.types = types
@@ -52,7 +52,7 @@ import Foundation
         }
 
         /// :nodoc:
-        public func encode(with aCoder: NSCoder) {
+        func encode(with aCoder: NSCoder) {
             aCoder.encode(self.path, forKey: "path")
             aCoder.encode(self.module, forKey: "module")
             aCoder.encode(self.types, forKey: "types")

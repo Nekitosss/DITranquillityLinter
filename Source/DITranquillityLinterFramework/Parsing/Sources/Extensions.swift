@@ -1,6 +1,6 @@
 import Foundation
 
-public extension String {
+extension String {
 
     /// :nodoc:
     /// Removes leading and trailing whitespace from str. Returns false if str was not altered.
@@ -178,7 +178,7 @@ public extension String {
     }
 }
 
-public extension NSString {
+extension NSString {
     var entireRange: NSRange {
         return NSRange(location: 0, length: self.length)
     }

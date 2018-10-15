@@ -24,7 +24,7 @@ DispatchQueue.global().async {
 		if let podsRoot = enironment[XcodeEnvVariable.podsRoot.rawValue],
 			let podsProject = try? XcodeProj(pathString: podsRoot + "/Pods.xcodeproj") {
 			print("Found pods project.")
-			files += projectFiles(project: podsProject, srcRoot: srcRoot)
+			files += projectFiles(project: podsProject, srcRoot: podsRoot)
 		}
 		
 		if let mainProjPath = enironment[XcodeEnvVariable.projectFilePath.rawValue],

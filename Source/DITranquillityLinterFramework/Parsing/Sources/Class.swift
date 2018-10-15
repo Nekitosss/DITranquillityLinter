@@ -3,17 +3,17 @@ import SourceKittenFramework
 
 // sourcery: skipDescription
 /// Descibes Swift class
-@objc(SwiftClass) @objcMembers public final class Class: Type {
+@objc(SwiftClass) @objcMembers final class Class: Type {
     /// Returns "class"
-    public override var kind: String { return "class" }
+    override var kind: String { return "class" }
 
     /// Whether type is final 
-    public var isFinal: Bool {
+    var isFinal: Bool {
         return attributes[Attribute.Identifier.final.name] != nil
     }
 
     /// :nodoc:
-    public override init(name: String = "",
+    override init(name: String = "",
                          parent: Type? = nil,
                          accessLevel: AccessLevel = .internal,
                          isExtension: Bool = false,
@@ -48,12 +48,12 @@ import SourceKittenFramework
 
     // sourcery:inline:Class.AutoCoding
         /// :nodoc:
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             super.init(coder: aDecoder)
         }
 
         /// :nodoc:
-        override public func encode(with aCoder: NSCoder) {
+        override func encode(with aCoder: NSCoder) {
             super.encode(with: aCoder)
         }
         // sourcery:end
