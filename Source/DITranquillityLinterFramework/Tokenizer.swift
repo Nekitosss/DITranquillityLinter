@@ -26,16 +26,25 @@ public class Tokenizer {
 		let collectedInfo = collectInfo(files: files)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
 		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(parsingContext: parsingContext) {
+			
+			guard parsingContext.errors.isEmpty else {
+				display(errorList: parsingContext.errors)
+				return false
+			}
+			
 			let validator = GraphValidator()
 			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
-			
-			errorList.forEach {
-				print($0.xcodeMessage)
-			}
+			display(errorList: errorList)
 			return errorList.isEmpty
 		}
 		
 		return true
+	}
+	
+	func display(errorList: [GraphError]) {
+		errorList.forEach {
+			print($0.xcodeMessage)
+		}
 	}
 	
 	func parseBinaryModules(fileContainer: FileContainer) -> [FileParserResult] {
@@ -142,7 +151,7 @@ public class Tokenizer {
 			container[$0.string] = file
 			return FileParser(contents: file.contents, path: $0, module: nil)
 		})
-		let allResults = filesParsers.map({ try! $0.parse() }) //+ parseBinaryModules(fileContainer: container)
+		let allResults = filesParsers.map({ try! $0.parse() }) + parseBinaryModules(fileContainer: container)
 		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [], linterVersion: linterVersion)) { acc, next in
 			acc.typealiases += next.typealiases
 			acc.types += next.types
