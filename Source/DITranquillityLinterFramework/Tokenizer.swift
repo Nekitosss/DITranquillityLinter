@@ -72,13 +72,19 @@ public class Tokenizer {
 		if sdk.range(of: "MacOSX") != nil {
 			commonFrameworkNames = ["Cocoa", "Foundation"]
 		}
-		let result = commonFrameworkNames.flatMap {
-			parseModule(moduleName: $0, frameworksPath: frameworksPath, compilerArguments: compilerArguments, fileContainer: fileContainer)
-		}
-		let cacher = ResultCacher()
-		cacher.cacheBinaryFiles(list: result, name: sdk)
 		
-		return result
+		let cacheName = sdk
+		let cacher = ResultCacher()
+		if let cachedResult = cacher.getCachedBinaryFiles(name: cacheName) {
+			return cachedResult
+		} else {
+			let result = commonFrameworkNames.flatMap {
+				parseModule(moduleName: $0, frameworksPath: frameworksPath, compilerArguments: compilerArguments, fileContainer: fileContainer)
+			}
+			cacher.cacheBinaryFiles(list: result, name: cacheName)
+			
+			return result
+		}
 	}
 	
 	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String], fileContainer: FileContainer) -> [FileParserResult] {

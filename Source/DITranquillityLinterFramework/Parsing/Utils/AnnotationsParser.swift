@@ -61,9 +61,10 @@ enum TypedCodableValue: Codable, Equatable {
 			self = .arrayValue(rightValue)
 		} else if let rightValue = try? container.decode(Int64.self, forKey: .int64Value) {
 			self = .int64Value(rightValue)
-		} else {
-			let rightValue = try container.decode([String: TypedCodableValue].self, forKey: .dictionaryValue)
+		} else if let rightValue = try? container.decode([String: TypedCodableValue].self, forKey: .dictionaryValue) {
 			self = .dictionaryValue(rightValue)
+		} else {
+			throw DecodingError.keyNotFound(CodingKeys.stringValue, DecodingError.Context(codingPath: container.codingPath, debugDescription: ""))
 		}
 	}
 	
@@ -75,11 +76,11 @@ enum TypedCodableValue: Codable, Equatable {
 		case .boolValue(let value):
 			try container.encode(value, forKey: .boolValue)
 		case .floatValue(let value):
-			try container.encode(value, forKey: .boolValue)
+			try container.encode(value, forKey: .floatValue)
 		case .arrayValue(let value):
-			try container.encode(value, forKey: .boolValue)
+			try container.encode(value, forKey: .arrayValue)
 		case .dictionaryValue(let value):
-			try container.encode(value, forKey: .boolValue)
+			try container.encode(value, forKey: .dictionaryValue)
 		case .int64Value(let value):
 			try container.encode(value, forKey: .int64Value)
 		}

@@ -331,6 +331,38 @@ class Type: Annotated, Codable, Equatable {
         type.inherits.forEach { self.inherits[$0.key] = $0.value }
         type.implements.forEach { self.implements[$0.key] = $0.value }
     }
+	
+	
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(module, forKey: .module)
+		try container.encode(typealiases, forKey: .typealiases)
+		try container.encode(isExtension, forKey: .isExtension)
+		try container.encode(accessLevel, forKey: .accessLevel)
+		try container.encode(isGeneric, forKey: .isGeneric)
+		try container.encode(localName, forKey: .localName)
+		try container.encode(variables, forKey: .variables)
+		try container.encode(methods, forKey: .methods)
+		try container.encode(subscripts, forKey: .subscripts)
+		try container.encode(bodyBytesRange, forKey: .bodyBytesRange)
+		try container.encode(annotations, forKey: .annotations)
+		try container.encode(inheritedTypes, forKey: .inheritedTypes)
+		try container.encode(based, forKey: .based)
+		try container.encode(inherits, forKey: .inherits)
+		try container.encode(implements, forKey: .implements)
+		try container.encode(containedTypes, forKey: .containedTypes)
+		try container.encode(containedType, forKey: .containedType)
+		// parent should not be encoded
+//		try container.encode(parentName, forKey: .parentName)
+//		try container.encode(parent, forKey: .parent)
+		try container.encode(supertype, forKey: .supertype)
+		try container.encode(attributes, forKey: .attributes)
+		try container.encode(__path, forKey: .__path)
+		try container.encode(filePath, forKey: .filePath)
+		try container.encode(parserData, forKey: .parserData)
+		try container.encode(genericTypeParameters, forKey: .genericTypeParameters)
+	}
+	
 
 }
 

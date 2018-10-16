@@ -39,4 +39,15 @@ final class Typealias: NSObject, Typed, Codable {
         self.parentName = parent?.name
 		self.filePath = filePath
     }
+	
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(aliasName, forKey: .aliasName)
+		try container.encode(typeName, forKey: .typeName)
+		try container.encode(type, forKey: .type)
+		try container.encode(filePath, forKey: .filePath)
+		try container.encode(parentName, forKey: .parentName)
+		// DO NOT ENCODE PARENT
+		
+	}
 }

@@ -28,8 +28,21 @@ final class ResultCacher {
 		}
 	}
 	
+	func getCachedBinaryFiles(name: String) -> [FileParserResult]? {
+		let cacheURLDirectory = URL(fileURLWithPath: ResultCacher.commonCacheDirectory + ResultCacher.libraryCacheFolderName, isDirectory: true)
+		let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: name))
+		do {
+			let data = try Data(contentsOf: cacheURL, options: [])
+			let decodedData = try decoder.decode([FileParserResult].self, from: data)
+			decodedData.forEach({ $0.updateRelationshipAfterDecoding() })
+			return decodedData
+		} catch {
+			return nil
+		}
+	}
+	
 	private func cacheName(name: String) -> String {
-		return "\(abs(name.hashValue))" + ".cache"
+		return SHA256.get(from: name) + ".cache"
 	}
 	
 }

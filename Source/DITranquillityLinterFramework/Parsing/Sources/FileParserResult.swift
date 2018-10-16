@@ -20,6 +20,25 @@ final class FileParserResult: Codable {
             }
         }
     }
+	
+	func updateRelationshipAfterDecoding() {
+		func fillParent(child: Type, parent: Type) {
+			child.parent = parent
+			for childChildren in child.containedTypes {
+				fillParent(child: childChildren, parent: child)
+			}
+		}
+		
+		for type in types {
+			for child in type.containedTypes {
+				fillParent(child: child, parent: type)
+			}
+			for typeali in type.typealiases {
+				typeali.value.parent = type
+			}
+		}
+	}
+	
     var typealiases = [Typealias]()
     var inlineRanges = [String: NSRange]()
 
