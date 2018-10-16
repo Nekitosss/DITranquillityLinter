@@ -6,13 +6,47 @@
 import Foundation
 import SourceKittenFramework
 
-enum AnnotationStructure: Codable, Equatable {
+enum TypedCodableValue: Codable, Equatable {
 	case floatValue(Float)
 	case boolValue(Bool)
 	case stringValue(String)
-	indirect case arrayValue([AnnotationStructure])
-	indirect case dictionaryValue(Annotations)
+	case int64Value(Int64)
+	indirect case arrayValue([TypedCodableValue])
+	indirect case dictionaryValue([String: TypedCodableValue])
 	
+	var sourceKitValue: SourceKitRepresentable {
+		switch self {
+		case .floatValue(let value):
+			return Int64(exactly: value) ?? 0
+		case .boolValue(let value):
+			return value
+		case .int64Value(let value):
+			return value
+		case .stringValue(let value):
+			return value
+		case .arrayValue(let value):
+			return value.map({ $0.sourceKitValue })
+		case .dictionaryValue(let value):
+			return value.mapValues({ $0.sourceKitValue })
+		}
+	}
+	
+	init(sourceKitRepresentable: SourceKitRepresentable) {
+		switch sourceKitRepresentable {
+		case let value as [SourceKitRepresentable]:
+			self = .arrayValue(value.map(TypedCodableValue.init(sourceKitRepresentable:)))
+		case let value as [String: SourceKitRepresentable]:
+			self = .dictionaryValue(value.mapValues({ TypedCodableValue(sourceKitRepresentable: $0) }))
+		case let value as String:
+			self = .stringValue(value)
+		case let value as Int64:
+			self = .int64Value(value)
+		case let value as Bool:
+			self = .boolValue(value)
+		default:
+			fatalError("Unknown SourceKitRepresentable object")
+		}
+	}
 	
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -23,10 +57,12 @@ enum AnnotationStructure: Codable, Equatable {
 			self = .boolValue(rightValue)
 		} else if let rightValue = try? container.decode(Float.self, forKey: .floatValue) {
 			self = .floatValue(rightValue)
-		} else if let rightValue = try? container.decode([AnnotationStructure].self, forKey: .arrayValue) {
+		} else if let rightValue = try? container.decode([TypedCodableValue].self, forKey: .arrayValue) {
 			self = .arrayValue(rightValue)
+		} else if let rightValue = try? container.decode(Int64.self, forKey: .int64Value) {
+			self = .int64Value(rightValue)
 		} else {
-			let rightValue = try container.decode(Annotations.self, forKey: .dictionaryValue)
+			let rightValue = try container.decode([String: TypedCodableValue].self, forKey: .dictionaryValue)
 			self = .dictionaryValue(rightValue)
 		}
 	}
@@ -44,6 +80,8 @@ enum AnnotationStructure: Codable, Equatable {
 			try container.encode(value, forKey: .boolValue)
 		case .dictionaryValue(let value):
 			try container.encode(value, forKey: .boolValue)
+		case .int64Value(let value):
+			try container.encode(value, forKey: .int64Value)
 		}
 	}
 	
@@ -53,10 +91,11 @@ enum AnnotationStructure: Codable, Equatable {
 		case floatValue
 		case arrayValue
 		case dictionaryValue
+		case int64Value
 	}
 	
 }
-typealias AnnotationValue = AnnotationStructure
+typealias AnnotationValue = TypedCodableValue
 internal typealias Annotations = [String: AnnotationValue]
 
 /// Parser for annotations

@@ -8,9 +8,8 @@
 
 import Foundation
 
-// sourcery: skipJSExport
-/// :nodoc:
-final class FileParserResult: NSObject {
+final class FileParserResult: Codable {
+	
     let path: String?
     let module: String?
     var types = [Type]() {
@@ -25,16 +24,27 @@ final class FileParserResult: NSObject {
     var inlineRanges = [String: NSRange]()
 
     var contentSha: String?
-    var sourceryVersion: String
+    var linterVersion: String
+	
+	static func ==(lhs: FileParserResult, rhs: FileParserResult) -> Bool {
+		if lhs.path != rhs.path { return false }
+		if lhs.module != rhs.module { return false }
+		if lhs.types != rhs.types { return false }
+		if lhs.typealiases != rhs.typealiases { return false }
+		if lhs.inlineRanges != rhs.inlineRanges { return false }
+		if lhs.contentSha != rhs.contentSha { return false }
+		if lhs.linterVersion != rhs.linterVersion { return false }
+		return true
+	}
 
-    init(path: String?, module: String?, types: [Type], typealiases: [Typealias] = [], inlineRanges: [String: NSRange] = [:], contentSha: String = "", sourceryVersion: String = "") {
+    init(path: String?, module: String?, types: [Type], typealiases: [Typealias] = [], inlineRanges: [String: NSRange] = [:], contentSha: String = "", linterVersion: String) {
         self.path = path
         self.module = module
         self.types = types
         self.typealiases = typealiases
         self.inlineRanges = inlineRanges
         self.contentSha = contentSha
-        self.sourceryVersion = sourceryVersion
+        self.linterVersion = linterVersion
 
         types.forEach { type in type.module = module }
     }

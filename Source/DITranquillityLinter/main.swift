@@ -38,7 +38,7 @@ DispatchQueue.global().async {
 		let srcRoot = "/Users/nikitapatskov/Develop/DITranquillityLinter/LintableProject/"
 		let project = try! XcodeProj(pathString: srcRoot + "LintableProject.xcodeproj")
 		let podsProject = try! XcodeProj(pathString: srcRoot + "Pods/Pods.xcodeproj")
-		files = projectFiles(project: project, srcRoot: srcRoot) + projectFiles(project: podsProject, srcRoot: srcRoot)
+		files = projectFiles(project: project, srcRoot: srcRoot) + projectFiles(project: podsProject, srcRoot: srcRoot + "/Pods")
 	}
 	
 	if tokenizer.process(files: files) {

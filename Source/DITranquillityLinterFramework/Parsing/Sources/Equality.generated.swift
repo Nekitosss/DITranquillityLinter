@@ -47,20 +47,6 @@ extension EnumCase {
         return true
     }
 }
-extension FileParserResult {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? FileParserResult else { return false }
-        if self.path != rhs.path { return false }
-        if self.module != rhs.module { return false }
-        if self.types != rhs.types { return false }
-        if self.typealiases != rhs.typealiases { return false }
-        if self.inlineRanges != rhs.inlineRanges { return false }
-        if self.contentSha != rhs.contentSha { return false }
-        if self.sourceryVersion != rhs.sourceryVersion { return false }
-        return true
-    }
-}
 extension GenericTypeParameter {
     /// :nodoc:
     override func isEqual(_ object: Any?) -> Bool {

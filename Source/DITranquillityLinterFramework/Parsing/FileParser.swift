@@ -114,7 +114,7 @@ final class FileParser {
 	
 	func parse(source: [String: SourceKitRepresentable], filePath: String) throws -> FileParserResult {
 		let (types, typealiases) = try parseTypes(source, filePath: filePath)
-		return FileParserResult(path: path, module: module, types: types, typealiases: typealiases, inlineRanges: inlineRanges)
+		return FileParserResult(path: path, module: module, types: types, typealiases: typealiases, inlineRanges: inlineRanges, linterVersion: linterVersion)
 	}
 
 	internal func parseTypes(_ source: [String: SourceKitRepresentable], filePath: String) throws -> ([Type], [Typealias]) {

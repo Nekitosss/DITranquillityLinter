@@ -12,6 +12,8 @@ import xcodeproj
 import PathKit
 import SourceKit
 
+public let linterVersion = "0.0.1"
+
 public class Tokenizer {
 	
 	typealias SourceKitTuple = (structure: Structure, file: File)
@@ -70,9 +72,13 @@ public class Tokenizer {
 		if sdk.range(of: "MacOSX") != nil {
 			commonFrameworkNames = ["Cocoa", "Foundation"]
 		}
-		return commonFrameworkNames.flatMap {
+		let result = commonFrameworkNames.flatMap {
 			parseModule(moduleName: $0, frameworksPath: frameworksPath, compilerArguments: compilerArguments, fileContainer: fileContainer)
 		}
+		let cacher = ResultCacher()
+		cacher.cacheBinaryFiles(list: result, name: sdk)
+		
+		return result
 	}
 	
 	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String], fileContainer: FileContainer) -> [FileParserResult] {
@@ -125,8 +131,8 @@ public class Tokenizer {
 			container[$0.string] = file
 			return FileParser(contents: file.contents, path: $0, module: nil)
 		})
-		let allResults = filesParsers.map({ try! $0.parse() }) //+ parseBinaryModules(fileContainer: container)
-		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [])) { acc, next in
+		let allResults = filesParsers.map({ try! $0.parse() }) + parseBinaryModules(fileContainer: container)
+		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [], linterVersion: linterVersion)) { acc, next in
 			acc.typealiases += next.typealiases
 			acc.types += next.types
 			return acc

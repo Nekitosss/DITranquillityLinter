@@ -32,33 +32,42 @@ enum AttributeArgumentValue: Equatable, Codable {
 	}
 }
 
+struct CodableSourceKitObject: SourceKitRepresentable, Codable {
+	
+}
+
 extension Structure: Codable {
 	
+	enum CodingKeys: String, CodingKey {
+		case dictionary
+	}
+	
+	struct CodableInfo: Codable {
+		let codableValues: [String: TypedCodableValue]
+		
+		var sourceKitObjects: [String: SourceKitRepresentable] {
+			return codableValues.mapValues { $0.sourceKitValue }
+		}
+		
+		init(sourceKitObjects: [String: SourceKitRepresentable]) {
+			self.codableValues = sourceKitObjects.mapValues { TypedCodableValue(sourceKitRepresentable: $0) }
+		}
+	}
+	
 	public init(from decoder: Decoder) throws {
-		fatalError()
+		let values = try decoder.container(keyedBy: CodingKeys.self)
+		let res = try values.decode(CodableInfo.self, forKey: .dictionary)
+		self.init(sourceKitResponse: res.sourceKitObjects)
 	}
 	
 	public func encode(to encoder: Encoder) throws {
-		fatalError()
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		let codableInfo = CodableInfo(sourceKitObjects: dictionary)
+		try container.encode(codableInfo, forKey: .dictionary)
 	}
 	
 	static func ==(lhs: Structure, rhs: Structure) -> Bool {
 		return true
-	}
-}
-
-extension File: Codable, Equatable {
-	public static func == (lhs: File, rhs: File) -> Bool {
-		return true
-	}
-	
-	
-	public convenience init(from decoder: Decoder) throws {
-		fatalError()
-	}
-	
-	public func encode(to encoder: Encoder) throws {
-		fatalError()
 	}
 }
 
