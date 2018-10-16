@@ -7,8 +7,32 @@ import Foundation
 import SourceKittenFramework
 
 /// Defines Swift type
-@objcMembers class Type: NSObject, SourceryModel, Annotated, Codable {
+class Type: Annotated, Codable, Equatable {
 
+	static func ==(lhs: Type, rhs: Type) -> Bool {
+		return lhs.isEqual(rhs)
+	}
+	
+	func isEqual(_ object: Any?) -> Bool {
+		guard let rhs = object as? Type else { return false }
+		if self.module != rhs.module { return false }
+		if self.typealiases != rhs.typealiases { return false }
+		if self.isExtension != rhs.isExtension { return false }
+		if self.accessLevel != rhs.accessLevel { return false }
+		if self.isGeneric != rhs.isGeneric { return false }
+		if self.localName != rhs.localName { return false }
+		if self.variables != rhs.variables { return false }
+		if self.methods != rhs.methods { return false }
+		if self.subscripts != rhs.subscripts { return false }
+		if self.annotations != rhs.annotations { return false }
+		if self.inheritedTypes != rhs.inheritedTypes { return false }
+		if self.containedTypes != rhs.containedTypes { return false }
+		if self.parentName != rhs.parentName { return false }
+		if self.attributes != rhs.attributes { return false }
+		if self.kind != rhs.kind { return false }
+		return true
+	}
+	
     /// :nodoc:
     var module: String?
 
@@ -32,7 +56,7 @@ import SourceKittenFramework
     /// Type access level, i.e. `internal`, `private`, `fileprivate`, `public`, `open`
     let accessLevel: String
 	
-	let file: File
+	let filePath: String
 
     /// Type name in global scope. For inner types includes the name of its containing type, i.e. `Type.Inner`
     var name: String {
@@ -263,7 +287,7 @@ import SourceKittenFramework
                 annotations: Annotations = [:],
 				isGeneric: Bool = false,
 				genericTypeParameters: [GenericTypeParameter] = [],
-				file: File) {
+				filePath: String) {
 
         self.localName = name
         self.accessLevel = accessLevel.rawValue
@@ -280,9 +304,8 @@ import SourceKittenFramework
         self.annotations = annotations
         self.isGeneric = isGeneric
 		self.genericTypeParameters = genericTypeParameters
-		self.file = file
+		self.filePath = filePath
 
-        super.init()
         containedTypes.forEach {
             containedType[$0.localName] = $0
             $0.parent = self

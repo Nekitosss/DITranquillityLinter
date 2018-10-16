@@ -6,11 +6,8 @@
 import Foundation
 import SourceKittenFramework
 
-/// :nodoc:
-typealias SourceryVariable = Variable
-
 /// Defines variable
-@objcMembers final class Variable: NSObject, SourceryModel, Typed, Annotated, Definition, Codable {
+final class Variable: NSObject, Typed, Annotated, Definition, Codable {
     /// Variable name
     let name: String
 

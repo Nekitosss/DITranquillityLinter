@@ -4,15 +4,6 @@
 // swiftlint:disable vertical_whitespace
 
 
-extension ArrayType {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? ArrayType else { return false }
-        if self.name != rhs.name { return false }
-        if self.elementTypeName != rhs.elementTypeName { return false }
-        return true
-    }
-}
 extension AssociatedValue {
     /// :nodoc:
     override func isEqual(_ object: Any?) -> Bool {
@@ -22,32 +13,6 @@ extension AssociatedValue {
         if self.typeName != rhs.typeName { return false }
         if self.annotations != rhs.annotations { return false }
         return true
-    }
-}
-extension Attribute {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? Attribute else { return false }
-        if self.name != rhs.name { return false }
-        if self.arguments != rhs.arguments { return false }
-        if self._description != rhs._description { return false }
-        return true
-    }
-}
-extension BytesRange {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? BytesRange else { return false }
-        if self.offset != rhs.offset { return false }
-        if self.length != rhs.length { return false }
-        return true
-    }
-}
-extension Class {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? Class else { return false }
-        return super.isEqual(rhs)
     }
 }
 extension ClosureType {
@@ -69,23 +34,6 @@ extension DictionaryType {
         if self.valueTypeName != rhs.valueTypeName { return false }
         if self.keyTypeName != rhs.keyTypeName { return false }
         return true
-    }
-}
-extension DiffableResult {
-    /// :nodoc:
-    override internal func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? DiffableResult else { return false }
-        if self.identifier != rhs.identifier { return false }
-        return true
-    }
-}
-extension Enum {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? Enum else { return false }
-        if self.cases != rhs.cases { return false }
-        if self.rawTypeName != rhs.rawTypeName { return false }
-        return super.isEqual(rhs)
     }
 }
 extension EnumCase {
@@ -110,15 +58,6 @@ extension FileParserResult {
         if self.inlineRanges != rhs.inlineRanges { return false }
         if self.contentSha != rhs.contentSha { return false }
         if self.sourceryVersion != rhs.sourceryVersion { return false }
-        return true
-    }
-}
-extension GenericType {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? GenericType else { return false }
-        if self.name != rhs.name { return false }
-        if self.typeParameters != rhs.typeParameters { return false }
         return true
     }
 }
@@ -163,71 +102,12 @@ extension MethodParameter {
         return true
     }
 }
-extension Protocol {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? Protocol else { return false }
-        return super.isEqual(rhs)
-    }
-}
-extension Struct {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? Struct else { return false }
-        return super.isEqual(rhs)
-    }
-}
-extension Subscript {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? Subscript else { return false }
-        if self.parameters != rhs.parameters { return false }
-        if self.returnTypeName != rhs.returnTypeName { return false }
-        if self.readAccess != rhs.readAccess { return false }
-        if self.writeAccess != rhs.writeAccess { return false }
-        if self.annotations != rhs.annotations { return false }
-        if self.definedInTypeName != rhs.definedInTypeName { return false }
-        if self.attributes != rhs.attributes { return false }
-        return true
-    }
-}
 extension TupleElement {
     /// :nodoc:
     override func isEqual(_ object: Any?) -> Bool {
         guard let rhs = object as? TupleElement else { return false }
         if self.name != rhs.name { return false }
         if self.typeName != rhs.typeName { return false }
-        return true
-    }
-}
-extension TupleType {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? TupleType else { return false }
-        if self.name != rhs.name { return false }
-        if self.elements != rhs.elements { return false }
-        return true
-    }
-}
-extension Type {
-    /// :nodoc:
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let rhs = object as? Type else { return false }
-        if self.module != rhs.module { return false }
-        if self.typealiases != rhs.typealiases { return false }
-        if self.isExtension != rhs.isExtension { return false }
-        if self.accessLevel != rhs.accessLevel { return false }
-        if self.isGeneric != rhs.isGeneric { return false }
-        if self.localName != rhs.localName { return false }
-        if self.variables != rhs.variables { return false }
-        if self.methods != rhs.methods { return false }
-        if self.subscripts != rhs.subscripts { return false }
-        if self.annotations != rhs.annotations { return false }
-        if self.inheritedTypes != rhs.inheritedTypes { return false }
-        if self.containedTypes != rhs.containedTypes { return false }
-        if self.parentName != rhs.parentName { return false }
-        if self.attributes != rhs.attributes { return false }
-        if self.kind != rhs.kind { return false }
         return true
     }
 }

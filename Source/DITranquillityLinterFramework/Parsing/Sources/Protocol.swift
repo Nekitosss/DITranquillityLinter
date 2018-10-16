@@ -9,12 +9,14 @@
 import Foundation
 import SourceKittenFramework
 
-/// :nodoc:
-typealias SourceryProtocol = Protocol
-
 /// Describes Swift protocol
-@objcMembers final class Protocol: Type {
+final class Protocol: Type {
 
+	override func isEqual(_ object: Any?) -> Bool {
+		guard let rhs = object as? Protocol else { return false }
+		return super.isEqual(rhs)
+	}
+	
     /// Returns "protocol"
     override var kind: String { return "protocol" }
 
@@ -33,7 +35,7 @@ typealias SourceryProtocol = Protocol
                          annotations: Annotations = [:],
 						 isGeneric: Bool = false,
 						 genericTypeParameters: [GenericTypeParameter] = [],
-						 file: File) {
+						 filePath: String) {
         super.init(
             name: name,
             parent: parent,
@@ -48,7 +50,7 @@ typealias SourceryProtocol = Protocol
             annotations: annotations,
 			isGeneric: isGeneric,
 			genericTypeParameters: genericTypeParameters,
-			file: file
+			filePath: filePath
         )
     }
 	

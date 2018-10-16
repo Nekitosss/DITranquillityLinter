@@ -18,10 +18,11 @@ public class Tokenizer {
 	
 	public init() {}
 	
+	let container = FileContainer()
 	public func process(files: [URL]) -> Bool {
 		
 		let collectedInfo = collectInfo(files: files)
-		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: collectedInfo) {
+		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: collectedInfo, fileContainer: container) {
 			let validator = GraphValidator()
 			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
 			
@@ -34,7 +35,7 @@ public class Tokenizer {
 		return true
 	}
 	
-	func parseBinaryModules() -> [FileParserResult] {
+	func parseBinaryModules(fileContainer: FileContainer) -> [FileParserResult] {
 		let enironment = ProcessInfo.processInfo.environment
 		var target = "x86_64-apple-ios11.4"
 		var sdk = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk"
@@ -70,11 +71,11 @@ public class Tokenizer {
 			commonFrameworkNames = ["Cocoa", "Foundation"]
 		}
 		return commonFrameworkNames.flatMap {
-			parseModule(moduleName: $0, frameworksPath: frameworksPath, compilerArguments: compilerArguments)
+			parseModule(moduleName: $0, frameworksPath: frameworksPath, compilerArguments: compilerArguments, fileContainer: fileContainer)
 		}
 	}
 	
-	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String]) -> [FileParserResult] {
+	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String], fileContainer: FileContainer) -> [FileParserResult] {
 		print("Parse module: \(moduleName)")
 		let frameworksURL = URL(fileURLWithPath: frameworksPath + "/\(moduleName).framework/Headers", isDirectory: true)
 		guard let frameworks = try? collectFrameworkNames(frameworksURL: frameworksURL) else { return [] }
@@ -95,7 +96,10 @@ public class Tokenizer {
 				let request = Request.customRequest(request: skObject)
 				let result = try request.send()
 				guard let contents = result["key.sourcetext"] as? String else { continue }
-				let fileParserResult = try FileParser(contents: contents, module: moduleName).parse()
+				let path = Path(frameworksURL.path + "/" + fullFrameworkName + ".h")
+				let parser = FileParser(contents: contents, path: path, module: moduleName)
+				let fileParserResult = try parser.parse()
+				fileContainer[path.string] = parser.file
 				parsedFilesResults.append(fileParserResult)
 			} catch {
 				print(error)
@@ -117,10 +121,11 @@ public class Tokenizer {
 	func collectInfo(files: [URL]) -> [String: Type] {
 		let paths = files.map({ Path($0.path) })
 		let filesParsers: [FileParser] = paths.compactMap({
-			guard let contents = File(path: $0.string)?.contents else { return nil }
-			return try? FileParser(contents: contents, path: $0, module: nil)
+			guard let file = File(path: $0.string) else { return nil }
+			container[$0.string] = file
+			return FileParser(contents: file.contents, path: $0, module: nil)
 		})
-		let allResults = filesParsers.map({ try! $0.parse() }) // + parseBinaryModules()
+		let allResults = filesParsers.map({ try! $0.parse() }) //+ parseBinaryModules(fileContainer: container)
 		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [])) { acc, next in
 			acc.typealiases += next.typealiases
 			acc.types += next.types
@@ -131,5 +136,6 @@ public class Tokenizer {
 	}
 	
 }
+
 
 

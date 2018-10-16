@@ -30,104 +30,8 @@ protocol Typed {
 }
 
 /// Describes name of the type used in typed declaration (variable, method parameter or return value etc.)
-@objcMembers final class TypeName: NSObject, AutoEquatable, AutoDiffable, LosslessStringConvertible, Codable {
+final class TypeName: NSObject, LosslessStringConvertible, Codable {
 
-    /// :nodoc:
-    init(_ name: String,
-                actualTypeName: TypeName? = nil,
-                attributes: [String: Attribute] = [:],
-                tuple: TupleType? = nil,
-                array: ArrayType? = nil,
-                dictionary: DictionaryType? = nil,
-                closure: ClosureType? = nil,
-                generic: GenericType? = nil) {
-
-        self.name = name
-        self.actualTypeName = actualTypeName
-        self.attributes = attributes
-        self.tuple = tuple
-        self.array = array
-        self.dictionary = dictionary
-        self.closure = closure
-        self.generic = generic
-
-        var name = name
-        attributes.forEach {
-            name = name.trimmingPrefix($0.value.description)
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-        }
-
-        if let genericConstraint = name.range(of: "where") {
-            name = String(name.prefix(upTo: genericConstraint.lowerBound))
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-        }
-
-		(self.unwrappedTypeName, self.isImplicitlyUnwrappedOptional, self.isOptional, self.isGeneric) = TypeName.unwrapTypeName(name: name)
-    }
-	
-	static func onlyUnwrappedName(name: String) -> String {
-		return unwrapTypeName(name: name).unwrappedTypeName
-	}
-	
-	static func onlyDroppedOptional(name: String) -> String {
-		let isImplicitlyUnwrappedOptional = name.hasSuffix("!") || name.hasPrefix("ImplicitlyUnwrappedOptional<")
-		let isOptional = name.hasSuffix("?") || name.hasPrefix("Optional<") || isImplicitlyUnwrappedOptional
-		var unwrappedTypeName = name
-		if isOptional {
-			if name.hasSuffix("?") || name.hasSuffix("!") {
-				unwrappedTypeName = String(name.dropLast())
-			} else if name.hasPrefix("Optional<") {
-				unwrappedTypeName = name.drop(first: "Optional<".count, last: 1)
-			} else {
-				unwrappedTypeName = name.drop(first: "ImplicitlyUnwrappedOptional<".count, last: 1)
-			}
-			unwrappedTypeName = unwrappedTypeName.bracketsBalancing()
-		} else {
-			unwrappedTypeName = name
-		}
-		return unwrappedTypeName
-	}
-	
-	static func unwrapTypeName(name: String) -> (unwrappedTypeName: String, isImplicitlyUnwrappedOptional: Bool, isOptional: Bool, isGeneric: Bool) {
-		var name = name
-		var unwrappedTypeName: String
-		var isImplicitlyUnwrappedOptional: Bool
-		var isOptional: Bool
-		var isGeneric: Bool
-		if name.isEmpty {
-			unwrappedTypeName = "Void"
-			isImplicitlyUnwrappedOptional = false
-			isOptional = false
-			isGeneric = false
-		} else {
-			name = name.bracketsBalancing()
-			name = name.trimmingPrefix("inout ").trimmingCharacters(in: .whitespacesAndNewlines)
-			isImplicitlyUnwrappedOptional = name.hasSuffix("!") || name.hasPrefix("ImplicitlyUnwrappedOptional<")
-			isOptional = name.hasSuffix("?") || name.hasPrefix("Optional<") || isImplicitlyUnwrappedOptional
-			
-			if isOptional {
-				if name.hasSuffix("?") || name.hasSuffix("!") {
-					unwrappedTypeName = String(name.dropLast())
-				} else if name.hasPrefix("Optional<") {
-					unwrappedTypeName = name.drop(first: "Optional<".count, last: 1)
-				} else {
-					unwrappedTypeName = name.drop(first: "ImplicitlyUnwrappedOptional<".count, last: 1)
-				}
-				unwrappedTypeName = unwrappedTypeName.bracketsBalancing()
-			} else {
-				unwrappedTypeName = name
-			}
-			
-			isGeneric = (unwrappedTypeName.contains("<") && unwrappedTypeName.last == ">")
-				|| unwrappedTypeName.isValidArrayName()
-				|| unwrappedTypeName.isValidDictionaryName()
-			
-			if isGeneric {
-				unwrappedTypeName = String(unwrappedTypeName.prefix(upTo: unwrappedTypeName.index(of: "<") ?? unwrappedTypeName.endIndex))
-			}
-		}
-		return (unwrappedTypeName, isImplicitlyUnwrappedOptional, isOptional, isGeneric)
-	}
 
     /// Type name used in declaration
     let name: String
@@ -157,6 +61,38 @@ protocol Typed {
     /// Type name without attributes and optional type information
     let unwrappedTypeName: String
 
+	/// :nodoc:
+	init(_ name: String,
+		 actualTypeName: TypeName? = nil,
+		 attributes: [String: Attribute] = [:],
+		 tuple: TupleType? = nil,
+		 array: ArrayType? = nil,
+		 dictionary: DictionaryType? = nil,
+		 closure: ClosureType? = nil,
+		 generic: GenericType? = nil) {
+		
+		self.name = name
+		self.actualTypeName = actualTypeName
+		self.attributes = attributes
+		self.tuple = tuple
+		self.array = array
+		self.dictionary = dictionary
+		self.closure = closure
+		self.generic = generic
+		
+		var name = name
+		attributes.forEach {
+			name = name.trimmingPrefix($0.value.description)
+				.trimmingCharacters(in: .whitespacesAndNewlines)
+		}
+		
+		if let genericConstraint = name.range(of: "where") {
+			name = String(name.prefix(upTo: genericConstraint.lowerBound))
+				.trimmingCharacters(in: .whitespacesAndNewlines)
+		}
+		
+		(self.unwrappedTypeName, self.isImplicitlyUnwrappedOptional, self.isOptional, self.isGeneric) = TypeName.unwrapTypeName(name: name)
+	}
     // sourcery: skipEquality
     /// Whether type is void (`Void` or `()`)
     var isVoid: Bool {
@@ -228,10 +164,74 @@ protocol Typed {
     override var debugDescription: String {
         return name
     }
+	
+	static func onlyUnwrappedName(name: String) -> String {
+		return unwrapTypeName(name: name).unwrappedTypeName
+	}
+	
+	static func onlyDroppedOptional(name: String) -> String {
+		let isImplicitlyUnwrappedOptional = name.hasSuffix("!") || name.hasPrefix("ImplicitlyUnwrappedOptional<")
+		let isOptional = name.hasSuffix("?") || name.hasPrefix("Optional<") || isImplicitlyUnwrappedOptional
+		var unwrappedTypeName = name
+		if isOptional {
+			if name.hasSuffix("?") || name.hasSuffix("!") {
+				unwrappedTypeName = String(name.dropLast())
+			} else if name.hasPrefix("Optional<") {
+				unwrappedTypeName = name.drop(first: "Optional<".count, last: 1)
+			} else {
+				unwrappedTypeName = name.drop(first: "ImplicitlyUnwrappedOptional<".count, last: 1)
+			}
+			unwrappedTypeName = unwrappedTypeName.bracketsBalancing()
+		} else {
+			unwrappedTypeName = name
+		}
+		return unwrappedTypeName
+	}
+	
+	static func unwrapTypeName(name: String) -> (unwrappedTypeName: String, isImplicitlyUnwrappedOptional: Bool, isOptional: Bool, isGeneric: Bool) {
+		var name = name
+		var unwrappedTypeName: String
+		var isImplicitlyUnwrappedOptional: Bool
+		var isOptional: Bool
+		var isGeneric: Bool
+		if name.isEmpty {
+			unwrappedTypeName = "Void"
+			isImplicitlyUnwrappedOptional = false
+			isOptional = false
+			isGeneric = false
+		} else {
+			name = name.bracketsBalancing()
+			name = name.trimmingPrefix("inout ").trimmingCharacters(in: .whitespacesAndNewlines)
+			isImplicitlyUnwrappedOptional = name.hasSuffix("!") || name.hasPrefix("ImplicitlyUnwrappedOptional<")
+			isOptional = name.hasSuffix("?") || name.hasPrefix("Optional<") || isImplicitlyUnwrappedOptional
+			
+			if isOptional {
+				if name.hasSuffix("?") || name.hasSuffix("!") {
+					unwrappedTypeName = String(name.dropLast())
+				} else if name.hasPrefix("Optional<") {
+					unwrappedTypeName = name.drop(first: "Optional<".count, last: 1)
+				} else {
+					unwrappedTypeName = name.drop(first: "ImplicitlyUnwrappedOptional<".count, last: 1)
+				}
+				unwrappedTypeName = unwrappedTypeName.bracketsBalancing()
+			} else {
+				unwrappedTypeName = name
+			}
+			
+			isGeneric = (unwrappedTypeName.contains("<") && unwrappedTypeName.last == ">")
+				|| unwrappedTypeName.isValidArrayName()
+				|| unwrappedTypeName.isValidDictionaryName()
+			
+			if isGeneric {
+				unwrappedTypeName = String(unwrappedTypeName.prefix(upTo: unwrappedTypeName.index(of: "<") ?? unwrappedTypeName.endIndex))
+			}
+		}
+		return (unwrappedTypeName, isImplicitlyUnwrappedOptional, isOptional, isGeneric)
+	}
 }
 
 /// Descibes Swift generic type parameter
-@objcMembers final class GenericTypeParameter: NSObject, SourceryModel, Codable {
+final class GenericTypeParameter: NSObject, Codable {
 
     /// Generic parameter type name
     let typeName: TypeName
@@ -248,22 +248,16 @@ protocol Typed {
 }
 
 /// Descibes Swift generic type
-@objcMembers final class GenericType: NSObject, SourceryModel, Codable {
+struct GenericType: Codable, Equatable {
     /// The name of the base type, i.e. `Array` for `Array<Int>`
     let name: String
 
     /// This generic type parameters
     let typeParameters: [GenericTypeParameter]
-
-    /// :nodoc:
-    init(name: String, typeParameters: [GenericTypeParameter] = []) {
-        self.name = name
-        self.typeParameters = typeParameters
-    }
 }
 
 /// Describes tuple type element
-@objcMembers final class TupleElement: NSObject, SourceryModel, Typed, Codable {
+final class TupleElement: NSObject, Typed, Codable {
 
     /// Tuple element name
     let name: String
@@ -284,33 +278,30 @@ protocol Typed {
 }
 
 /// Describes tuple type
-@objcMembers final class TupleType: NSObject, SourceryModel, Codable {
+struct TupleType: Codable, Equatable {
 
     /// Type name used in declaration
     let name: String
 
     /// Tuple elements
     let elements: [TupleElement]
-
-    /// :nodoc:
-    init(name: String, elements: [TupleElement]) {
-        self.name = name
-        self.elements = elements
-    }
 }
 
 /// Describes array type
-@objcMembers final class ArrayType: NSObject, SourceryModel, Codable {
+class ArrayType: Codable, Equatable {
 
     /// Type name used in declaration
     let name: String
 
     /// Array element type name
     let elementTypeName: TypeName
-
-    // sourcery: skipEquality, skipDescription
-    /// Array element type, if known
-    var elementType: Type?
+	
+	/// Array element type, if known
+	var elementType: Type?
+	
+	static func ==(lhs: ArrayType, rhs: ArrayType) -> Bool {
+		return lhs.name == rhs.name && lhs.elementTypeName == rhs.elementTypeName
+	}
 
     /// :nodoc:
     init(name: String, elementTypeName: TypeName, elementType: Type? = nil) {
@@ -321,7 +312,7 @@ protocol Typed {
 }
 
 /// Describes dictionary type
-@objcMembers final class DictionaryType: NSObject, SourceryModel, Codable {
+final class DictionaryType: NSObject, Codable {
 
     /// Type name used in declaration
     let name: String
@@ -351,7 +342,7 @@ protocol Typed {
 }
 
 /// Describes closure type
-@objcMembers final class ClosureType: NSObject, SourceryModel, Codable {
+final class ClosureType: NSObject, Codable {
 
     /// Type name used in declaration with stripped whitespaces and new lines
     let name: String

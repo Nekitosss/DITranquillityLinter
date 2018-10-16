@@ -5,7 +5,7 @@ import SourceKittenFramework
 typealias SourceryMethod = Method
 
 /// Describes method parameter
-@objcMembers final class MethodParameter: NSObject, SourceryModel, Typed, Annotated, Codable {
+final class MethodParameter: NSObject, Typed, Annotated, Codable {
     /// Parameter external name
     var argumentLabel: String?
 
@@ -62,7 +62,7 @@ typealias SourceryMethod = Method
 }
 
 /// Describes method
-@objc(SwiftMethod) @objcMembers final class Method: NSObject, SourceryModel, Annotated, Definition, Codable {
+final class Method: NSObject, Annotated, Definition, Codable {
 
     /// Full method name, including generic constraints, i.e. `foo<T>(bar: T)`
     let name: String
@@ -145,12 +145,6 @@ typealias SourceryMethod = Method
 
     /// Whether method is a failable initializer
     let isFailableInitializer: Bool
-
-    // sourcery: skipEqaulitey, skipDescription, skipCoding, skipJSExport
-    /// :nodoc:
-    @available(*, deprecated: 0.7, message: "Use isConvenienceInitializer instead") var isConvenienceInitialiser: Bool {
-        return attributes[Attribute.Identifier.convenience.name] != nil
-    }
 
     // sourcery: skipEquality, skipDescription
     /// Whether method is a convenience initializer

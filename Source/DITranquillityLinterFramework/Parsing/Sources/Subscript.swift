@@ -2,8 +2,20 @@ import Foundation
 import SourceKittenFramework
 
 /// Describes subscript
-@objcMembers final class Subscript: NSObject, SourceryModel, Annotated, Definition, Codable {
+final class Subscript: NSObject, Annotated, Definition, Codable {
 
+	override func isEqual(_ object: Any?) -> Bool {
+		guard let rhs = object as? Subscript else { return false }
+		if self.parameters != rhs.parameters { return false }
+		if self.returnTypeName != rhs.returnTypeName { return false }
+		if self.readAccess != rhs.readAccess { return false }
+		if self.writeAccess != rhs.writeAccess { return false }
+		if self.annotations != rhs.annotations { return false }
+		if self.definedInTypeName != rhs.definedInTypeName { return false }
+		if self.attributes != rhs.attributes { return false }
+		return true
+	}
+	
     /// Method parameters
     var parameters: [MethodParameter]
 

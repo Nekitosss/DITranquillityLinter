@@ -3,10 +3,15 @@ import SourceKittenFramework
 
 // sourcery: skipDescription
 /// Descibes Swift class
-@objc(SwiftClass) @objcMembers final class Class: Type {
+final class Class: Type {
     /// Returns "class"
     override var kind: String { return "class" }
-
+	
+	override func isEqual(_ object: Any?) -> Bool {
+		guard let rhs = object as? Class else { return false }
+		return super.isEqual(rhs)
+	}
+	
     /// Whether type is final 
     var isFinal: Bool {
         return attributes[Attribute.Identifier.final.name] != nil
@@ -27,7 +32,7 @@ import SourceKittenFramework
                          annotations: Annotations = [:],
 						 isGeneric: Bool = false,
 						 genericTypeParameters: [GenericTypeParameter] = [],
-						 file: File) {
+						 filePath: String) {
         super.init(
             name: name,
             parent: parent,
@@ -42,7 +47,7 @@ import SourceKittenFramework
             annotations: annotations,
 			isGeneric: isGeneric,
 			genericTypeParameters: genericTypeParameters,
-			file: file
+			filePath: filePath
         )
     }
 	

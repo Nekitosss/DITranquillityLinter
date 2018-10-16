@@ -7,7 +7,7 @@ import Foundation
 import SourceKittenFramework
 
 /// Defines enum case associated value
-@objcMembers final class AssociatedValue: NSObject, SourceryModel, AutoDescription, Typed, Annotated, Codable {
+final class AssociatedValue: NSObject, Typed, Annotated, Codable {
 
     /// Associated value local name.
     /// This is a name to be used to construct enum case value
@@ -43,7 +43,7 @@ import SourceKittenFramework
 }
 
 /// Defines enum case
-@objcMembers final class EnumCase: NSObject, SourceryModel, AutoDescription, Annotated, Codable {
+final class EnumCase: NSObject, AutoDescription, Annotated, Codable {
 
     /// Enum case name
     let name: String
@@ -78,8 +78,15 @@ import SourceKittenFramework
 }
 
 /// Defines Swift enum
-@objcMembers final class Enum: Type {
+final class Enum: Type {
 
+	override func isEqual(_ object: Any?) -> Bool {
+		guard let rhs = object as? Enum else { return false }
+		if self.cases != rhs.cases { return false }
+		if self.rawTypeName != rhs.rawTypeName { return false }
+		return super.isEqual(rhs)
+	}
+	
     // sourcery: skipDescription
     /// Returns "enum"
     override var kind: String { return "enum" }
@@ -140,13 +147,13 @@ import SourceKittenFramework
                 attributes: [String: Attribute] = [:],
                 annotations: Annotations = [:],
                 isGeneric: Bool = false,
-				file: File) {
+				file: String) {
 
         self.cases = cases
         self.rawTypeName = rawTypeName
         self.hasRawType = rawTypeName != nil || !inheritedTypes.isEmpty
 
-		super.init(name: name, parent: parent, accessLevel: accessLevel, isExtension: isExtension, variables: variables, methods: methods, inheritedTypes: inheritedTypes, containedTypes: containedTypes, typealiases: typealiases, attributes: attributes, annotations: annotations, isGeneric: isGeneric, file: file)
+		super.init(name: name, parent: parent, accessLevel: accessLevel, isExtension: isExtension, variables: variables, methods: methods, inheritedTypes: inheritedTypes, containedTypes: containedTypes, typealiases: typealiases, attributes: attributes, annotations: annotations, isGeneric: isGeneric, filePath: file)
 
         if let rawTypeName = rawTypeName?.name, let index = self.inheritedTypes.index(of: rawTypeName) {
             self.inheritedTypes.remove(at: index)

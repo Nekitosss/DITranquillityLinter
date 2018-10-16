@@ -10,7 +10,7 @@ import SourceKittenFramework
 
 final class AppendContainerTokenBuilder {
 	
-	static func build(functionName: String, collectedInfo: [String : Type], argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File, currentPartName: String?) -> AppendContainerToken? {
+	static func build(functionName: String, collectedInfo: [String : Type], argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File, currentPartName: String?, fileContainer: FileContainer) -> AppendContainerToken? {
 		guard functionName == DIKeywords.append.rawValue,
 			let appendInfo = argumentStack.first,
 			argumentStack.count == 1 else { return nil }
@@ -30,8 +30,8 @@ final class AppendContainerTokenBuilder {
 			let loadContainerStructure = swiftType.substructure.first(where: { $0.get(.name, of: String.self) == DIKeywords.loadContainer.rawValue })
 			else { return nil }
 		
-		let anotherFile = File(path: swiftType.path!.string)!
-		let containerPart = ContainerPart(substructureList: (loadContainerStructure.substructures ?? []), file: anotherFile, collectedInfo: collectedInfo, currentPartName: typeName)
+		let anotherFile = fileContainer[swiftType.filePath]!
+		let containerPart = ContainerPart(substructureList: (loadContainerStructure.substructures ?? []), file: anotherFile, collectedInfo: collectedInfo, currentPartName: typeName, fileContainer: fileContainer)
 		
 		return AppendContainerToken(location: location, typeName: typeName, containerPart: containerPart)
 	}

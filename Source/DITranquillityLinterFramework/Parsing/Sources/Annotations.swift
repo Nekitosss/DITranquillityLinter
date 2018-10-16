@@ -3,8 +3,8 @@ import Foundation
 /// Describes annotated declaration, i.e. type, method, variable, enum case
 protocol Annotated {
     /**
-     All annotations of declaration stored by their name. Value can be `bool`, `String`, float `NSNumber`
-     or array of those types if you use several annotations with the same name.
+     All annotations of declaration stored by their name. Value can be `Bool`, `String`, `Float` `NSNumber`
+     or `Array` of those types if you use several annotations with the same name.
     
      **Example:**
      

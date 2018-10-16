@@ -3,7 +3,7 @@ import SourceKittenFramework
 
 // sourcery: skipJSExport
 /// :nodoc:
-@objcMembers final class Typealias: NSObject, Typed, SourceryModel, Codable {
+final class Typealias: NSObject, Typed, Codable {
     // New typealias name
     let aliasName: String
 
@@ -13,7 +13,7 @@ import SourceKittenFramework
     // sourcery: skipEquality, skipDescription
     var type: Type?
 	
-	var file: File
+	var filePath: String
 
     // sourcery: skipEquality, skipDescription
     var parent: Type? {
@@ -32,13 +32,11 @@ import SourceKittenFramework
         }
     }
 
-    // TODO: access level
-
-    init(aliasName: String = "", typeName: TypeName, parent: Type? = nil, file: File) {
+    init(aliasName: String = "", typeName: TypeName, parent: Type? = nil, filePath: String) {
         self.aliasName = aliasName
         self.typeName = typeName
         self.parent = parent
         self.parentName = parent?.name
-		self.file = file
+		self.filePath = filePath
     }
 }

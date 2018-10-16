@@ -121,7 +121,7 @@ struct Composer {
 												  inheritedTypes: containingTypes.flatMap({ $0.inheritedTypes }),
 												  containedTypes: containingTypes.flatMap({ $0.containedTypes }),
 												  typealiases: containingTypes.flatMap({ $0.typealiases.values }),
-												  file: globalTypealias.file)
+												  filePath: globalTypealias.filePath)
 			result[globalTypealias.unwrappedTypeName] = typeComposition
 			result[globalTypealias.name] = typeComposition
 		}
@@ -251,7 +251,7 @@ struct Composer {
             enumeration.rawType = rawValueVariable.type
         } else if let rawTypeName = enumeration.inheritedTypes.first {
             if let rawTypeCandidate = types[rawTypeName] {
-                if !(rawTypeCandidate is SourceryProtocol) {
+                if !(rawTypeCandidate is Protocol) {
                     enumeration.rawTypeName = TypeName(rawTypeName)
                     enumeration.rawType = rawTypeCandidate
                 }
@@ -412,7 +412,7 @@ struct Composer {
 
             if baseType is Class {
                 type.inherits[name] = baseType
-            } else if baseType is SourceryProtocol {
+            } else if baseType is Protocol {
                 type.implements[name] = baseType
             }
         }

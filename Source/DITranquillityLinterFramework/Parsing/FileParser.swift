@@ -7,7 +7,7 @@ import Foundation
 import SourceKittenFramework
 import PathKit
 
-protocol Parsable: AnyObject {
+protocol Parsable {
     var parserData: Structure? { get set }
 }
 
@@ -18,7 +18,7 @@ extension Parsable {
     }
 
     /// sets underlying source
-    fileprivate func setSource(_ source: [String: SourceKitRepresentable]) {
+    mutating fileprivate func setSource(_ source: [String: SourceKitRepresentable]) {
         parserData = Structure(sourceKitResponse: source)
     }
 }
@@ -58,16 +58,17 @@ extension Attribute: Parsable {}
 
 final class FileParser {
 
-    let path: String?
+    let path: String
     let module: String?
     let initialContents: String
+	var file: File!
 
     fileprivate var contents: String!
     fileprivate var annotations: AnnotationsParser!
     fileprivate var inlineRanges: [String: NSRange]!
 
     fileprivate var logPrefix: String {
-        return path.flatMap { "\($0):" } ?? ""
+        return "\(path):"
     }
 
     /// Parses given contents.
@@ -77,8 +78,8 @@ final class FileParser {
     ///   - contents: Contents to parse.
     ///   - path: Path to file.
     /// - Throws: parsing errors.
-    init(contents: String, path: Path? = nil, module: String? = nil) throws {
-        self.path = path?.string
+    init(contents: String, path: Path, module: String? = nil) {
+        self.path = path.string
         self.module = module
         self.initialContents = contents
     }
@@ -104,39 +105,38 @@ final class FileParser {
     func parse() throws -> FileParserResult {
         _ = parseContentsIfNeeded()
 
-        if let path = path {
-            Log.verbose("Processing file \(path)")
-        }
+		Log.verbose("Processing file \(path)")
         let file = File(contents: contents)
+		self.file = file
         let source = try Structure(file: file).dictionary
-		return try parse(source: source, file: file)
+		return try parse(source: source, filePath: path)
     }
 	
-	func parse(source: [String: SourceKitRepresentable], file: File) throws -> FileParserResult {
-		let (types, typealiases) = try parseTypes(source, file: file)
+	func parse(source: [String: SourceKitRepresentable], filePath: String) throws -> FileParserResult {
+		let (types, typealiases) = try parseTypes(source, filePath: filePath)
 		return FileParserResult(path: path, module: module, types: types, typealiases: typealiases, inlineRanges: inlineRanges)
 	}
 
-	internal func parseTypes(_ source: [String: SourceKitRepresentable], file: File) throws -> ([Type], [Typealias]) {
+	internal func parseTypes(_ source: [String: SourceKitRepresentable], filePath: String) throws -> ([Type], [Typealias]) {
         var types = [Type]()
         var typealiases = [Typealias]()
         try walkDeclarations(source: source) { kind, name, access, inheritedTypes, source, definedIn, next in
-            let type: Type
+            var type: Type
 
             switch kind {
             case .protocol:
-                type = Protocol(name: name, accessLevel: access, isExtension: false, inheritedTypes: inheritedTypes, file: file)
+                type = Protocol(name: name, accessLevel: access, isExtension: false, inheritedTypes: inheritedTypes, filePath: filePath)
             case .class:
-                type = Class(name: name, accessLevel: access, isExtension: false, inheritedTypes: inheritedTypes, file: file)
+                type = Class(name: name, accessLevel: access, isExtension: false, inheritedTypes: inheritedTypes, filePath: filePath)
             case .struct:
-                type = Struct(name: name, accessLevel: access, isExtension: false, inheritedTypes: inheritedTypes, file: file)
+                type = Struct(name: name, accessLevel: access, isExtension: false, inheritedTypes: inheritedTypes, filePath: filePath)
             case .enum:
-                type = Enum(name: name, accessLevel: access, isExtension: false, inheritedTypes: inheritedTypes, file: file)
+                type = Enum(name: name, accessLevel: access, isExtension: false, inheritedTypes: inheritedTypes, file: filePath)
             case .extension,
                  .extensionClass,
                  .extensionStruct,
                  .extensionEnum:
-                type = Type(name: name, accessLevel: access, isExtension: true, inheritedTypes: inheritedTypes, file: file)
+                type = Type(name: name, accessLevel: access, isExtension: true, inheritedTypes: inheritedTypes, filePath: filePath)
             case .enumelement:
                 return parseEnumCase(source)
             case .varInstance:
@@ -155,7 +155,7 @@ final class FileParser {
             case .varParameter:
                 return parseParameter(source)
             case .typealias:
-                guard let `typealias` = parseTypealias(source, containingType: definedIn as? Type, file: file) else { return nil }
+                guard let `typealias` = parseTypealias(source, containingType: definedIn as? Type, filePath: filePath) else { return nil }
                 if definedIn == nil {
                     typealiases.append(`typealias`)
                 }
@@ -457,7 +457,7 @@ extension FileParser {
     internal func parseVariable(_ source: [String: SourceKitRepresentable], definedIn: Type?, isStatic: Bool = false) -> Variable? {
         guard let (name, _, accessibility) = parseTypeRequirements(source) else { return nil }
 
-        let definedInProtocol = (definedIn != nil) ? definedIn is SourceryProtocol : false
+        let definedInProtocol = (definedIn != nil) ? definedIn is Protocol : false
         var maybeType: String? = source[SwiftDocKey.typeName.rawValue] as? String
 
         if maybeType == nil, let substring = extract(.nameSuffix, from: source)?.trimmingCharacters(in: .whitespaces) {
@@ -494,7 +494,7 @@ extension FileParser {
         let defaultValue = extractDefaultValue(type: maybeType, from: source)
         let definedInTypeName = definedIn.map { TypeName($0.name) }
 
-        let variable = Variable(name: name, typeName: typeName, accessLevel: accessLevel, isComputed: computed, isStatic: isStatic, defaultValue: defaultValue, attributes: parseDeclarationAttributes(source), annotations: annotations.from(source), definedInTypeName: definedInTypeName)
+		var variable = Variable(name: name, typeName: typeName, accessLevel: accessLevel, isComputed: computed, isStatic: isStatic, defaultValue: defaultValue, attributes: parseDeclarationAttributes(source), annotations: annotations.from(source), definedInTypeName: definedInTypeName)
         variable.setSource(source)
 		
         return variable
@@ -610,7 +610,7 @@ extension FileParser {
         }
 
         let definedInTypeName  = definedIn.map { TypeName($0.name) }
-        let method = Method(name: fullName, selectorName: name.trimmingSuffix("()"), returnTypeName: TypeName(returnTypeName), throws: `throws`, rethrows: `rethrows`, accessLevel: accessibility, isStatic: isStatic, isClass: isClass, isFailableInitializer: isFailableInitializer, attributes: parseDeclarationAttributes(source), annotations: annotations.from(source), definedInTypeName: definedInTypeName)
+        var method = Method(name: fullName, selectorName: name.trimmingSuffix("()"), returnTypeName: TypeName(returnTypeName), throws: `throws`, rethrows: `rethrows`, accessLevel: accessibility, isStatic: isStatic, isClass: isClass, isFailableInitializer: isFailableInitializer, attributes: parseDeclarationAttributes(source), annotations: annotations.from(source), definedInTypeName: definedInTypeName)
         method.setSource(source)
 
         return method
@@ -626,7 +626,7 @@ extension FileParser {
         let `inout` = type.hasPrefix("inout ")
         let typeName = TypeName(type, attributes: parseTypeAttributes(type))
         let defaultValue = extractDefaultValue(type: type, from: source)
-        let parameter = MethodParameter(argumentLabel: argumentLabel, name: name, typeName: typeName, defaultValue: defaultValue, annotations: annotations.from(source), isInout: `inout`)
+        var parameter = MethodParameter(argumentLabel: argumentLabel, name: name, typeName: typeName, defaultValue: defaultValue, annotations: annotations.from(source), isInout: `inout`)
         parameter.setSource(source)
         return parameter
     }
@@ -662,7 +662,7 @@ extension FileParser {
              Log.info("\(logPrefix)parseEnumCase: Unknown enum case body format \(wrappedBody)")
         }
 
-        let enumCase = EnumCase(name: name, rawValue: rawValue, associatedValues: associatedValues, annotations: annotations.from(source))
+        var enumCase = EnumCase(name: name, rawValue: rawValue, associatedValues: associatedValues, annotations: annotations.from(source))
         enumCase.setSource(source)
         return enumCase
     }
@@ -706,13 +706,13 @@ extension FileParser {
 // MARK: - Typealiases
 extension FileParser {
 
-	fileprivate func parseTypealias(_ source: [String: SourceKitRepresentable], containingType: Type?, file: File) -> Typealias? {
+	fileprivate func parseTypealias(_ source: [String: SourceKitRepresentable], containingType: Type?, filePath: String) -> Typealias? {
         guard let (name, _, _) = parseTypeRequirements(source),
             let nameSuffix = extract(.nameSuffix, from: source)?
                 .trimmingCharacters(in: CharacterSet.init(charactersIn: "=").union(.whitespacesAndNewlines))
             else { return nil }
 
-		return Typealias(aliasName: name, typeName: TypeName(nameSuffix), parent: containingType, file: file)
+		return Typealias(aliasName: name, typeName: TypeName(nameSuffix), parent: containingType, filePath: filePath)
     }
 
 }
@@ -727,7 +727,7 @@ extension FileParser {
                 guard let key = extract(.key, from: attributeDict) else { return nil }
                 guard let identifier = (attributeDict["key.attribute"] as? String).flatMap(Attribute.Identifier.init(identifier:)) else { return nil }
 
-                let attribute = parseAttribute(key.trimmingPrefix("@"), identifier: identifier)
+                var attribute = parseAttribute(key.trimmingPrefix("@"), identifier: identifier)
                 attribute?.setSource(attributeDict)
                 return attribute
             }

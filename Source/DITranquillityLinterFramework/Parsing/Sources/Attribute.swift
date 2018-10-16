@@ -41,9 +41,17 @@ extension Structure: Codable {
 	public func encode(to encoder: Encoder) throws {
 		fatalError()
 	}
+	
+	static func ==(lhs: Structure, rhs: Structure) -> Bool {
+		return true
+	}
 }
 
-extension File: Codable {
+extension File: Codable, Equatable {
+	public static func == (lhs: File, rhs: File) -> Bool {
+		return true
+	}
+	
 	
 	public convenience init(from decoder: Decoder) throws {
 		fatalError()
@@ -56,7 +64,7 @@ extension File: Codable {
 
 typealias AttributeArguments = [String: AttributeArgumentValue]
 /// Describes Swift attribute
-@objcMembers class Attribute: NSObject, AutoEquatable, AutoDiffable, Codable {
+struct Attribute: Codable, Equatable {
 
     /// Attribute name
     let name: String
@@ -64,23 +72,16 @@ typealias AttributeArguments = [String: AttributeArgumentValue]
     /// Attribute arguments
     let arguments: AttributeArguments
 
-    // sourcery: skipJSExport
-    let _description: String
+	/// Attribute description that can be used in a template.
+    let description: String
 
-    // sourcery: skipEquality, skipDescription, skipCoding, skipJSExport
-    /// :nodoc:
     var parserData: Structure?
 
-    /// :nodoc:
+	/// :nodoc:
     init(name: String, arguments: AttributeArguments = [:], description: String? = nil) {
         self.name = name
         self.arguments = arguments
-        self._description = description ?? "@\(name)"
-    }
-
-    /// Attribute description that can be used in a template.
-    override var description: String {
-        return _description
+        self.description = description ?? "@\(name)"
     }
 
     /// :nodoc:

@@ -36,8 +36,9 @@ func extractRegistrationInfo(containerInfo: ContainerPart, maximumRegistrationCo
 
 func validateGraph(fileName: String) throws -> [GraphError] {
 	let fileURL = pathToSourceFile(with: fileName)
-	let collectedInfo = Tokenizer().collectInfo(files: [fileURL])
-	guard let containerInfo = ContainerInitializatorFinder.findContainerStructure(dictionary: collectedInfo) else {
+	let tokenizer = Tokenizer()
+	let collectedInfo = tokenizer.collectInfo(files: [fileURL])
+	guard let containerInfo = ContainerInitializatorFinder.findContainerStructure(dictionary: collectedInfo, fileContainer: tokenizer.container) else {
 		throw TestError.containerInfoNotFound
 	}
 	XCTAssertFalse(containerInfo.tokenInfo.isEmpty)
@@ -46,14 +47,15 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 }
 
 func findContainerStructure(fileName: String) throws -> ContainerPart {
+	let tokenizer = Tokenizer()
 	let fileURL = pathToSourceFile(with: fileName)
-	guard let containerInfo = ContainerInitializatorFinder.findContainerStructure(dictionary: Tokenizer().collectInfo(files: [fileURL])) else {
+	guard let containerInfo = ContainerInitializatorFinder.findContainerStructure(dictionary: tokenizer.collectInfo(files: [fileURL]), fileContainer: tokenizer.container) else {
 		throw TestError.containerInfoNotFound
 	}
 	return containerInfo
 }
 
 func pathToSourceFile(with name: String) -> URL {
-	let pathToTestableSource = "/Users/nikita/development/DITranquillityLinter/LintableProject/LintableProject/Testable/"
+	let pathToTestableSource = "/Users/nikitapatskov/Develop/DITranquillityLinter/LintableProject/LintableProject/Testable/"
 	return URL(fileURLWithPath: pathToTestableSource + name + ".swift", isDirectory: false)
 }

@@ -10,7 +10,7 @@ import SourceKittenFramework
 
 // sourcery: skipDescription
 /// Descibes Swift class
-@objc(TypeComposition) @objcMembers final class TypeComposition: Type {
+final class TypeComposition: Type {
 	/// Returns "class"
 	override var kind: String { return "composed" }
 	
@@ -30,7 +30,7 @@ import SourceKittenFramework
 						 annotations: Annotations = [:],
 						 isGeneric: Bool = false,
 						 genericTypeParameters: [GenericTypeParameter] = [],
-						 file: File) {
+						 filePath: String) {
 		super.init(
 			name: name,
 			parent: parent,
@@ -45,7 +45,7 @@ import SourceKittenFramework
 			annotations: annotations,
 			isGeneric: isGeneric,
 			genericTypeParameters: genericTypeParameters,
-			file: file
+			filePath: filePath
 		)
 	}
 	
