@@ -390,7 +390,8 @@ struct Composer {
         types.forEach { type in
 			let parentTypeName = type.parentName.flatMap({ $0 + "." }) ?? ""
 			
-            if let type = type as? Class, let supertype = type.inheritedTypes.first.flatMap({ typesByName[parentTypeName + $0] ?? typesByName[$0]  }) as? Class {
+			// TODO: - Fix supertype (make it Class back again)
+            if let type = type as? Class, let supertype = type.inheritedTypes.first.flatMap({ typesByName[parentTypeName + $0] ?? typesByName[$0]  }), supertype.kind == "class" || supertype.kind == "unknown" {
                 type.supertype = supertype
             }
             processed[type.name] = true
@@ -410,7 +411,7 @@ struct Composer {
             baseType.inherits.forEach { type.inherits[$0.key] = $0.value }
             baseType.implements.forEach { type.implements[$0.key] = $0.value }
 
-            if baseType is Class {
+            if baseType is Class || baseType.kind == "unknown" {
                 type.inherits[name] = baseType
             } else if baseType is Protocol {
                 type.implements[name] = baseType

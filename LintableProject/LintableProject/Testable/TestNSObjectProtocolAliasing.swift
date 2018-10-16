@@ -1,5 +1,5 @@
 //
-//  TestInvalidMethodCallingRegistration.swift
+//  TestNSObjectProtocolAliasing.swift
 //  LintableProject
 //
 //  Created by Nikita Patskov on 16/10/2018.
@@ -8,22 +8,21 @@
 
 import DITranquillity
 
-private class MyClass {
+private protocol MyProtocol {}
+private class MyClass: NSObject, MyProtocol {
 }
 
 private class ParsablePart: DIPart {
 	
 	static let container: DIContainer = {
-		let cont = DIContainer()
-		cont.append(part: ParsablePart.self)
-		return cont
+		let container = DIContainer()
+		container.append(part: ParsablePart.self)
+		return container
 	}()
 	
 	static func load(container: DIContainer) {
-		invalidInjectionMethod(container)
+		container.register(MyClass.self)
+			.as(NSObjectProtocol.self)
 	}
 	
-	static func invalidInjectionMethod(_ c: DIContainer) {
-		c.register(MyClass.init)
-	}
 }

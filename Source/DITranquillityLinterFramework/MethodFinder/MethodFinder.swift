@@ -54,6 +54,11 @@ class MethodFinder {
 				}
 			}
 			
+			let modificators = methodSignature.injectionModificators[argumentIndex] ?? []
+			if InjectionToken.isMany(modificators) {
+				typeName = typeName.droppedArrayInfo()
+				plainTypeName = plainTypeName.droppedArrayInfo()
+			}
 			if let typealiased = parsingContext.collectedInfo[plainTypeName]?.name {
 				if !typeName.contains("<") {
 					// Type name should not be only if its typealias, not generic
@@ -62,7 +67,7 @@ class MethodFinder {
 				plainTypeName = typealiased
 			}
 			let location = Location(file: file, byteOffset: injectableArgInfo.argumentBodyOffset)
-			let modificators = methodSignature.injectionModificators[argumentIndex] ?? []
+			
 			var injection = InjectionToken(name: parameter.name,
 										   typeName: typeName,
 										   plainTypeName: plainTypeName,
@@ -80,7 +85,7 @@ class MethodFinder {
 				case .tagged:
 					break
 				case .many:
-					fatalError("Not implemented")
+					break
 				}
 			}
 			argumentInfo.append(injection)

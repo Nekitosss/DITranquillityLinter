@@ -77,7 +77,9 @@ final class GraphValidator {
 				}
 				guard alias.typeName != registration.typeName && !autoimplementedTypes.contains(alias.typeName) else { continue }
 				let inheritanceAndImplementations = typeInfo.inheritanceAndImplementations
-				for aliasType in alias.decomposedTypes where inheritanceAndImplementations[aliasType] == nil {
+				for aliasType in alias.decomposedTypes {
+					let aliasTypeName = nsObjectProtocolConvert(aliasType)
+					guard inheritanceAndImplementations[aliasTypeName] == nil && !typeInfo.inheritedTypes.contains(aliasTypeName) else { continue }
 					let info = buildNotFoundAliasMessage(alias: alias)
 					errors.append(GraphError(infoString: info, location: alias.location))
 				}
@@ -95,7 +97,7 @@ final class GraphValidator {
 						let info = buildTooManyRegistrationsForType(injection: injection, accessor: accessor)
 						errors.append(GraphError(infoString: info, location: injection.location))
 					}
-				} else {
+				} else if !injection.optionalInjection {
 					let info = buildNotFoundRegistrationMessage(injection: injection, accessor: accessor)
 					errors.append(GraphError(infoString: info, location: injection.location))
 				}
@@ -106,6 +108,10 @@ final class GraphValidator {
 		}
 		
 		return errors
+	}
+	
+	private func nsObjectProtocolConvert(_ name: String) -> String {
+		return name == "NSObjectProtocol" ? "NSObject" : name
 	}
 	
 	private func buildTagTypeNotFoundMessage(tagName: String) -> String {

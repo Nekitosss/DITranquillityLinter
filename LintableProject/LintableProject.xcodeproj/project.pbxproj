@@ -39,6 +39,9 @@
 		D9702440A11CC123D48D7EAB /* Pods_LintableProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 90DD9BCF1810B25E7A234F34 /* Pods_LintableProject.framework */; };
 		FD563C3B2175F5D4009B4350 /* TestInvalidMethodCallingRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD563C3A2175F5D4009B4350 /* TestInvalidMethodCallingRegistration.swift */; };
 		FD563C3D2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD563C3C2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift */; };
+		FD563C402175FE8C009B4350 /* TestOuterUIKitMethodRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD563C3F2175FE8C009B4350 /* TestOuterUIKitMethodRegistration.swift */; };
+		FD563C422176066D009B4350 /* TestNSObjectProtocolAliasing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD563C412176066D009B4350 /* TestNSObjectProtocolAliasing.swift */; };
+		FD563C4421760F45009B4350 /* TestManyInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD563C4321760F45009B4350 /* TestManyInjection.swift */; };
 		FD642E4021623D7E0049E0BF /* TestPlainRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E3F21623D7E0049E0BF /* TestPlainRegistration.swift */; };
 		FD642E4221623DEE0049E0BF /* TestPlainGenericRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E4121623DEE0049E0BF /* TestPlainGenericRegistration.swift */; };
 		FD642E4421623E320049E0BF /* TestNestedClassPlainRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E4321623E320049E0BF /* TestNestedClassPlainRegistration.swift */; };
@@ -112,6 +115,9 @@
 		B155841C5469E9BB60055504 /* Pods-LintableProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LintableProject.release.xcconfig"; path = "Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject.release.xcconfig"; sourceTree = "<group>"; };
 		FD563C3A2175F5D4009B4350 /* TestInvalidMethodCallingRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInvalidMethodCallingRegistration.swift; sourceTree = "<group>"; };
 		FD563C3C2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInitialDefinitionInvalidMethodCallingRegistration.swift; sourceTree = "<group>"; };
+		FD563C3F2175FE8C009B4350 /* TestOuterUIKitMethodRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestOuterUIKitMethodRegistration.swift; sourceTree = "<group>"; };
+		FD563C412176066D009B4350 /* TestNSObjectProtocolAliasing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNSObjectProtocolAliasing.swift; sourceTree = "<group>"; };
+		FD563C4321760F45009B4350 /* TestManyInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestManyInjection.swift; sourceTree = "<group>"; };
 		FD642E3F21623D7E0049E0BF /* TestPlainRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPlainRegistration.swift; sourceTree = "<group>"; };
 		FD642E4121623DEE0049E0BF /* TestPlainGenericRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPlainGenericRegistration.swift; sourceTree = "<group>"; };
 		FD642E4321623E320049E0BF /* TestNestedClassPlainRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNestedClassPlainRegistration.swift; sourceTree = "<group>"; };
@@ -272,6 +278,9 @@
 				11E6F7E12170D99100C591F6 /* TestStaticVariableRegistration.swift */,
 				FD563C3A2175F5D4009B4350 /* TestInvalidMethodCallingRegistration.swift */,
 				FD563C3C2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift */,
+				FD563C3F2175FE8C009B4350 /* TestOuterUIKitMethodRegistration.swift */,
+				FD563C412176066D009B4350 /* TestNSObjectProtocolAliasing.swift */,
+				FD563C4321760F45009B4350 /* TestManyInjection.swift */,
 			);
 			path = Testable;
 			sourceTree = "<group>";
@@ -418,6 +427,8 @@
 				11E6F7E22170D99100C591F6 /* TestStaticVariableRegistration.swift in Sources */,
 				FD642E60216241450049E0BF /* TestTypedAndTaggedVariableInjection.swift in Sources */,
 				FD6E0BEC21663965007AA232 /* TestTypedInitializerInjection.swift in Sources */,
+				FD563C402175FE8C009B4350 /* TestOuterUIKitMethodRegistration.swift in Sources */,
+				FD563C422176066D009B4350 /* TestNSObjectProtocolAliasing.swift in Sources */,
 				112D67A82169370400A9E6DF /* TestWrappedProtocolCompositionAliasing.swift in Sources */,
 				FD642E58216240720049E0BF /* TestExplicitKeyPathInjection.swift in Sources */,
 				FD642E4A21623EC30049E0BF /* TestImplicitInitRegistration.swift in Sources */,
@@ -458,6 +469,7 @@
 				112D67AE2169501A00A9E6DF /* TestTypealiasedClassRegistration.swift in Sources */,
 				112D67B4216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift in Sources */,
 				11264022216A5DB4008ED24C /* TestComposedTypealiasFailure.swift in Sources */,
+				FD563C4421760F45009B4350 /* TestManyInjection.swift in Sources */,
 				FD563C3D2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift in Sources */,
 				11264024216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift in Sources */,
 				FD642E5E216240D80049E0BF /* TestTypedVariableInjection.swift in Sources */,

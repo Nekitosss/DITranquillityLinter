@@ -39,6 +39,16 @@ extension String {
 		return droppedSuffix(".init")
 	}
 	
+	func droppedArrayInfo() -> String {
+		if hasPrefix("Array<") {
+			return drop(first: 6, last: 1)
+		} else if hasPrefix("[") {
+			return dropFirstAndLast()
+		} else {
+			return self
+		}
+	}
+	
 	func droppedDotSelf() -> String {
 		return droppedSuffix(".self")
 	}

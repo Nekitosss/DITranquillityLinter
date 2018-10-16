@@ -439,4 +439,21 @@ final class ParserTests: XCTestCase {
 		XCTAssertFalse(context.errors.isEmpty, "Should not allow container passing between methods")
 	}
 	
+	// .register(MyClass.init(nibName:bundle:))
+	func testOuterUIKitMethodRegistration() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestOuterUIKitMethodRegistration")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		XCTAssertEqual(registration.typeName, "MyClass")
+	}
+	
+	// .injection(\.ss) { many($0) }
+	func testManyInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestManyInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertTrue(injection.isMany)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "MyProtocol")
+	}
+	
 }

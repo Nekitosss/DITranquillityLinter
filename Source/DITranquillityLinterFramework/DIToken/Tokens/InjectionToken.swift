@@ -11,8 +11,24 @@ import Foundation
 struct InjectionToken: DIToken {
 	
 	let name: String
-	var typeName: String
-	var plainTypeName: String
+	var typeName: String {
+		didSet {
+			// Handle many($0) unwrapping
+			let new = typeName.droppedArrayInfo()
+			if typeName != new {
+				typeName = new
+			}
+		}
+	}
+	var plainTypeName: String {
+		didSet {
+			// Handle many($0) unwrapping
+			let new = typeName.droppedArrayInfo()
+			if typeName != new {
+				typeName = new
+			}
+		}
+	}
 	let cycle: Bool
 	var optionalInjection: Bool
 	let methodInjection: Bool
@@ -26,7 +42,7 @@ struct InjectionToken: DIToken {
 		return RegistrationAccessor(typeName: preferredType, tag: tag)
 	}
 	
-	var isMany: Bool {
+	static func isMany(_ modificators: [InjectionModificator]) -> Bool {
 		for modificator in modificators {
 			switch modificator {
 			case .many:
@@ -36,6 +52,10 @@ struct InjectionToken: DIToken {
 			}
 		}
 		return false
+	}
+	
+	var isMany: Bool {
+		return InjectionToken.isMany(modificators)
 	}
 	
 	var tag: String {

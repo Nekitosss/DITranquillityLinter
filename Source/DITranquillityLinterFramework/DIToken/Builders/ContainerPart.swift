@@ -125,7 +125,7 @@ final class ContainerPart {
 		let actualName = extractActualFuncionInvokation(name: name)
 		
 		let substructureList = loadContainerBodyPart.substructures ?? []
-		let argumentStack = argumentInfo(substructures: substructureList, content: content)
+		var argumentStack = argumentInfo(substructures: substructureList, content: content)
 		
 		if let alias = AliasTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, parsingContext: parsingContext, bodyOffset: bodyOffset, file: file) {
 			tokenList.append(alias)
@@ -138,11 +138,16 @@ final class ContainerPart {
 			result.append(appendContainerToken)
 		} else if let isDefaultToken = IsDefaultTokenBuilder.build(functionName: actualName, invocationBody: body, bodyOffset: bodyOffset, file: file) {
 			tokenList.append(isDefaultToken)
-		} else if argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
-			let location = Location(file: file, byteOffset: bodyOffset)
-			let info = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
-			let invalidCallError = GraphError(infoString: info, location: location)
-			parsingContext.errors.append(invalidCallError)
+		} else {
+			if argumentStack.isEmpty {
+				argumentStack = AliasTokenBuilder.parseArgumentList(body: body, substructureList: substructureList)
+			}
+			if argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
+				let location = Location(file: file, byteOffset: bodyOffset)
+				let info = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
+				let invalidCallError = GraphError(infoString: info, location: location)
+				parsingContext.errors.append(invalidCallError)
+			}
 		}
 		
 		for substructure in substructureList {

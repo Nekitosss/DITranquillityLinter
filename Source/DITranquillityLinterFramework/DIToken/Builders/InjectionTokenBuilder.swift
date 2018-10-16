@@ -40,12 +40,12 @@ final class InjectionTokenBuilder {
 				// injection { $0.name = $1 }
 				name = String(nameFromPattern.dropFirst(3))
 			}
-			if let taggedModificators = InjectionTokenBuilder.parseTaggedInjection(structure: argument.structure, content: content), !taggedModificators.isEmpty {
+			if let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: argument.structure, content: content), !taggedModificators.isEmpty {
 				// For tagged variable injection structure always on "closure" level
 				modificators += taggedModificators
 				
 			} else if let closureSubstructure = argument.structure.substructures?.first,
-				let taggedModificators = InjectionTokenBuilder.parseTaggedInjection(structure: closureSubstructure, content: content), !taggedModificators.isEmpty {
+				let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: closureSubstructure, content: content), !taggedModificators.isEmpty {
 				// Tag stores in argument -> closure -> expressionCall
 				// parseTaggedInjection can parse sinse "closure" level. So we unwrap single time
 				modificators += taggedModificators
@@ -57,24 +57,30 @@ final class InjectionTokenBuilder {
 				modificators.append(.typed(typeFromPattern))
 			}
 		}
-		
+		if InjectionToken.isMany(modificators) {
+			typeName = typeName.droppedArrayInfo()
+		}
 		return InjectionToken(name: name, typeName: typeName, plainTypeName: typeName, cycle: cycle, optionalInjection: false, methodInjection: false, modificators: modificators, injectionSubstructureList: substructureList.last?.substructures ?? substructureList, location: location)
 	}
 	
-	static func parseTaggedInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
+	static func parseTaggedAndManyInjectionInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
 		let expresstionCallSubstructures = structure.substructures ?? []
 		var result: [InjectionModificator] = []
 		for substructure in expresstionCallSubstructures {
 			guard let name: String = substructure.get(.name),
 				let kind: String = substructure.get(.kind),
-				kind == SwiftExpressionKind.call.rawValue,
-				let argumentsSubstructure = substructure.substructures,
-				name == DIKeywords.by.rawValue
+				kind == SwiftExpressionKind.call.rawValue
 				else { continue }
-			let arguments = ContainerPart.argumentInfo(substructures: argumentsSubstructure, content: content)
-			guard let tagType = arguments.first(where: { $0.name == DIKeywords.tag.rawValue }) else { continue }
-			let tagTypeName = tagType.value.droppedDotSelf()
-			result.append(.tagged(tagTypeName))
+			
+			if name == DIKeywords.by.rawValue {
+				guard let argumentsSubstructure = substructure.substructures else { continue }
+				let arguments = ContainerPart.argumentInfo(substructures: argumentsSubstructure, content: content)
+				guard let tagType = arguments.first(where: { $0.name == DIKeywords.tag.rawValue }) else { continue }
+				let tagTypeName = tagType.value.droppedDotSelf()
+				result.append(.tagged(tagTypeName))
+			} else if name == DIKeywords.many.rawValue {
+				result.append(.many)
+			}
 		}
 		return result
 	}

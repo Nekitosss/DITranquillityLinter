@@ -114,7 +114,11 @@ final class RegistrationTokenBuilder {
 	}
 	
 	private static func parseTypeName(name: String) -> (typeName: String, fullTypeName: String, genericType: GenericType?) {
-		let name = name.droppedDotInit()
+		var name = name
+		if let bracketIndex = name.firstIndex(of: "(") {
+			name = String(name[..<bracketIndex])
+		}
+		name = name.droppedDotInit()
 		if let genericType = Composer.parseGenericType(name) {
 			return (genericType.name, name, genericType)
 		} else {
@@ -154,7 +158,7 @@ final class RegistrationTokenBuilder {
 			if let forcedType = body.firstMatch(RegExp.forcedType)?.trimmingCharacters(in: .whitespacesAndNewlines) {
 				injectionModificators[argumentNumber, default: []].append(InjectionModificator.typed(forcedType))
 			}
-			if let taggedInjection = InjectionTokenBuilder.parseTaggedInjection(structure: substucture, content: content) {
+			if let taggedInjection = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: substucture, content: content) {
 				injectionModificators[argumentNumber, default: []].append(contentsOf: taggedInjection)
 			}
 			

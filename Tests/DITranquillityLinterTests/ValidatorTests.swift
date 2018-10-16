@@ -62,4 +62,9 @@ class ValidatorTests: XCTestCase {
 		XCTAssertTrue(errorList.isEmpty)
 	}
 	
+	func testNSObjectProtocolAliasing() throws {
+		let errorList = try validateGraph(fileName: "TestNSObjectProtocolAliasing")
+		XCTAssertTrue(errorList.isEmpty)
+	}
+	
 }
