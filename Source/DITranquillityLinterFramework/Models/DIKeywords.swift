@@ -24,4 +24,5 @@ enum DIKeywords: String {
 	case diContainer = "DIContainer"
 	case initDIContainer = "DIContainer.init"
 	case appDelegate = "AppDelegate"
+	case container = "container"
 }

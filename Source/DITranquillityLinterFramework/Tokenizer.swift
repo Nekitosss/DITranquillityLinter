@@ -24,7 +24,8 @@ public class Tokenizer {
 	public func process(files: [URL]) -> Bool {
 		
 		let collectedInfo = collectInfo(files: files)
-		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(dictionary: collectedInfo, fileContainer: container) {
+		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
+		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(parsingContext: parsingContext) {
 			let validator = GraphValidator()
 			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
 			
@@ -75,13 +76,17 @@ public class Tokenizer {
 		
 		let cacheName = sdk
 		let cacher = ResultCacher()
+		var start = Date()
 		if let cachedResult = cacher.getCachedBinaryFiles(name: cacheName) {
+			print("Decode end: ", Date().timeIntervalSince(start))
 			return cachedResult
 		} else {
 			let result = commonFrameworkNames.flatMap {
 				parseModule(moduleName: $0, frameworksPath: frameworksPath, compilerArguments: compilerArguments, fileContainer: fileContainer)
 			}
+			start = Date()
 			cacher.cacheBinaryFiles(list: result, name: cacheName)
+			print("Encode end: ", Date().timeIntervalSince(start))
 			
 			return result
 		}
@@ -137,7 +142,7 @@ public class Tokenizer {
 			container[$0.string] = file
 			return FileParser(contents: file.contents, path: $0, module: nil)
 		})
-		let allResults = filesParsers.map({ try! $0.parse() }) + parseBinaryModules(fileContainer: container)
+		let allResults = filesParsers.map({ try! $0.parse() }) //+ parseBinaryModules(fileContainer: container)
 		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [], linterVersion: linterVersion)) { acc, next in
 			acc.typealiases += next.typealiases
 			acc.types += next.types

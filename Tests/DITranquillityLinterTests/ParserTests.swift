@@ -417,4 +417,26 @@ final class ParserTests: XCTestCase {
 		XCTAssertEqual(registration.typeName, "MyClass")
 	}
 	
+	// invalidInjectionMethod(c: container)
+	func testInvalidMethodCallingRegistration() throws {
+		let tokenizer = Tokenizer()
+		let fileURL = pathToSourceFile(with: "TestInvalidMethodCallingRegistration")
+		let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
+		guard let _ = ContainerInitializatorFinder.findContainerStructure(parsingContext: context) else {
+			throw TestError.containerInfoNotFound
+		}
+		XCTAssertFalse(context.errors.isEmpty, "Should not allow container passing between methods")
+	}
+	
+	// invalidInjectionMethod(c: container) in static let container: DIContainer = { ... }
+	func testInitialDefinitionInvalidMethodCallingRegistration() throws {
+		let tokenizer = Tokenizer()
+		let fileURL = pathToSourceFile(with: "TestInitialDefinitionInvalidMethodCallingRegistration")
+		let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
+		guard let _ = ContainerInitializatorFinder.findContainerStructure(parsingContext: context) else {
+			throw TestError.containerInfoNotFound
+		}
+		XCTAssertFalse(context.errors.isEmpty, "Should not allow container passing between methods")
+	}
+	
 }

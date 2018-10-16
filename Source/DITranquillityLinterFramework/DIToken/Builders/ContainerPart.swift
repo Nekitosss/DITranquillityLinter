@@ -16,7 +16,7 @@ final class ContainerPart {
 	
 	let tokenInfo: [RegistrationAccessor: [RegistrationToken]]
 	
-	init(substructureList: [SourceKitStructure], file: File, collectedInfo: [String: Type], currentPartName: String?, fileContainer: FileContainer) {
+	init(substructureList: [SourceKitStructure], file: File, parsingContext: ParsingContext, currentPartName: String?) {
 		let content = file.contents.bridge()
 		var tmpTokenList: [DIToken] = []
 		var assignedRegistrations: [String: RegistrationToken] = [:]
@@ -31,7 +31,7 @@ final class ContainerPart {
 			switch kind {
 			case SwiftExpressionKind.call.rawValue:
 				// Get all tokens
-				var collectedTokens = ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, tokenList: &tmpTokenList, currentPartName: currentPartName, fileContainer: fileContainer)
+				var collectedTokens = ContainerPart.processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, parsingContext: parsingContext, tokenList: &tmpTokenList, currentPartName: currentPartName)
 				
 				if let registrationTokenIndex = collectedTokens.index(where: { $0 is RegistrationToken }) {
 					// get registration token. Should be 0 or 1 count. Remember that container.append(part:).register() is available
@@ -50,7 +50,7 @@ final class ContainerPart {
 					// r.inject(_:)  (processed in that if block)
 					let tokenList = RegistrationTokenBuilder.fillTokenListWithInfo(input: registrationToken.tokenList + collectedTokens + tmpTokenList,
 																				   typeName: registrationToken.plainTypeName,
-																				   collectedInfo: collectedInfo,
+																				   parsingContext: parsingContext,
 																				   content: content,
 																				   file: file)
 					let newToken = RegistrationToken(typeName: registrationToken.typeName,
@@ -112,7 +112,7 @@ final class ContainerPart {
 		}
 	}
 	
-	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, collectedInfo: [String: Type], tokenList: inout [DIToken], currentPartName: String?, fileContainer: FileContainer) -> [DIToken] {
+	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, parsingContext: ParsingContext, tokenList: inout [DIToken], currentPartName: String?) -> [DIToken] {
 		var result: [DIToken] = []
 		
 		guard let kind: String = loadContainerBodyPart.get(.kind),
@@ -127,21 +127,26 @@ final class ContainerPart {
 		let substructureList = loadContainerBodyPart.substructures ?? []
 		let argumentStack = argumentInfo(substructures: substructureList, content: content)
 		
-		if let alias = AliasTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, collectedInfo: collectedInfo, bodyOffset: bodyOffset, file: file) {
+		if let alias = AliasTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, parsingContext: parsingContext, bodyOffset: bodyOffset, file: file) {
 			tokenList.append(alias)
 		} else if let injection = InjectionTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, content: content, substructureList: substructureList) {
 			tokenList.append(injection)
-		} else if let registration = RegistrationTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, collectedInfo: collectedInfo, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
+		} else if let registration = RegistrationTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, parsingContext: parsingContext, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
 			tokenList.removeAll()
 			result.append(registration)
-		} else if let appendContainerToken = AppendContainerTokenBuilder.build(functionName: actualName, collectedInfo: collectedInfo, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName, fileContainer: fileContainer) {
+		} else if let appendContainerToken = AppendContainerTokenBuilder.build(functionName: actualName, parsingContext: parsingContext, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
 			result.append(appendContainerToken)
 		} else if let isDefaultToken = IsDefaultTokenBuilder.build(functionName: actualName, invocationBody: body, bodyOffset: bodyOffset, file: file) {
 			tokenList.append(isDefaultToken)
+		} else if argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
+			let location = Location(file: file, byteOffset: bodyOffset)
+			let info = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
+			let invalidCallError = GraphError(infoString: info, location: location)
+			parsingContext.errors.append(invalidCallError)
 		}
 		
 		for substructure in substructureList {
-			result += processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, collectedInfo: collectedInfo, tokenList: &tokenList, currentPartName: currentPartName, fileContainer: fileContainer)
+			result += processLoadContainerBodyPart(loadContainerBodyPart: substructure, file: file, content: content, parsingContext: parsingContext, tokenList: &tokenList, currentPartName: currentPartName)
 		}
 		return result
 	}

@@ -37,6 +37,8 @@
 		11E6F7E021709DEA00C591F6 /* TestGenericMethodInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E6F7DF21709DEA00C591F6 /* TestGenericMethodInjection.swift */; };
 		11E6F7E22170D99100C591F6 /* TestStaticVariableRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E6F7E12170D99100C591F6 /* TestStaticVariableRegistration.swift */; };
 		D9702440A11CC123D48D7EAB /* Pods_LintableProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 90DD9BCF1810B25E7A234F34 /* Pods_LintableProject.framework */; };
+		FD563C3B2175F5D4009B4350 /* TestInvalidMethodCallingRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD563C3A2175F5D4009B4350 /* TestInvalidMethodCallingRegistration.swift */; };
+		FD563C3D2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD563C3C2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift */; };
 		FD642E4021623D7E0049E0BF /* TestPlainRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E3F21623D7E0049E0BF /* TestPlainRegistration.swift */; };
 		FD642E4221623DEE0049E0BF /* TestPlainGenericRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E4121623DEE0049E0BF /* TestPlainGenericRegistration.swift */; };
 		FD642E4421623E320049E0BF /* TestNestedClassPlainRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD642E4321623E320049E0BF /* TestNestedClassPlainRegistration.swift */; };
@@ -108,6 +110,8 @@
 		6A58C79706F5DD0C467ADB0F /* Pods-LintableProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LintableProject.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject.debug.xcconfig"; sourceTree = "<group>"; };
 		90DD9BCF1810B25E7A234F34 /* Pods_LintableProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LintableProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B155841C5469E9BB60055504 /* Pods-LintableProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LintableProject.release.xcconfig"; path = "Pods/Target Support Files/Pods-LintableProject/Pods-LintableProject.release.xcconfig"; sourceTree = "<group>"; };
+		FD563C3A2175F5D4009B4350 /* TestInvalidMethodCallingRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInvalidMethodCallingRegistration.swift; sourceTree = "<group>"; };
+		FD563C3C2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInitialDefinitionInvalidMethodCallingRegistration.swift; sourceTree = "<group>"; };
 		FD642E3F21623D7E0049E0BF /* TestPlainRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPlainRegistration.swift; sourceTree = "<group>"; };
 		FD642E4121623DEE0049E0BF /* TestPlainGenericRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPlainGenericRegistration.swift; sourceTree = "<group>"; };
 		FD642E4321623E320049E0BF /* TestNestedClassPlainRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNestedClassPlainRegistration.swift; sourceTree = "<group>"; };
@@ -266,6 +270,8 @@
 				11E6F7DD21709D3700C591F6 /* TestGenericVariableInjection.swift */,
 				11E6F7DF21709DEA00C591F6 /* TestGenericMethodInjection.swift */,
 				11E6F7E12170D99100C591F6 /* TestStaticVariableRegistration.swift */,
+				FD563C3A2175F5D4009B4350 /* TestInvalidMethodCallingRegistration.swift */,
+				FD563C3C2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift */,
 			);
 			path = Testable;
 			sourceTree = "<group>";
@@ -452,6 +458,7 @@
 				112D67AE2169501A00A9E6DF /* TestTypealiasedClassRegistration.swift in Sources */,
 				112D67B4216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift in Sources */,
 				11264022216A5DB4008ED24C /* TestComposedTypealiasFailure.swift in Sources */,
+				FD563C3D2175F99B009B4350 /* TestInitialDefinitionInvalidMethodCallingRegistration.swift in Sources */,
 				11264024216A5E26008ED24C /* TestTypealiasedComposedAliasingFailure.swift in Sources */,
 				FD642E5E216240D80049E0BF /* TestTypedVariableInjection.swift in Sources */,
 				FD6E0BEE21663E8C007AA232 /* TestInheritedInitializerInjection.swift in Sources */,
@@ -459,6 +466,7 @@
 				117EFFF22142FEC30082EA06 /* MyPresenter.swift in Sources */,
 				FD6E0BE82166378A007AA232 /* TestImplicitPlainGenericInitializerInjection.swift in Sources */,
 				FD642E4E21623F250049E0BF /* TestExplicitGenericInitRegistration.swift in Sources */,
+				FD563C3B2175F5D4009B4350 /* TestInvalidMethodCallingRegistration.swift in Sources */,
 				FD642E4821623E930049E0BF /* TestExplicitInitRegistration.swift in Sources */,
 				FD642F7B216345950049E0BF /* TestSeveralRegistrations.swift in Sources */,
 				112D67B02169510C00A9E6DF /* TestTypealiasedVariableInjection.swift in Sources */,

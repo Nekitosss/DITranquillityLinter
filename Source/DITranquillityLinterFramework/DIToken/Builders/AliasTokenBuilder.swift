@@ -10,7 +10,7 @@ import SourceKittenFramework
 
 final class AliasTokenBuilder {
 	
-	static func build(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], collectedInfo: [String: Type], bodyOffset: Int64, file: File) -> AliasToken? {
+	static func build(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], parsingContext: ParsingContext, bodyOffset: Int64, file: File) -> AliasToken? {
 		guard functionName == DIKeywords.as.rawValue else { return nil }
 		var typeName = ""
 		var tag = ""
@@ -27,11 +27,11 @@ final class AliasTokenBuilder {
 				 "_" where argument.value.hasSuffix(".self"),
 				 DIKeywords.check.rawValue:
 				typeName = argument.value.droppedDotSelf().bracketsBalancing()
-				if let type = collectedInfo[typeName] {
+				if let type = parsingContext.collectedInfo[typeName] {
 					typeName = type.name
 				}
 			case DIKeywords.tag.rawValue:
-				tag = argument.value.droppedDotSelf()
+				tag = argument.value.droppedDotSelf().bracketsBalancing()
 			default:
 				break
 			}

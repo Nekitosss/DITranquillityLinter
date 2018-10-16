@@ -10,12 +10,12 @@ import SourceKittenFramework
 
 class MethodFinder {
 	
-	static func findMethodInfo(methodSignature: MethodSignature, initialObjectName: String, collectedInfo: [String: Type], file: File, genericType: GenericType?, methodCallBodyOffset: Int64, forcedAllInjection: Bool) -> [InjectionToken]? {
-		guard let swiftType = collectedInfo[initialObjectName] else { return [] }
+	static func findMethodInfo(methodSignature: MethodSignature, initialObjectName: String, parsingContext: ParsingContext, file: File, genericType: GenericType?, methodCallBodyOffset: Int64, forcedAllInjection: Bool) -> [InjectionToken]? {
+		guard let swiftType = parsingContext.collectedInfo[initialObjectName] else { return [] }
 		let isPlainSignature = !methodSignature.name.contains("(")
 		
 		let extractInfoBlock: (Method) -> [InjectionToken]? = {
-			return extractArgumentInfo(swiftType: swiftType, methodSignature: methodSignature, parameters: $0.parameters, file: file, methodCallBodyOffset: methodCallBodyOffset, genericType: genericType, collectedInfo: collectedInfo, forcedAllInjection: forcedAllInjection)
+			return extractArgumentInfo(swiftType: swiftType, methodSignature: methodSignature, parameters: $0.parameters, file: file, methodCallBodyOffset: methodCallBodyOffset, genericType: genericType, parsingContext: parsingContext, forcedAllInjection: forcedAllInjection)
 		}
 		if let method = swiftType.allMethods.first(where: { $0.selectorName == methodSignature.name }) {
 			return extractInfoBlock(method)
@@ -32,7 +32,7 @@ class MethodFinder {
 		return nil
 	}
 	
-	static func extractArgumentInfo(swiftType: Type, methodSignature: MethodSignature, parameters: [MethodParameter], file: File, methodCallBodyOffset: Int64, genericType: GenericType?, collectedInfo: [String: Type], forcedAllInjection: Bool) -> [InjectionToken] {
+	static func extractArgumentInfo(swiftType: Type, methodSignature: MethodSignature, parameters: [MethodParameter], file: File, methodCallBodyOffset: Int64, genericType: GenericType?, parsingContext: ParsingContext, forcedAllInjection: Bool) -> [InjectionToken] {
 		var argumentInfo: [InjectionToken] = []
 		var argumentIndex = -1
 		for parameter in parameters {
@@ -54,7 +54,7 @@ class MethodFinder {
 				}
 			}
 			
-			if let typealiased = collectedInfo[plainTypeName]?.name {
+			if let typealiased = parsingContext.collectedInfo[plainTypeName]?.name {
 				if !typeName.contains("<") {
 					// Type name should not be only if its typealias, not generic
 					typeName = TypeName.onlyDroppedOptional(name: typealiased)
