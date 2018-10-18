@@ -52,7 +52,9 @@ DispatchQueue.global().async {
 		files = source + pods
 	}
 	
-	if tokenizer.process(files: files) {
+	let result = tokenizer.process(files: files)
+	TimeRecorder.common.end(event: .total)
+	if result {
 		exit(EXIT_SUCCESS)
 	} else {
 		exit(EXIT_FAILURE)

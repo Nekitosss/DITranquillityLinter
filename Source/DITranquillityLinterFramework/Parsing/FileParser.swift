@@ -23,31 +23,6 @@ extension Parsable {
     }
 }
 
-extension Type {
-
-    var path: Path? {
-        return __path.map({ Path($0) })
-    }
-
-    func bodyRange(_ contents: String) -> NSRange? {
-        guard let bytesRange = bodyBytesRange else { return nil }
-        return contents.bridge().byteRangeToNSRange(start: Int(bytesRange.offset), length: Int(bytesRange.length))
-    }
-
-    func contents() throws -> String? {
-        return try path?.read(.utf8)
-    }
-
-    func rangeToAppendBody() throws -> NSRange? {
-        guard let contents = try self.contents() else { return nil }
-        guard let bodyRange = bodyRange(contents) else { return nil }
-        let bodyEndRange = NSRange(location: NSMaxRange(bodyRange), length: 0)
-        let bodyEndLineRange = contents.bridge().lineRange(for: bodyEndRange)
-        return NSRange(location: max(bodyRange.location, bodyEndLineRange.location), length: 0)
-    }
-
-}
-
 extension Variable: Parsable {}
 extension Type: Parsable {}
 extension SourceryMethod: Parsable {}
@@ -113,6 +88,9 @@ final class FileParser {
     }
 	
 	func parse(source: [String: SourceKitRepresentable], filePath: String) throws -> FileParserResult {
+		let filePathToRecord = ((filePath as NSString).lastPathComponent) as String
+		TimeRecorder.common.start(event: .file(filePathToRecord))
+		defer { TimeRecorder.common.end(event: .file(filePathToRecord)) }
 		let (types, typealiases) = try parseTypes(source, filePath: filePath)
 		return FileParserResult(path: path, module: module, types: types, typealiases: typealiases, inlineRanges: inlineRanges, linterVersion: linterVersion)
 	}
@@ -192,17 +170,16 @@ final class FileParser {
 
     /// Walks all declarations in the source
     private func walkDeclarations(source: [String: SourceKitRepresentable], containingIn: (Any, [String: SourceKitRepresentable])? = nil, foundEntry: FoundEntry) throws {
-        guard let substructures = source[SwiftDocKey.substructure.rawValue] as? [SourceKitRepresentable] else { return }
+        let substructures = source.substructures
 
         for (index, substructure) in substructures.enumerated() {
-            guard let source = substructure as? [String: SourceKitRepresentable] else { continue }
 
             let nextStructure = index < substructures.count - 1
-                ? substructures[index+1] as? [String: SourceKitRepresentable]
+                ? substructures[index + 1]
                 : nil
 
             try walkDeclaration(
-                source: source,
+                source: substructure,
                 next: nextStructure,
                 containingIn: containingIn,
                 foundEntry: foundEntry

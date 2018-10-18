@@ -22,8 +22,8 @@ public class Tokenizer {
 	
 	let container = FileContainer()
 	public func process(files: [String]) -> Bool {
-		
-		let collectedInfo = collectInfo(files: files)
+		let filteredFiles = files.filter({ $0.hasSuffix(".swift") && !$0.hasSuffix("generated.swift") })
+		let collectedInfo = collectInfo(files: filteredFiles)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
 		TimeRecorder.common.start(event: .createTokens)
 		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(parsingContext: parsingContext) {

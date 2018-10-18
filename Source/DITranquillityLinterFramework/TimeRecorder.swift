@@ -9,7 +9,7 @@ import Foundation
 
 public final class TimeRecorder {
 	
-	public enum Event: String, Hashable {
+	public enum Event: Hashable {
 		case total
 		case collectSource
 		case collectDependencies
@@ -18,6 +18,7 @@ public final class TimeRecorder {
 		case compose
 		case createTokens
 		case validate
+		case file(String)
 	}
 	
 	public static let common = TimeRecorder()
@@ -39,8 +40,5 @@ public final class TimeRecorder {
 			return
 		}
 		print("End \(event) with time: \(Date().timeIntervalSince(startDate))")
-		if event != .total {
-			end(event: .total)
-		}
 	}
 }
