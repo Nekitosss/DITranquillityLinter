@@ -16,6 +16,8 @@ final class ResultCacher {
 	private let decoder = JSONDecoder()
 	
 	func cacheBinaryFiles(list: [FileParserResult], name: String) {
+		TimeRecorder.common.start(event: .encodeBinary)
+		defer { TimeRecorder.common.end(event: .encodeBinary) }
 		do {
 			let cacheURLDirectory = URL(fileURLWithPath: ResultCacher.commonCacheDirectory + ResultCacher.libraryCacheFolderName, isDirectory: true)
 			let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: name))
@@ -29,6 +31,9 @@ final class ResultCacher {
 	}
 	
 	func getCachedBinaryFiles(name: String) -> [FileParserResult]? {
+		TimeRecorder.common.start(event: .decodeBinary)
+		defer { TimeRecorder.common.end(event: .decodeBinary) }
+		
 		let cacheURLDirectory = URL(fileURLWithPath: ResultCacher.commonCacheDirectory + ResultCacher.libraryCacheFolderName, isDirectory: true)
 		let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: name))
 		do {

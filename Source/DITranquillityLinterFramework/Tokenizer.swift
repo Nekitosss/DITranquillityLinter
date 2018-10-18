@@ -88,17 +88,14 @@ public class Tokenizer {
 		
 		let cacheName = sdk
 		let cacher = ResultCacher()
-		var start = Date()
 		if let cachedResult = cacher.getCachedBinaryFiles(name: cacheName) {
-			print("Decode end: ", Date().timeIntervalSince(start))
 			return cachedResult
 		} else {
+			
 			let result = commonFrameworkNames.flatMap {
 				parseModule(moduleName: $0, frameworksPath: frameworksPath, compilerArguments: compilerArguments, fileContainer: fileContainer)
 			}
-			start = Date()
 			cacher.cacheBinaryFiles(list: result, name: cacheName)
-			print("Encode end: ", Date().timeIntervalSince(start))
 			
 			return result
 		}
