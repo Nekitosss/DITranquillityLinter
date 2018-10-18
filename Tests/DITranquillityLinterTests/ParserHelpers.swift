@@ -57,7 +57,7 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 	return containerInfo
 }
 
-func pathToSourceFile(with name: String) -> URL {
+func pathToSourceFile(with name: String) -> String {
 	let pathToTestableSource = "/Users/nikitapatskov/Develop/DITranquillityLinter/LintableProject/LintableProject/Testable/"
-	return URL(fileURLWithPath: pathToTestableSource + name + ".swift", isDirectory: false)
+	return pathToTestableSource + name + ".swift"
 }
