@@ -15,11 +15,12 @@ final class ResultCacher {
 	private let encoder = JSONEncoder()
 	private let decoder = JSONDecoder()
 	
-	func cacheBinaryFiles(list: [FileParserResult], name: String) {
+	func cacheBinaryFiles(list: [FileParserResult], name: String, isCommonCache: Bool) {
 		TimeRecorder.common.start(event: .encodeBinary)
 		defer { TimeRecorder.common.end(event: .encodeBinary) }
 		do {
-			let cacheURLDirectory = URL(fileURLWithPath: ResultCacher.commonCacheDirectory + ResultCacher.libraryCacheFolderName, isDirectory: true)
+			let cacheDicectoryPlace = cachePath(isCommonCache: isCommonCache)
+			let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
 			let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: name))
 			try FileManager.default.createDirectory(atPath: cacheURLDirectory.path, withIntermediateDirectories: true, attributes: nil)
 			let encodedData = try encoder.encode(list)
@@ -30,11 +31,12 @@ final class ResultCacher {
 		}
 	}
 	
-	func getCachedBinaryFiles(name: String) -> [FileParserResult]? {
+	func getCachedBinaryFiles(name: String, isCommonCache: Bool) -> [FileParserResult]? {
 		TimeRecorder.common.start(event: .decodeBinary)
 		defer { TimeRecorder.common.end(event: .decodeBinary) }
 		
-		let cacheURLDirectory = URL(fileURLWithPath: ResultCacher.commonCacheDirectory + ResultCacher.libraryCacheFolderName, isDirectory: true)
+		let cacheDicectoryPlace = cachePath(isCommonCache: isCommonCache)
+		let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
 		let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: name))
 		do {
 			let data = try Data(contentsOf: cacheURL, options: [])
@@ -43,6 +45,16 @@ final class ResultCacher {
 			return decodedData
 		} catch {
 			return nil
+		}
+	}
+	
+	func cachePath(isCommonCache: Bool) -> String {
+		if isCommonCache {
+			return ResultCacher.commonCacheDirectory
+		} else if let srcRoot = ProcessInfo.processInfo.environment[XcodeEnvVariable.srcRoot.rawValue] {
+			return srcRoot
+		} else {
+			return FileManager.default.currentDirectoryPath
 		}
 	}
 	

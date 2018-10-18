@@ -22,7 +22,7 @@ public class Tokenizer {
 	
 	let container = FileContainer()
 	public func process(files: [String]) -> Bool {
-		let filteredFiles = files.filter({ $0.hasSuffix(".swift") && !$0.hasSuffix("generated.swift") })
+		let filteredFiles = files.filter({ $0.hasSuffix(".swift") && !$0.hasSuffix("generated.swift") && !$0.hasSuffix("pb.swift") })
 		let collectedInfo = collectInfo(files: filteredFiles)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
 		TimeRecorder.common.start(event: .createTokens)
@@ -50,56 +50,121 @@ public class Tokenizer {
 		}
 	}
 	
-	func parseBinaryModules(fileContainer: FileContainer) -> [FileParserResult] {
+	func collectInfo(files: [String]) -> [String: Type] {
+		let paths = files.map({ Path($0) })
+		let filesParsers: [FileParser] = paths.compactMap({
+			guard let file = File(path: $0.string) else { return nil }
+			container[$0.string] = file
+			return FileParser(contents: file.contents, path: $0, module: nil)
+		})
+		
+		TimeRecorder.common.start(event: .parseSourceAndDependencies)
+		var allResults = filesParsers.map({ try! $0.parse() })
+		TimeRecorder.common.end(event: .parseSourceAndDependencies)
+		TimeRecorder.common.start(event: .parseBinary)
+		allResults += parseBinaryModules(fileContainer: container)
+		TimeRecorder.common.end(event: .parseBinary)
+		TimeRecorder.common.start(event: .compose)
+		defer {
+			TimeRecorder.common.end(event: .compose)
+		}
+		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [], linterVersion: linterVersion)) { acc, next in
+			acc.typealiases += next.typealiases
+			acc.types += next.types
+			return acc
+		}
+		
+		return Composer().composedTypes(parserResult)
+	}
+	
+	private func parseBinaryModules(fileContainer: FileContainer) -> [FileParserResult] {
 		let enironment = ProcessInfo.processInfo.environment
+		
 		var target = "x86_64-apple-ios11.4"
 		var sdk = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk"
 		
-		if let arch = enironment["PLATFORM_PREFERRED_ARCH"],
-			let targetPrefix = enironment["SWIFT_PLATFORM_TARGET_PREFIX"],
-			let deploymentTarget = enironment["IPHONEOS_DEPLOYMENT_TARGET"] {
+		if let arch = enironment[XcodeEnvVariable.platformPreferredArch.rawValue],
+			let targetPrefix = enironment[XcodeEnvVariable.targetPrefix.rawValue],
+			let deploymentTarget = enironment[XcodeEnvVariable.deploymentTarget.rawValue] {
 			//		"${PLATFORM_PREFERRED_ARCH}-apple-${SWIFT_PLATFORM_TARGET_PREFIX}${IPHONEOS_DEPLOYMENT_TARGET}"
 			target = "\(arch)-apple-\(targetPrefix)\(deploymentTarget)"
 			print("Found environment info.")
 		} else {
 			print("Environment info not found. Will be used default")
 		}
-		if let sdkRoot = enironment["SDKROOT"] {
+		if let sdkRoot = enironment[XcodeEnvVariable.sdkRoot.rawValue] {
 			sdk = sdkRoot
 		}
-		let frameworksPath = sdk + "/System/Library/Frameworks"
 		
-		let compilerArguments = [
-			"-target",
-			target,
-			"-sdk",
-			sdk,
-			"-F",
-			frameworksPath,
-			]
+		// Parse all binary frameworks (Carthage + Cooapods-created)
+		var frameworkInfoList: [(path: String, name: String)] = []
+		if let frameworkPathsString = enironment[XcodeEnvVariable.frameworkSearchPaths.rawValue] {
+			let frameworkPaths = frameworkPathsString.split(separator: "\"").filter({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+			
+			for frameworkPath in frameworkPaths {
+				let stringedFrameworkPath = String(frameworkPath.trimmingCharacters(in: .whitespacesAndNewlines))
+				guard let frameworkURL = URL(string: stringedFrameworkPath) else { continue }
+				do {
+					// Get the directory contents urls (including subfolders urls)
+					let directoryContents = try FileManager.default.contentsOfDirectory(at: frameworkURL, includingPropertiesForKeys: nil, options: [])
+					
+					for file in directoryContents where file.pathExtension == "framework" {
+						frameworkInfoList.append((stringedFrameworkPath, file.deletingPathExtension().lastPathComponent))
+					}
+					
+				} catch {
+					print(error.localizedDescription)
+					continue
+				}
+			}
+		}
 		
-		var commonFrameworkNames = [String]()
+		var result: [FileParserResult] = []
+		result += parseFrameworkInfoList(frameworkInfoList, target: target, sdk: sdk, fileContainer: fileContainer, isCommon: false)
+		
+		// Parse common frameworks (UIKit + Foundation)
+		let commonFrameworksPath = sdk + "/System/Library/Frameworks"
+		
+		var commonFrameworkInfoList: [(path: String, name: String)] = []
 		if sdk.range(of: "iPhoneSimulator") != nil || sdk.range(of: "iPhoneOS") != nil {
-			commonFrameworkNames = ["UIKit", "Foundation"]
+			commonFrameworkInfoList.append((commonFrameworksPath, "UIKit"))
+			commonFrameworkInfoList.append((commonFrameworksPath, "Foundation"))
 		}
 		if sdk.range(of: "MacOSX") != nil {
-			commonFrameworkNames = ["Cocoa", "Foundation"]
+			commonFrameworkInfoList.append((commonFrameworksPath, "Cocoa"))
+			commonFrameworkInfoList.append((commonFrameworksPath, "Foundation"))
 		}
-		
-		let cacheName = sdk
-		let cacher = ResultCacher()
-		if let cachedResult = cacher.getCachedBinaryFiles(name: cacheName) {
-			return cachedResult
-		} else {
-			
-			let result = commonFrameworkNames.flatMap {
-				parseModule(moduleName: $0, frameworksPath: frameworksPath, compilerArguments: compilerArguments, fileContainer: fileContainer)
-			}
-			cacher.cacheBinaryFiles(list: result, name: cacheName)
-			
-			return result
-		}
+		result += parseFrameworkInfoList(commonFrameworkInfoList, target: target, sdk: sdk, fileContainer: fileContainer, isCommon: true)
+		return result
 	}
+	
+	func parseFrameworkInfoList(_ frameworkInfoList: [(path: String, name: String)], target: String, sdk: String, fileContainer: FileContainer, isCommon: Bool) -> [FileParserResult] {
+		
+		var result: [FileParserResult] = []
+		let cacher = ResultCacher()
+		for frameworkInfo in frameworkInfoList {
+			let compilerArguments = [
+				"-target",
+				target,
+				"-sdk",
+				sdk,
+				"-F",
+				frameworkInfo.path,
+				]
+			
+			let cacheName = frameworkInfo.path + frameworkInfo.name
+			
+			if let cachedResult = cacher.getCachedBinaryFiles(name: cacheName, isCommonCache: isCommon) {
+				result += cachedResult
+			} else {
+				let parsedModule = parseModule(moduleName: frameworkInfo.name, frameworksPath: frameworkInfo.path, compilerArguments: compilerArguments, fileContainer: fileContainer)
+				result += parsedModule
+				cacher.cacheBinaryFiles(list: parsedModule, name: cacheName, isCommonCache: isCommon)
+			}
+		}
+		return result
+	}
+	
 	
 	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String], fileContainer: FileContainer) -> [FileParserResult] {
 		print("Parse module: \(moduleName)")
@@ -142,33 +207,6 @@ public class Tokenizer {
 	private func collectFrameworkNames(frameworksURL: URL) throws -> [String] {
 		let fileURLs = try FileManager.default.contentsOfDirectory(at: frameworksURL, includingPropertiesForKeys: nil)
 		return fileURLs.filter({ $0.pathExtension == "h" }).map({ $0.lastPathComponent }).map({ $0.droppedSuffix(".h") })
-	}
-	
-	func collectInfo(files: [String]) -> [String: Type] {
-		let paths = files.map({ Path($0) })
-		let filesParsers: [FileParser] = paths.compactMap({
-			guard let file = File(path: $0.string) else { return nil }
-			container[$0.string] = file
-			return FileParser(contents: file.contents, path: $0, module: nil)
-		})
-		
-		TimeRecorder.common.start(event: .parseSourceAndDependencies)
-		var allResults = filesParsers.map({ try! $0.parse() })
-		TimeRecorder.common.end(event: .parseSourceAndDependencies)
-		TimeRecorder.common.start(event: .parseBinary)
-		allResults += parseBinaryModules(fileContainer: container)
-		TimeRecorder.common.end(event: .parseBinary)
-		TimeRecorder.common.start(event: .compose)
-		defer {
-			TimeRecorder.common.end(event: .compose)
-		}
-		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [], linterVersion: linterVersion)) { acc, next in
-			acc.typealiases += next.typealiases
-			acc.types += next.types
-			return acc
-		}
-		
-		return Composer().composedTypes(parserResult)
 	}
 	
 }

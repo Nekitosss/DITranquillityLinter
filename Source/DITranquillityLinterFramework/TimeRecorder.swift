@@ -27,7 +27,7 @@ public final class TimeRecorder {
 	
 	var events: [Event: Date] = [:]
 	
-	let isRecording = false
+	let isRecording = true
 	
 	init() {
 		start(event: .total)
@@ -39,12 +39,20 @@ public final class TimeRecorder {
 		print("Start \(event)")
 	}
 	
+	var infoDict = [(String, TimeInterval)]()
 	public func end(event: Event) {
 		guard isRecording else { return }
 		guard let startDate = events[event] else {
 			print("Not found \(event) for logging")
 			return
 		}
-		print("End \(event) with time: \(Date().timeIntervalSince(startDate))")
+		let interval = Date().timeIntervalSince(startDate)
+		print("End \(event) with time: \(interval)")
+		switch event {
+		case .file(let path):
+			infoDict.append((path, interval))
+		default:
+			break
+		}
 	}
 }
