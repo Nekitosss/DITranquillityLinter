@@ -180,7 +180,11 @@ class TypeFinder {
 			typeName = typeName.droppedArrayInfo()
 			plainTypeName = plainTypeName.droppedArrayInfo()
 		}
-		if let typealiased = parsingContext.collectedInfo[plainTypeName]?.name {
+		
+		// Typealias may be global or nested, so we check both variants
+		let fullPossibleTypeName = "\(swiftType.name).\(plainTypeName)"
+		let possibleTypealias = parsingContext.collectedInfo[plainTypeName]?.name ?? parsingContext.collectedInfo[fullPossibleTypeName]?.name
+		if let typealiased = possibleTypealias {
 			if !typeName.contains("<") {
 				// Type name should not be only if its typealias, not generic
 				typeName = TypeName.onlyDroppedOptional(name: typealiased)

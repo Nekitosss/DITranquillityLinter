@@ -5,18 +5,19 @@ import xcodeproj
 import Basic
 
 
-func projectFiles(project: XcodeProj, srcRoot: String) -> [URL] {
+func projectFiles(project: XcodeProj, srcRoot: String) -> [String] {
 	let srcAbsolute = AbsolutePath(srcRoot)
 	let sourceFileReferences = project.pbxproj.sourcesBuildPhases.flatMap({ $0.files.compactMap({ $0.file }) })
-	return sourceFileReferences.compactMap({ (element: PBXFileElement) -> URL? in
+	return sourceFileReferences.compactMap({ (element: PBXFileElement) -> String? in
 		guard let fullPath = (try? element.fullPath(sourceRoot: srcAbsolute))??.asString else { return nil }
-		return URL(string: fullPath)
+		// Warning: URL with spaces not allowed, file will be excluded if we will use Foundation.URL, so we use strings
+		return fullPath
 	})
 }
 
 DispatchQueue.global().async {
 	let tokenizer = Tokenizer()
-	var files: [URL] = []
+	var files: [String] = []
 	
 	let enironment = ProcessInfo.processInfo.environment
 	if let srcRoot = enironment[XcodeEnvVariable.srcRoot.rawValue] {
@@ -35,8 +36,8 @@ DispatchQueue.global().async {
 	} else {
 		// TMP for debug
 		print("Using tmp debug path")
-		let srcRoot = "/Users/nikitapatskov/Develop/DITranquillityLinter/LintableProject/"
-		let project = try! XcodeProj(pathString: srcRoot + "LintableProject.xcodeproj")
+		let srcRoot = "/Users/nikitapatskov/Develop/ios.client.fork2/"
+		let project = try! XcodeProj(pathString: srcRoot + "AtiClient.xcodeproj")
 		let podsProject = try! XcodeProj(pathString: srcRoot + "Pods/Pods.xcodeproj")
 		files = projectFiles(project: project, srcRoot: srcRoot) + projectFiles(project: podsProject, srcRoot: srcRoot + "/Pods")
 	}

@@ -21,7 +21,7 @@ public class Tokenizer {
 	public init() {}
 	
 	let container = FileContainer()
-	public func process(files: [URL]) -> Bool {
+	public func process(files: [String]) -> Bool {
 		
 		let collectedInfo = collectInfo(files: files)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
@@ -144,8 +144,8 @@ public class Tokenizer {
 		return fileURLs.filter({ $0.pathExtension == "h" }).map({ $0.lastPathComponent }).map({ $0.droppedSuffix(".h") })
 	}
 	
-	func collectInfo(files: [URL]) -> [String: Type] {
-		let paths = files.map({ Path($0.path) })
+	func collectInfo(files: [String]) -> [String: Type] {
+		let paths = files.map({ Path($0) })
 		let filesParsers: [FileParser] = paths.compactMap({
 			guard let file = File(path: $0.string) else { return nil }
 			container[$0.string] = file
