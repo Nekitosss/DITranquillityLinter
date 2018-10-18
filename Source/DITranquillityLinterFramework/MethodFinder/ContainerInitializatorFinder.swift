@@ -44,7 +44,7 @@ final class ContainerInitializatorFinder {
 		}
 
 		for substructureInfo in list {
-			if let mainContainerPart = recursivelyFindContainerInitialization(list: substructureInfo.substructures ?? [], file: file, parsingContext: parsingContext) {
+			if let mainContainerPart = recursivelyFindContainerInitialization(list: substructureInfo.substructures, file: file, parsingContext: parsingContext) {
 				return mainContainerPart
 			}
 		}

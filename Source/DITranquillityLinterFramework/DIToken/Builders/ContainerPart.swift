@@ -48,8 +48,9 @@ final class ContainerPart {
 					// something like:
 					// let r = container.register(_:)  (processed earlier)
 					// r.inject(_:)  (processed in that if block)
-					let tokenList = RegistrationTokenBuilder.fillTokenListWithInfo(input: registrationToken.tokenList + collectedTokens + tmpTokenList,
-																				   typeName: registrationToken.plainTypeName,
+					let inputTokenList = registrationToken.tokenList + collectedTokens + tmpTokenList
+					let tokenList = RegistrationTokenBuilder.fillTokenListWithInfo(input: inputTokenList,
+																				   registrationTypeName: registrationToken.plainTypeName,
 																				   parsingContext: parsingContext,
 																				   content: content,
 																				   file: file)
@@ -97,19 +98,15 @@ final class ContainerPart {
 					registrationTokens[aliasToken.getRegistrationAccessor(), default: []].append(registration)
 				}
 			case let appendContainer as AppendContainerToken:
-				mergeNamedRegistrations(lhs: &registrationTokens, rhs: appendContainer.containerPart.tokenInfo)
+				for subInfo in appendContainer.containerPart.tokenInfo {
+					registrationTokens[subInfo.key, default: []].append(contentsOf: subInfo.value)
+				}
 			default:
 				// Should not be here. All another tokens should be composed in registration and appendContainer tokens
 				break
 			}
 		}
 		return registrationTokens
-	}
-	
-	private static func mergeNamedRegistrations(lhs: inout [RegistrationAccessor: [RegistrationToken]], rhs: [RegistrationAccessor: [RegistrationToken]]) {
-		for subInfo in rhs {
-			lhs[subInfo.key, default: []].append(contentsOf: subInfo.value)
-		}
 	}
 	
 	private static func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], file: File, content: NSString, parsingContext: ParsingContext, tokenList: inout [DIToken], currentPartName: String?) -> [DIToken] {
@@ -122,32 +119,30 @@ final class ContainerPart {
 			kind == SwiftExpressionKind.call.rawValue
 			else { return result }
 		let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength)!
-		let actualName = extractActualFuncionInvokation(name: name)
+		let functionName = extractActualFuncionInvokation(name: name)
 		
-		let substructureList = loadContainerBodyPart.substructures ?? []
+		let substructureList = loadContainerBodyPart.substructures
 		var argumentStack = argumentInfo(substructures: substructureList, content: content)
+		if argumentStack.isEmpty {
+			argumentStack = AliasTokenBuilder.parseArgumentList(body: body, substructureList: substructureList)
+		}
+		let location = Location(file: file, byteOffset: bodyOffset)
 		
-		if let alias = AliasTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, parsingContext: parsingContext, bodyOffset: bodyOffset, file: file) {
+		if let alias = AliasTokenBuilder.build(functionName: functionName, argumentStack: argumentStack, parsingContext: parsingContext, location: location) {
 			tokenList.append(alias)
-		} else if let injection = InjectionTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, content: content, substructureList: substructureList) {
+		} else if let injection = InjectionTokenBuilder.build(functionName: functionName, argumentStack: argumentStack, content: content, substructureList: substructureList, location: location) {
 			tokenList.append(injection)
-		} else if let registration = RegistrationTokenBuilder.build(functionName: actualName, invocationBody: body, argumentStack: argumentStack, tokenList: tokenList, parsingContext: parsingContext, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
+		} else if let registration = RegistrationTokenBuilder.build(functionName: functionName, invocationBody: body, tokenList: tokenList, parsingContext: parsingContext, substructureList: substructureList, content: content, bodyOffset: bodyOffset, file: file) {
 			tokenList.removeAll()
 			result.append(registration)
-		} else if let appendContainerToken = AppendContainerTokenBuilder.build(functionName: actualName, parsingContext: parsingContext, argumentStack: argumentStack, bodyOffset: bodyOffset, file: file, currentPartName: currentPartName) {
+		} else if let appendContainerToken = AppendContainerTokenBuilder.build(functionName: functionName, parsingContext: parsingContext, argumentStack: argumentStack, currentPartName: currentPartName, location: location) {
 			result.append(appendContainerToken)
-		} else if let isDefaultToken = IsDefaultTokenBuilder.build(functionName: actualName, invocationBody: body, bodyOffset: bodyOffset, file: file) {
+		} else if let isDefaultToken = IsDefaultTokenBuilder.build(functionName: functionName) {
 			tokenList.append(isDefaultToken)
-		} else {
-			if argumentStack.isEmpty {
-				argumentStack = AliasTokenBuilder.parseArgumentList(body: body, substructureList: substructureList)
-			}
-			if argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
-				let location = Location(file: file, byteOffset: bodyOffset)
-				let info = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
-				let invalidCallError = GraphError(infoString: info, location: location)
-				parsingContext.errors.append(invalidCallError)
-			}
+		} else if argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
+			let info = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
+			let invalidCallError = GraphError(infoString: info, location: location)
+			parsingContext.errors.append(invalidCallError)
 		}
 		
 		for substructure in substructureList {
@@ -158,10 +153,12 @@ final class ContainerPart {
 	
 	static func argumentInfo(substructures: [SourceKitStructure], content: NSString) -> [ArgumentInfo] {
 		var argumentStack = [ArgumentInfo]()
-		let substructures = substructures.filter({ $0.get(.kind, of: String.self) == SwiftExpressionKind.argument.rawValue })
 		
 		for structure in substructures {
-			guard let bodyOffset: Int64 = structure.get(.bodyOffset),
+			guard
+				let kind: String = structure.get(.kind),
+				kind == SwiftExpressionKind.argument.rawValue,
+				let bodyOffset: Int64 = structure.get(.bodyOffset),
 				let bodyLength: Int64 = structure.get(.bodyLength),
 				let nameLength: Int64 = structure.get(.nameLength),
 				let nameOffset: Int64 = structure.get(.nameOffset)
@@ -175,10 +172,10 @@ final class ContainerPart {
 	}
 	
 	static func extractActualFuncionInvokation(name: String) -> String {
-		guard let dotIndex = name.reversed().index(of: ".") else {
+		guard let dotIndex = name.lastIndex(of: ".") else {
 			return name
 		}
-		return String(name[dotIndex.base...])
+		return String(name[name.index(after: dotIndex)...])
 	}
 	
 }

@@ -10,7 +10,7 @@ import SourceKittenFramework
 
 final class IsDefaultTokenBuilder {
 	
-	static func build(functionName: String, invocationBody: String, bodyOffset: Int64, file: File) -> IsDefaultToken? {
+	static func build(functionName: String) -> IsDefaultToken? {
 		guard functionName == DIKeywords.default.rawValue else { return nil }
 		return IsDefaultToken()
 	}

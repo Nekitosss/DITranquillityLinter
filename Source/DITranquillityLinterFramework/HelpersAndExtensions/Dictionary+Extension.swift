@@ -17,8 +17,8 @@ extension Dictionary where Value == SourceKitRepresentable, Key == String  {
 		return self[key.rawValue] as? T
 	}
 	
-	var substructures: [SourceKitStructure]? {
-		return get(.substructure)
+	var substructures: [SourceKitStructure] {
+		return get(.substructure) ?? []
 	}
 	
 }

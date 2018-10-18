@@ -87,6 +87,7 @@ final class GraphValidator {
 			case let injection as InjectionToken:
 				let accessor = injection.getRegistrationAccessor()
 				if !accessor.tag.isEmpty && collectedInfo[accessor.tag] == nil {
+					// Could not resolve tag
 					let info = buildTagTypeNotFoundMessage(tagName: accessor.tag)
 					errors.append(GraphError(infoString: info, location: injection.location))
 				} else if let registrations = containerPart.tokenInfo[accessor] {
@@ -94,10 +95,12 @@ final class GraphValidator {
 						registration.tokenList.contains(where: { $0 is IsDefaultToken })
 					}).count
 					if registrations.count > 1 && !injection.isMany && defaultCount != 1 {
+						// More than one registration for requested type+tag
 						let info = buildTooManyRegistrationsForType(injection: injection, accessor: accessor)
 						errors.append(GraphError(infoString: info, location: injection.location))
 					}
 				} else if !injection.optionalInjection {
+					// Not found at lease one registration for requested type+tag
 					let info = buildNotFoundRegistrationMessage(injection: injection, accessor: accessor)
 					errors.append(GraphError(infoString: info, location: injection.location))
 				}
@@ -156,6 +159,4 @@ final class GraphValidator {
 		}
 		return result
 	}
-	
-	
 }

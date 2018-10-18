@@ -10,14 +10,12 @@ import SourceKittenFramework
 
 final class AppendContainerTokenBuilder {
 	
-	static func build(functionName: String, parsingContext: ParsingContext, argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File, currentPartName: String?) -> AppendContainerToken? {
+	static func build(functionName: String, parsingContext: ParsingContext, argumentStack: [ArgumentInfo], currentPartName: String?, location: Location) -> AppendContainerToken? {
 		guard functionName == DIKeywords.append.rawValue,
 			let appendInfo = argumentStack.first,
 			argumentStack.count == 1 else { return nil }
 		
-		let location = Location(file: file, byteOffset: bodyOffset)
-		
-		let value = String(appendInfo.value.dropLast(5)) // .self
+		let value = appendInfo.value.droppedDotSelf()
 		let isDIPart: (ArgumentInfo) -> Bool = {
 			return ($0.name == "part" && (parsingContext.collectedInfo[value]?.inheritedTypes ?? []).contains(DIKeywords.diPart.rawValue))
 				|| ($0.name == "framework" && (parsingContext.collectedInfo[value]?.inheritedTypes ?? []).contains(DIKeywords.diFramework.rawValue))
@@ -33,7 +31,7 @@ final class AppendContainerTokenBuilder {
 		let anotherFile = parsingContext.fileContainer[swiftType.filePath]!
 		let oldContainerName = parsingContext.currentContainerName
 		parsingContext.currentContainerName = DIKeywords.container.rawValue
-		let containerPart = ContainerPart(substructureList: (loadContainerStructure.substructures ?? []), file: anotherFile, parsingContext: parsingContext, currentPartName: typeName)
+		let containerPart = ContainerPart(substructureList: loadContainerStructure.substructures, file: anotherFile, parsingContext: parsingContext, currentPartName: typeName)
 		parsingContext.currentContainerName = oldContainerName
 		
 		return AppendContainerToken(location: location, typeName: typeName, containerPart: containerPart)

@@ -33,7 +33,7 @@ struct AliasToken: DIToken {
 		self.typeName = typeName
 		self.tag = tag
 		self.location = location
-		self.plainTypeName = RegistrationTokenBuilder.extractPlainTypeName(typeName: typeName)
+		self.plainTypeName = TypeFinder.parseTypeName(name: typeName).typeName
 	}
 	
 	func getRegistrationAccessor() -> RegistrationAccessor {

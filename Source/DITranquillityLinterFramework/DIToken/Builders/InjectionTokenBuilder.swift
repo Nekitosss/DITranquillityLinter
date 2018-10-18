@@ -11,18 +11,11 @@ import xcodeproj
 
 final class InjectionTokenBuilder {
 	
-	static func build(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], bodyOffset: Int64, file: File, content: NSString, substructureList: [SourceKitStructure]) -> InjectionToken? {
+	static func build(functionName: String, argumentStack: [ArgumentInfo], content: NSString, substructureList: [SourceKitStructure], location: Location) -> InjectionToken? {
 		guard functionName == DIKeywords.injection.rawValue else { return nil }
-		
-		var argumentStack = argumentStack
-		if argumentStack.isEmpty {
-			argumentStack = AliasTokenBuilder.parseArgumentList(body: invocationBody, substructureList: substructureList)
-		}
 		var cycle = false
 		var name = ""
-		var typeName = ""
 		var modificators: [InjectionModificator] = []
-		let location = Location(file: file, byteOffset: bodyOffset)
 		
 		
 		for argument in argumentStack {
@@ -44,7 +37,7 @@ final class InjectionTokenBuilder {
 				// For tagged variable injection structure always on "closure" level
 				modificators += taggedModificators
 				
-			} else if let closureSubstructure = argument.structure.substructures?.first,
+			} else if let closureSubstructure = argument.structure.substructures.first,
 				let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: closureSubstructure, content: content), !taggedModificators.isEmpty {
 				// Tag stores in argument -> closure -> expressionCall
 				// parseTaggedInjection can parse sinse "closure" level. So we unwrap single time
@@ -53,28 +46,23 @@ final class InjectionTokenBuilder {
 			if var typeFromPattern = argument.value.firstMatch(.forcedType) {
 				// $0 "as String }"
 				typeFromPattern = typeFromPattern.filter({ $0 != "}" }).trimmingCharacters(in: .whitespacesAndNewlines)
-				typeName = typeFromPattern
 				modificators.append(.typed(typeFromPattern))
 			}
 		}
-		if InjectionToken.isMany(modificators) {
-			typeName = typeName.droppedArrayInfo()
-		}
-		return InjectionToken(name: name, typeName: typeName, plainTypeName: typeName, cycle: cycle, optionalInjection: false, methodInjection: false, modificators: modificators, injectionSubstructureList: substructureList.last?.substructures ?? substructureList, location: location)
+		// Type name will be resolved later
+		return InjectionToken(name: name, typeName: "", plainTypeName: "", cycle: cycle, optionalInjection: false, methodInjection: false, modificators: modificators, injectionSubstructureList: substructureList.last?.substructures ?? substructureList, location: location)
 	}
 	
 	static func parseTaggedAndManyInjectionInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
-		let expresstionCallSubstructures = structure.substructures ?? []
 		var result: [InjectionModificator] = []
-		for substructure in expresstionCallSubstructures {
+		for substructure in structure.substructures {
 			guard let name: String = substructure.get(.name),
 				let kind: String = substructure.get(.kind),
 				kind == SwiftExpressionKind.call.rawValue
 				else { continue }
 			
 			if name == DIKeywords.by.rawValue {
-				guard let argumentsSubstructure = substructure.substructures else { continue }
-				let arguments = ContainerPart.argumentInfo(substructures: argumentsSubstructure, content: content)
+				let arguments = ContainerPart.argumentInfo(substructures: substructure.substructures, content: content)
 				guard let tagType = arguments.first(where: { $0.name == DIKeywords.tag.rawValue }) else { continue }
 				let tagTypeName = tagType.value.droppedDotSelf()
 				result.append(.tagged(tagTypeName))

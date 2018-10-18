@@ -10,16 +10,10 @@ import SourceKittenFramework
 
 final class AliasTokenBuilder {
 	
-	static func build(functionName: String, invocationBody: String, argumentStack: [ArgumentInfo], parsingContext: ParsingContext, bodyOffset: Int64, file: File) -> AliasToken? {
+	static func build(functionName: String, argumentStack: [ArgumentInfo], parsingContext: ParsingContext, location: Location) -> AliasToken? {
 		guard functionName == DIKeywords.as.rawValue else { return nil }
 		var typeName = ""
 		var tag = ""
-		let location = Location(file: file, byteOffset: bodyOffset)
-		
-		var argumentStack = argumentStack
-		if argumentStack.isEmpty {
-			argumentStack = AliasTokenBuilder.parseArgumentList(body: invocationBody, substructureList: [])
-		}
 		
 		for argument in argumentStack {
 			switch argument.name {
