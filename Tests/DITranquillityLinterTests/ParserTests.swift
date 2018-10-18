@@ -50,4 +50,11 @@ final class ParserTests: XCTestCase {
 		XCTAssertFalse(context.errors.isEmpty, "Should not allow container passing between methods")
 	}
 	
+	// Space in file name
+	func testSpacedPlainRegistration() throws {
+		let containerInfo = try findContainerStructure(fileName: " TestSpacedPlainRegistration")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		XCTAssertEqual(registration.typeName, "MyClass")
+	}
+	
 }

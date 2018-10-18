@@ -156,4 +156,22 @@ class InjectionParserTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "String")
 	}
 	
+	// .injection { $0.ss = $1 } where ss: NestedClass, NestedClass contains in MyClass
+	func testNestedClassVariableInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestNestedClassVariableInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "MyClass.NestedClass")
+	}
+	
+	// .injection { $0.injectSS(ss: $1) } where ss: NestedClass, NestedClass contains in MyClass
+	func testNestedClassMethodInjection() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestNestedClassMethodInjection")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		let injection = try extractInjectionInfo(registrationToken: registration)
+		XCTAssertEqual(injection.name, "ss")
+		XCTAssertEqual(injection.typeName, "MyClass.NestedClass")
+	}
+	
 }

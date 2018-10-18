@@ -4,26 +4,6 @@ import XCTest
 @testable import DITranquillityLinterFramework
 
 class RegistrationParserTests: XCTestCase {
-
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
 	
 	// register{ MyClass<Float>() }
 	func testExplicitGenericInitRegistration() throws {
@@ -181,6 +161,13 @@ class RegistrationParserTests: XCTestCase {
 	// .register(MyClass.init(nibName:bundle:))
 	func testOuterUIKitMethodRegistration() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestOuterUIKitMethodRegistration")
+		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
+		XCTAssertEqual(registration.typeName, "MyClass")
+	}
+	
+	// .register(MyClassTypealias.self) where MyClassTypealias = MyClass contained in another class
+	func testNestedTypealiasedClassRegistration() throws {
+		let containerInfo = try findContainerStructure(fileName: "TestNestedTypealiasedClassRegistration")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
 		XCTAssertEqual(registration.typeName, "MyClass")
 	}

@@ -25,15 +25,18 @@ public class Tokenizer {
 		
 		let collectedInfo = collectInfo(files: files)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
+		TimeRecorder.common.start(event: .createTokens)
 		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(parsingContext: parsingContext) {
-			
+			TimeRecorder.common.end(event: .createTokens)
 			guard parsingContext.errors.isEmpty else {
 				display(errorList: parsingContext.errors)
 				return false
 			}
 			
+			TimeRecorder.common.start(event: .validate)
 			let validator = GraphValidator()
 			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
+			TimeRecorder.common.end(event: .validate)
 			display(errorList: errorList)
 			return errorList.isEmpty
 		}
@@ -151,7 +154,17 @@ public class Tokenizer {
 			container[$0.string] = file
 			return FileParser(contents: file.contents, path: $0, module: nil)
 		})
-		let allResults = filesParsers.map({ try! $0.parse() }) + parseBinaryModules(fileContainer: container)
+		
+		TimeRecorder.common.start(event: .parseSourceAndDependencies)
+		var allResults = filesParsers.map({ try! $0.parse() })
+		TimeRecorder.common.end(event: .parseSourceAndDependencies)
+		TimeRecorder.common.start(event: .parseBinary)
+		allResults += parseBinaryModules(fileContainer: container)
+		TimeRecorder.common.end(event: .parseBinary)
+		TimeRecorder.common.start(event: .compose)
+		defer {
+			TimeRecorder.common.end(event: .compose)
+		}
 		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [], linterVersion: linterVersion)) { acc, next in
 			acc.typealiases += next.typealiases
 			acc.types += next.types

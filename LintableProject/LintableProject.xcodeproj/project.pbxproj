@@ -76,6 +76,10 @@
 		FD6E0BEE21663E8C007AA232 /* TestInheritedInitializerInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BED21663E8C007AA232 /* TestInheritedInitializerInjection.swift */; };
 		FD6E0BF021663F05007AA232 /* TestInheritedVariableInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BEF21663F05007AA232 /* TestInheritedVariableInjection.swift */; };
 		FD6E0BF221663F70007AA232 /* TestInheritedMethodInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6E0BF121663F70007AA232 /* TestInheritedMethodInjection.swift */; };
+		FDB931D22178C77700934409 /*  TestSpacedPlainRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB931D12178C77700934409 /*  TestSpacedPlainRegistration.swift */; };
+		FDB931D42178C82100934409 /* TestNestedTypealiasedClassRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB931D32178C82100934409 /* TestNestedTypealiasedClassRegistration.swift */; };
+		FDB931D62178C8D900934409 /* TestNestedClassVariableInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB931D52178C8D900934409 /* TestNestedClassVariableInjection.swift */; };
+		FDB931D82178C96200934409 /* TestNestedClassMethodInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB931D72178C96200934409 /* TestNestedClassMethodInjection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -152,6 +156,10 @@
 		FD6E0BED21663E8C007AA232 /* TestInheritedInitializerInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInheritedInitializerInjection.swift; sourceTree = "<group>"; };
 		FD6E0BEF21663F05007AA232 /* TestInheritedVariableInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInheritedVariableInjection.swift; sourceTree = "<group>"; };
 		FD6E0BF121663F70007AA232 /* TestInheritedMethodInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInheritedMethodInjection.swift; sourceTree = "<group>"; };
+		FDB931D12178C77700934409 /*  TestSpacedPlainRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = " TestSpacedPlainRegistration.swift"; sourceTree = "<group>"; };
+		FDB931D32178C82100934409 /* TestNestedTypealiasedClassRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNestedTypealiasedClassRegistration.swift; sourceTree = "<group>"; };
+		FDB931D52178C8D900934409 /* TestNestedClassVariableInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNestedClassVariableInjection.swift; sourceTree = "<group>"; };
+		FDB931D72178C96200934409 /* TestNestedClassMethodInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNestedClassMethodInjection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -221,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				FD642E3F21623D7E0049E0BF /* TestPlainRegistration.swift */,
+				FDB931D12178C77700934409 /*  TestSpacedPlainRegistration.swift */,
 				FD642E4121623DEE0049E0BF /* TestPlainGenericRegistration.swift */,
 				FD642E4321623E320049E0BF /* TestNestedClassPlainRegistration.swift */,
 				FD642E4521623E670049E0BF /* TestNestedGenericClassRegistration.swift */,
@@ -281,6 +290,9 @@
 				FD563C3F2175FE8C009B4350 /* TestOuterUIKitMethodRegistration.swift */,
 				FD563C412176066D009B4350 /* TestNSObjectProtocolAliasing.swift */,
 				FD563C4321760F45009B4350 /* TestManyInjection.swift */,
+				FDB931D32178C82100934409 /* TestNestedTypealiasedClassRegistration.swift */,
+				FDB931D52178C8D900934409 /* TestNestedClassVariableInjection.swift */,
+				FDB931D72178C96200934409 /* TestNestedClassMethodInjection.swift */,
 			);
 			path = Testable;
 			sourceTree = "<group>";
@@ -450,11 +462,13 @@
 				FD642E5C216240BE0049E0BF /* TestPlainVariableInjection.swift in Sources */,
 				FD642E4621623E670049E0BF /* TestNestedGenericClassRegistration.swift in Sources */,
 				112D67B62169554500A9E6DF /* TestTypealiasedCompositionedVariableInjection.swift in Sources */,
+				FDB931D42178C82100934409 /* TestNestedTypealiasedClassRegistration.swift in Sources */,
 				1126401A216A5CB6008ED24C /* TestComposedTypealiasSuccess.swift in Sources */,
 				11264018216A5C68008ED24C /* TestFullTypealiasedAliasingSuccess.swift in Sources */,
 				11264012216A58A2008ED24C /* TestValidateAliasingSuccess.swift in Sources */,
 				FD642E5421623FF20049E0BF /* TestPlainAliasing.swift in Sources */,
 				FD642E4221623DEE0049E0BF /* TestPlainGenericRegistration.swift in Sources */,
+				FDB931D82178C96200934409 /* TestNestedClassMethodInjection.swift in Sources */,
 				FD642E5A2162409B0049E0BF /* TestImplicitKeyPathInjection.swift in Sources */,
 				112D67AC21694EF200A9E6DF /* TestTypealiasedRegistrationAliasing.swift in Sources */,
 				11264014216A5B8B008ED24C /* TestValidatePlainAliasingError.swift in Sources */,
@@ -463,8 +477,10 @@
 				11264016216A5C07008ED24C /* TestTypealiasedAliasingSuccess.swift in Sources */,
 				11264026216A640A008ED24C /* TestPlainInjectionValidation.swift in Sources */,
 				117EFFDC2142FB210082EA06 /* AppDelegate.swift in Sources */,
+				FDB931D62178C8D900934409 /* TestNestedClassVariableInjection.swift in Sources */,
 				FD6E0BF021663F05007AA232 /* TestInheritedVariableInjection.swift in Sources */,
 				1126401E216A5D26008ED24C /* TestTypealiasedComposedTypealiasSuccess.swift in Sources */,
+				FDB931D22178C77700934409 /*  TestSpacedPlainRegistration.swift in Sources */,
 				FD642E6A216242480049E0BF /* TestGenericArgumentVariableInjection.swift in Sources */,
 				112D67AE2169501A00A9E6DF /* TestTypealiasedClassRegistration.swift in Sources */,
 				112D67B4216954D500A9E6DF /* TestTypealiasedCompositionedMethodInjection.swift in Sources */,

@@ -25,13 +25,17 @@ DispatchQueue.global().async {
 		if let podsRoot = enironment[XcodeEnvVariable.podsRoot.rawValue],
 			let podsProject = try? XcodeProj(pathString: podsRoot + "/Pods.xcodeproj") {
 			print("Found pods project.")
+			TimeRecorder.common.start(event: .collectDependencies)
 			files += projectFiles(project: podsProject, srcRoot: podsRoot)
+			TimeRecorder.common.end(event: .collectDependencies)
 		}
 		
 		if let mainProjPath = enironment[XcodeEnvVariable.projectFilePath.rawValue],
 			let mainProj = try? XcodeProj(pathString: mainProjPath) {
 			print("Found main project.")
+			TimeRecorder.common.start(event: .collectSource)
 			files += projectFiles(project: mainProj, srcRoot: srcRoot)
+			TimeRecorder.common.end(event: .collectSource)
 		}
 	} else {
 		// TMP for debug
@@ -39,7 +43,13 @@ DispatchQueue.global().async {
 		let srcRoot = "/Users/nikitapatskov/Develop/ios.client.fork2/"
 		let project = try! XcodeProj(pathString: srcRoot + "AtiClient.xcodeproj")
 		let podsProject = try! XcodeProj(pathString: srcRoot + "Pods/Pods.xcodeproj")
-		files = projectFiles(project: project, srcRoot: srcRoot) + projectFiles(project: podsProject, srcRoot: srcRoot + "/Pods")
+		TimeRecorder.common.start(event: .collectSource)
+		let source = projectFiles(project: project, srcRoot: srcRoot)
+		TimeRecorder.common.end(event: .collectSource)
+		TimeRecorder.common.start(event: .collectDependencies)
+		let pods = projectFiles(project: podsProject, srcRoot: srcRoot + "/Pods")
+		TimeRecorder.common.end(event: .collectDependencies)
+		files = source + pods
 	}
 	
 	if tokenizer.process(files: files) {
