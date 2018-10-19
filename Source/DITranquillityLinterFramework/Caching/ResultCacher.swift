@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SourceKittenFramework
 
 final class ResultCacher {
 	
@@ -48,11 +49,42 @@ final class ResultCacher {
 		}
 	}
 	
+	func getCachedFileParseResult(contents: String) -> FileParserResult? {
+		TimeRecorder.common.start(event: .decodeCachedSource)
+		defer { TimeRecorder.common.end(event: .decodeCachedSource) }
+		let cacheDicectoryPlace = cachePath(isCommonCache: false)
+		let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
+		let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: contents))
+		do {
+			let data = try Data(contentsOf: cacheURL, options: [])
+			let decodedData = try decoder.decode(FileParserResult.self, from: data)
+//			decodedData.updateRelationshipAfterDecoding()
+			return decodedData
+		} catch {
+			return nil
+		}
+	}
+	
+	func setCachedFileParseResult(result: FileParserResult, contents: String) {
+		defer { TimeRecorder.common.end(event: .encodeBinary) }
+		do {
+			let cacheDicectoryPlace = cachePath(isCommonCache: false)
+			let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
+			let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: contents))
+			try FileManager.default.createDirectory(atPath: cacheURLDirectory.path, withIntermediateDirectories: true, attributes: nil)
+			let encodedData = try encoder.encode(result)
+			try encodedData.write(to: cacheURL)
+		} catch {
+			print(error)
+		}
+	}
+	
 	func cachePath(isCommonCache: Bool) -> String {
 		if isCommonCache {
 			return ResultCacher.commonCacheDirectory
 		} else if let srcRoot = ProcessInfo.processInfo.environment[XcodeEnvVariable.srcRoot.rawValue] {
-			return srcRoot
+			print("SRCROOT: ", srcRoot)
+			return srcRoot + "/"
 		} else {
 			return FileManager.default.currentDirectoryPath
 		}

@@ -128,11 +128,9 @@ public class Tokenizer {
 		var commonFrameworkInfoList: [(path: String, name: String)] = []
 		if sdk.range(of: "iPhoneSimulator") != nil || sdk.range(of: "iPhoneOS") != nil {
 			commonFrameworkInfoList.append((commonFrameworksPath, "UIKit"))
-			commonFrameworkInfoList.append((commonFrameworksPath, "Foundation"))
 		}
 		if sdk.range(of: "MacOSX") != nil {
 			commonFrameworkInfoList.append((commonFrameworksPath, "Cocoa"))
-			commonFrameworkInfoList.append((commonFrameworksPath, "Foundation"))
 		}
 		result += parseFrameworkInfoList(commonFrameworkInfoList, target: target, sdk: sdk, fileContainer: fileContainer, isCommon: true)
 		return result
