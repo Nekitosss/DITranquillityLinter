@@ -8,6 +8,7 @@
 import Foundation
 import SourceKittenFramework
 
+/// Trying to create RegsitrationToken. Resolves containing InjectionToken types.
 final class RegistrationTokenBuilder {
 	
 	typealias RegistrationInfo = (typeName: String, plainTypeName: String, tokenList: [DIToken])

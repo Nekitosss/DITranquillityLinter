@@ -8,13 +8,23 @@
 
 import Foundation
 
+
+/// Contains information about aliasing c.register(...).as(MyProtocol.self)
 struct AliasToken: DIToken {
 	
+	/// Unique type name of injection. With resolved generic constraints and typealiases
 	let typeName: String
+	
+	/// Type name for accessing [String: Type] dicationary for getting all collected info of type
 	let plainTypeName: String
+	
+	/// Unique tag of aliasing. With resolved generic constraints and typealiases
 	let tag: String
+	
+	/// Location of registration token (For printing message in XCode)
 	let location: Location
 	
+	/// (Type1 & Type2) -> [Type1, Type2]
 	var decomposedTypes: [String] {
 		return AliasToken.decompose(name: plainTypeName)
 	}
@@ -42,6 +52,7 @@ struct AliasToken: DIToken {
 	
 }
 
+/// Combination of typeName and tag for unique registration identifying
 struct RegistrationAccessor: Hashable {
 	let typeName: String
 	let tag: String

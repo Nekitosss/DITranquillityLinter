@@ -9,6 +9,7 @@ import Foundation
 import SourceKittenFramework
 import xcodeproj
 
+/// Trying to create InjectionToken (without injection type resolving)
 final class InjectionTokenBuilder {
 	
 	static func build(functionName: String, argumentStack: [ArgumentInfo], content: NSString, substructureList: [SourceKitStructure], location: Location) -> InjectionToken? {

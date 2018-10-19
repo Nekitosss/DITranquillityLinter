@@ -8,6 +8,7 @@
 import Foundation
 import SourceKittenFramework
 
+/// Trying to create AliasToken
 final class AliasTokenBuilder {
 	
 	static func build(functionName: String, argumentStack: [ArgumentInfo], parsingContext: ParsingContext, location: Location) -> AliasToken? {

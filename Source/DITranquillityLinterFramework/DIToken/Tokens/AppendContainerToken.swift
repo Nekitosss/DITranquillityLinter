@@ -8,8 +8,17 @@
 
 import Foundation
 
+
+/// For information abound appending another DIPart or DIFramework to container
+/// container.append(part: MyPart.self) or .append(framework: MyFramework.self)
 struct AppendContainerToken: DIToken {
+	
+	/// Location of registration token (For printing message in XCode)
 	let location: Location
+	
+	/// DIPart or DIFramework class name
 	let typeName: String
+	
+	/// All registrations, contained in part
 	let containerPart: ContainerPart
 }

@@ -12,6 +12,7 @@ import xcodeproj
 
 
 // DIPart, DIFramework
+/// Trying to collect info from container part and pack it into RegistrationTokens
 final class ContainerPart {
 	
 	let tokenInfo: [RegistrationAccessor: [RegistrationToken]]

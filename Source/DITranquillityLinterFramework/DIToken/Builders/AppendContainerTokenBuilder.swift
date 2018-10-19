@@ -8,6 +8,7 @@
 import Foundation
 import SourceKittenFramework
 
+/// Trying to create AppendContainerToken
 final class AppendContainerTokenBuilder {
 	
 	static func build(functionName: String, parsingContext: ParsingContext, argumentStack: [ArgumentInfo], currentPartName: String?, location: Location) -> AppendContainerToken? {
