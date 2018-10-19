@@ -14,4 +14,5 @@ public enum XcodeEnvVariable: String {
 	case targetPrefix = "SWIFT_PLATFORM_TARGET_PREFIX"
 	case deploymentTarget = "IPHONEOS_DEPLOYMENT_TARGET"
 	case frameworkSearchPaths = "FRAMEWORK_SEARCH_PATHS"
+	case productName = "PRODUCT_NAME"
 }
