@@ -52,14 +52,14 @@ public class Tokenizer {
 	
 	func collectInfo(files: [String]) -> [String: Type] {
 		let paths = files.map({ Path($0) })
-		let filesParsers: [FileParser] = paths.compactMap({
+		guard let filesParsers: [FileParser?] = try? paths.parallelMap({
 			guard let file = File(path: $0.string) else { return nil }
 			container[$0.string] = file
 			return FileParser(contents: file.contents, path: $0, module: nil)
-		})
+		}) else { return [:] }
 		
 		TimeRecorder.common.start(event: .parseSourceAndDependencies)
-		var allResults = filesParsers.map({ try! $0.parse() })
+		var allResults = (try? filesParsers.parallelMap({ try! $0?.parse() }).compactMap({ $0 })) ?? []
 		TimeRecorder.common.end(event: .parseSourceAndDependencies)
 		TimeRecorder.common.start(event: .parseBinary)
 		allResults += parseBinaryModules(fileContainer: container)
@@ -81,7 +81,7 @@ public class Tokenizer {
 		let enironment = ProcessInfo.processInfo.environment
 		
 		var target = "x86_64-apple-ios11.4"
-		var sdk = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk"
+		var sdk = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.1.sdk"
 		
 		if let arch = enironment[XcodeEnvVariable.platformPreferredArch.rawValue],
 			let targetPrefix = enironment[XcodeEnvVariable.targetPrefix.rawValue],
