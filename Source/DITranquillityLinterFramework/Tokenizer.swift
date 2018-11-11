@@ -12,7 +12,7 @@ import xcodeproj
 import PathKit
 import SourceKit
 
-public let linterVersion = "0.0.1"
+public let linterVersion = "0.0.2"
 
 public class Tokenizer {
 	

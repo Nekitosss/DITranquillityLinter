@@ -24,7 +24,11 @@ final class ResultCacher {
 			let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
 			let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: name))
 			try FileManager.default.createDirectory(atPath: cacheURLDirectory.path, withIntermediateDirectories: true, attributes: nil)
-			let encodedData = try encoder.encode(list)
+			
+			var listResult = Protobuf_FileParserResultList()
+			listResult.value = list.map({ $0.toProtoMessage })
+			let encodedData = try listResult.serializedData()
+			
 			try encodedData.write(to: cacheURL)
 		} catch {
 			print(error)
@@ -41,7 +45,10 @@ final class ResultCacher {
 		let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: name))
 		do {
 			let data = try Data(contentsOf: cacheURL, options: [])
-			let decodedData = try decoder.decode([FileParserResult].self, from: data)
+			let decodedDataNotUnwrapped = try Protobuf_FileParserResultList(serializedData: data).value
+			TimeRecorder.common.start(event: .mapBinary)
+			let decodedData = decodedDataNotUnwrapped.map { FileParserResult.fromProtoMessage($0) }
+			TimeRecorder.common.end(event: .mapBinary)
 			decodedData.forEach({ $0.updateRelationshipAfterDecoding() })
 			return decodedData
 		} catch {
@@ -57,7 +64,7 @@ final class ResultCacher {
 		let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: contents))
 		do {
 			let data = try Data(contentsOf: cacheURL, options: [])
-			let decodedData = try decoder.decode(FileParserResult.self, from: data)
+			let decodedData = try FileParserResult.fromProtoMessage(FileParserResult.ProtoStructure(serializedData: data))
 //			decodedData.updateRelationshipAfterDecoding()
 			return decodedData
 		} catch {
@@ -72,7 +79,7 @@ final class ResultCacher {
 			let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
 			let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: contents))
 			try FileManager.default.createDirectory(atPath: cacheURLDirectory.path, withIntermediateDirectories: true, attributes: nil)
-			let encodedData = try encoder.encode(result)
+			let encodedData = try result.toProtoMessage.serializedData()
 			try encodedData.write(to: cacheURL)
 		} catch {
 			print(error)

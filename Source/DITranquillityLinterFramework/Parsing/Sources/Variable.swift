@@ -7,7 +7,45 @@ import Foundation
 import SourceKittenFramework
 
 /// Defines variable
-final class Variable: NSObject, Typed, Annotated, Definition, Codable {
+final class Variable: NSObject, Typed, Annotated, Definition, Codable, ProtobufBridgable {
+	
+	typealias ProtoStructure = Protobuf_Variable
+	
+	var toProtoMessage: Variable.ProtoStructure {
+		var res = ProtoStructure()
+		res.name = self.name
+		res.typeName = self.typeName.toProtoMessage
+		res.type = .init(value: self.type?.toProtoMessage)
+		res.isComputed = self.isComputed
+		res.isStatic = self.isStatic
+		res.readAccess = self.readAccess
+		res.writeAccess = self.writeAccess
+		res.defaultValue = .init(value: self.defaultValue)
+		res.annotations = self.annotations.mapValues({ $0.toProtoMessage })
+		res.attributes = self.attributes.mapValues({ $0.toProtoMessage })
+		res.definedInTypeName = .init(value: self.definedInTypeName?.toProtoMessage)
+		res.definedInType = .init(value: self.definedInType?.toProtoMessage)
+		res.parserData = .init(value: parserData?.toProtoMessage)
+		return res
+	}
+	
+	static func fromProtoMessage(_ message: Variable.ProtoStructure) -> Variable {
+		let access: (read: AccessLevel, write: AccessLevel) = (AccessLevel(value: message.readAccess), write: AccessLevel(value: message.writeAccess))
+		let value = Variable(name: message.name,
+							 typeName: .fromProtoMessage(message.typeName),
+							 type: message.type.toValue.flatMap({ .fromProtoMessage($0) }),
+							 accessLevel: access,
+							 isComputed: message.isComputed,
+							 isStatic: message.isStatic,
+							 defaultValue: message.defaultValue.toValue,
+							 attributes: message.attributes.mapValues({ .fromProtoMessage($0) }),
+							 annotations: message.annotations.mapValues({ .fromProtoMessage($0) }),
+							 definedInTypeName: message.definedInTypeName.toValue.map({ .fromProtoMessage($0) }))
+		value.definedInType = message.definedInType.toValue.flatMap({ .fromProtoMessage($0) })
+		value.parserData = message.parserData.toValue.flatMap({ .fromProtoMessage($0) })
+		return value
+	}
+	
     /// Variable name
     let name: String
 

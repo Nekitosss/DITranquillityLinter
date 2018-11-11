@@ -3,7 +3,30 @@ import SourceKittenFramework
 
 // sourcery: skipJSExport
 /// :nodoc:
-final class Typealias: NSObject, Typed, Codable {
+final class Typealias: NSObject, Typed, Codable, ProtobufBridgable {
+	
+	typealias ProtoStructure = Protobuf_Typealias
+	
+	var toProtoMessage: Typealias.ProtoStructure {
+		var res = ProtoStructure()
+		res.aliasName = aliasName
+		res.typeName = typeName.toProtoMessage
+		res.type = .init(value: type?.toProtoMessage)
+		res.filePath = filePath
+		res.parent = .init(value: nil)
+		res.parentName = ""
+		return res
+	}
+	
+	static func fromProtoMessage(_ message: Protobuf_Typealias) -> Typealias {
+		var res = Typealias(aliasName: message.aliasName,
+							typeName: .fromProtoMessage(message.typeName),
+							parent: message.parent.toValue.flatMap({ .fromProtoMessage($0) }),
+							filePath: message.filePath)
+		res.type = message.type.toValue.flatMap({ .fromProtoMessage($0) })
+		return res
+	}
+	
     // New typealias name
     let aliasName: String
 

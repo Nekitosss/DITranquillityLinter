@@ -2,8 +2,38 @@ import Foundation
 import SourceKittenFramework
 
 /// Describes subscript
-final class Subscript: NSObject, Annotated, Definition, Codable {
+final class Subscript: NSObject, Annotated, Definition, Codable, ProtobufBridgable {
 
+	typealias ProtoStructure = Protobuf_Subscript
+	
+	var toProtoMessage: Subscript.ProtoStructure {
+		var res = ProtoStructure()
+		res.parameters = self.parameters.map({ $0.toProtoMessage })
+		res.returnTypeName = self.returnTypeName.toProtoMessage
+		res.returnType = .init(value: self.returnType?.toProtoMessage)
+		res.readAccess = self.readAccess
+		res.writeAccess = self.writeAccess
+		res.annotations = self.annotations.mapValues({ $0.toProtoMessage })
+		res.definedInType = .init(value: self.definedInType?.toProtoMessage)
+		res.definedInTypeName = .init(value: self.definedInTypeName?.toProtoMessage)
+		res.attributes = self.attributes.mapValues({ $0.toProtoMessage })
+		res.parserData = .init(value: self.parserData?.toProtoMessage)
+		return res
+	}
+	
+	static func fromProtoMessage(_ message: Subscript.ProtoStructure) -> Subscript {
+		let res = Subscript(parameters: message.parameters.map({ .fromProtoMessage($0) }),
+						 returnTypeName: .fromProtoMessage(message.returnTypeName),
+						 accessLevel: (AccessLevel.init(value: message.readAccess), AccessLevel.init(value: message.writeAccess)),
+						 attributes: message.attributes.mapValues({ .fromProtoMessage($0) }),
+						 annotations: message.annotations.mapValues({ .fromProtoMessage($0) }),
+						 definedInTypeName: message.definedInTypeName.toValue.flatMap({ .fromProtoMessage($0) }))
+		res.returnType = message.returnType.toValue.flatMap({ .fromProtoMessage($0) })
+		res.definedInType = message.definedInType.toValue.flatMap({ .fromProtoMessage($0) })
+		res.parserData = message.parserData.toValue.flatMap({ .fromProtoMessage($0) })
+		return res
+	}
+	
 	override func isEqual(_ object: Any?) -> Bool {
 		guard let rhs = object as? Subscript else { return false }
 		if self.parameters != rhs.parameters { return false }

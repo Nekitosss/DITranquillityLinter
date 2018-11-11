@@ -3,11 +3,11 @@
     "pins": [
       {
         "package": "AEXML",
-        "repositoryURL": "https://github.com/tadija/AEXML.git",
+        "repositoryURL": "https://github.com/tadija/AEXML",
         "state": {
           "branch": null,
-          "revision": "6eea665515d079c338690147082a8084a36484b0",
-          "version": "4.3.0"
+          "revision": "54bb8ea6fb693dd3f92a89e5fcc19e199fdeedd0",
+          "version": "4.3.3"
         }
       },
       {
@@ -74,12 +74,21 @@
         }
       },
       {
-        "package": "SwiftPM",
-        "repositoryURL": "https://github.com/apple/swift-package-manager",
+        "package": "SwiftProtobuf",
+        "repositoryURL": "https://github.com/apple/swift-protobuf.git",
         "state": {
           "branch": null,
-          "revision": "6983434787dec4e543e9d398a0a9acf63ccd4da1",
-          "version": "0.2.1"
+          "revision": "86c579d280d629416c7bd9d32a5dfacab8e0b0b4",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "SwiftShell",
+        "repositoryURL": "https://github.com/kareman/SwiftShell",
+        "state": {
+          "branch": null,
+          "revision": "beebe43c986d89ea5359ac3adcb42dac94e5e08a",
+          "version": "4.1.2"
         }
       },
       {
@@ -87,8 +96,8 @@
         "repositoryURL": "https://github.com/drmohundro/SWXMLHash.git",
         "state": {
           "branch": null,
-          "revision": "0ce63a93a455adb3cd5e4c55f78f1232a590a5a5",
-          "version": "4.7.2"
+          "revision": "b130217d81833cecd7ddf78b76d60200f1070d98",
+          "version": "4.7.4"
         }
       },
       {
@@ -96,8 +105,8 @@
         "repositoryURL": "https://github.com/tuist/xcodeproj.git",
         "state": {
           "branch": null,
-          "revision": "1314329687682864119ecc03c73a413dfc24ade0",
-          "version": "6.0.1"
+          "revision": "23da51abd3de3bedaad59a0afbb150b48504b5b0",
+          "version": "6.3.0"
         }
       },
       {

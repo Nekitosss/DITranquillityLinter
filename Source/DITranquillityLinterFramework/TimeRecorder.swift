@@ -20,6 +20,7 @@ public final class TimeRecorder {
 		case validate
 		case encodeBinary
 		case decodeBinary
+		case mapBinary
 		case decodeCachedSource
 		case file(String)
 	}

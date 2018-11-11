@@ -8,7 +8,34 @@
 
 import Foundation
 
-final class FileParserResult: Codable {
+final class FileParserResult: Codable, ProtobufBridgable {
+	
+	typealias ProtoStructure = Protobuf_FileParserResult
+	
+	var toProtoMessage: FileParserResult.ProtoStructure {
+		var res = ProtoStructure()
+		res.path = .init(value: self.path)
+		res.module = .init(value: self.module)
+		res.types = self.types.map({ $0.toProtoMessage })
+		res.typealiases = self.typealiases.map({ $0.toProtoMessage })
+		res.inlineRanges = self.inlineRanges.mapValues({ BytesRange(offset: Int64($0.location), length: Int64($0.length)).toProtoMessage })
+		res.contentSha = .init(value: self.contentSha)
+		res.linterVersion = self.linterVersion
+		return res
+	}
+	
+	static func fromProtoMessage(_ message: FileParserResult.ProtoStructure) -> FileParserResult {
+		return FileParserResult(path: message.path.toValue,
+								module: message.module.toValue,
+								types: message.types.map({ .fromProtoMessage($0) }),
+								typealiases: message.typealiases.map({ .fromProtoMessage($0) }),
+								inlineRanges: message.inlineRanges.mapValues({
+									let res = BytesRange.fromProtoMessage($0)
+									return NSRange(location: Int(res.offset), length: Int(res.length))
+								}),
+								contentSha: message.contentSha.toValue!,
+								linterVersion: message.linterVersion)
+	}
 	
     let path: String?
     let module: String?
@@ -42,7 +69,7 @@ final class FileParserResult: Codable {
     var typealiases = [Typealias]()
     var inlineRanges = [String: NSRange]()
 
-    var contentSha: String?
+    var contentSha: String
     var linterVersion: String
 	
 	static func ==(lhs: FileParserResult, rhs: FileParserResult) -> Bool {

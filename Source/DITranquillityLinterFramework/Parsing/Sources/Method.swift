@@ -5,7 +5,35 @@ import SourceKittenFramework
 typealias SourceryMethod = Method
 
 /// Describes method parameter
-final class MethodParameter: NSObject, Typed, Annotated, Codable {
+final class MethodParameter: NSObject, Typed, Annotated, Codable, ProtobufBridgable {
+	
+	typealias ProtoStructure = Protobuf_MethodParameter
+	
+	var toProtoMessage: MethodParameter.ProtoStructure {
+		var res = ProtoStructure()
+		res.argumentLabel = .init(value: self.argumentLabel)
+		res.name = self.name
+		res.typeName = self.typeName.toProtoMessage
+		res.inout = self.inout
+		res.type = .init(value: self.type?.toProtoMessage)
+		res.defaultValue = .init(value: self.defaultValue)
+		res.annotations = self.annotations.mapValues({ $0.toProtoMessage })
+		res.parserData = .init(value: self.parserData?.toProtoMessage)
+		return res
+	}
+	
+	static func fromProtoMessage(_ message: MethodParameter.ProtoStructure) -> MethodParameter {
+		let res = MethodParameter(argumentLabel: message.argumentLabel.toValue,
+							   name: message.name,
+							   typeName: .fromProtoMessage(message.typeName),
+							   type: message.type.toValue.flatMap({ .fromProtoMessage($0) }),
+							   defaultValue: message.defaultValue.toValue,
+							   annotations: message.annotations.mapValues({ .fromProtoMessage($0) }),
+							   isInout: message.inout)
+		res.parserData = message.parserData.toValue.flatMap({ .fromProtoMessage($0) })
+		return res
+	}
+	
     /// Parameter external name
     var argumentLabel: String?
 
@@ -49,21 +77,51 @@ final class MethodParameter: NSObject, Typed, Annotated, Codable {
         self.`inout` = isInout
     }
 
-    /// :nodoc:
-    init(name: String = "", typeName: TypeName, type: Type? = nil, defaultValue: String? = nil, annotations: Annotations = [:], isInout: Bool = false) {
-        self.typeName = typeName
-        self.argumentLabel = name
-        self.name = name
-        self.type = type
-        self.defaultValue = defaultValue
-        self.annotations = annotations
-        self.`inout` = isInout
-    }
 }
 
 /// Describes method
-final class Method: NSObject, Annotated, Definition, Codable {
+final class Method: NSObject, Annotated, Definition, Codable, ProtobufBridgable {
 
+	typealias ProtoStructure = Protobuf_Method
+	
+	var toProtoMessage: Method.ProtoStructure {
+		var res = ProtoStructure()
+		res.name = self.name
+		res.selectorName = self.selectorName
+		res.parameters = self.parameters.map({ $0.toProtoMessage })
+		res.returnType = .init(value: self.returnType?.toProtoMessage)
+		res.returnTypeName = self.returnTypeName.toProtoMessage
+		res.throws = self.throws
+		res.rethrows = self.rethrows
+		res.accessLevel = self.accessLevel
+		res.isStatic = self.isStatic
+		res.isClass = self.isClass
+		res.isFailableInitializer = self.isFailableInitializer
+		res.annotations = self.annotations.mapValues({ $0.toProtoMessage })
+		res.definedInType = .init(value: self.definedInType?.toProtoMessage)
+		res.definedInTypeName = .init(value: self.definedInTypeName?.toProtoMessage)
+		res.attributes = self.attributes.mapValues({ $0.toProtoMessage })
+		res.parserData = .init(value: self.parserData?.toProtoMessage)
+		return res
+	}
+	
+	static func fromProtoMessage(_ message: Method.ProtoStructure) -> Method {
+		let res = Method(name: message.name,
+						 selectorName: message.selectorName,
+						 parameters: message.parameters.map({ .fromProtoMessage($0) }),
+						 returnTypeName: .fromProtoMessage(message.returnTypeName),
+						 throws: message.throws,
+						 rethrows: message.rethrows,
+						 accessLevel: .init(value: message.accessLevel),
+						 isStatic: message.isStatic,
+						 isClass: message.isClass,
+						 isFailableInitializer: message.isFailableInitializer,
+						 attributes: message.attributes.mapValues({ .fromProtoMessage($0) }),
+						 annotations: message.annotations.mapValues({ .fromProtoMessage($0) }),
+						 definedInTypeName: message.definedInTypeName.toValue.flatMap({ .fromProtoMessage($0) }))
+		return res
+	}
+	
     /// Full method name, including generic constraints, i.e. `foo<T>(bar: T)`
     let name: String
 

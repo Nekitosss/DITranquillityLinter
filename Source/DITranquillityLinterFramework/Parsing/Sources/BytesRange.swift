@@ -3,17 +3,29 @@
 
 import Foundation
 
-struct BytesRange: Codable, Equatable {
+struct BytesRange: Codable, Equatable, ProtobufBridgable {
 
     let offset: Int64
     let length: Int64
 
-    init(offset: Int64, length: Int64) {
-        self.offset = offset
-        self.length = length
-    }
+	typealias ProtoStructure = Protobuf_BytesRange
+	
+	var toProtoMessage: BytesRange.ProtoStructure {
+		var res = ProtoStructure()
+		res.offset = offset
+		res.length = length
+		return res
+	}
+	
+	static func fromProtoMessage(_ message: Protobuf_BytesRange) -> BytesRange {
+		return .init(offset: message.offset, length: message.length)
+	}
+	
+}
 
-    init(range: (offset: Int64, length: Int64)) {
-        self.init(offset: range.offset, length: range.length)
-    }
+extension BytesRange {
+	
+	init(range: (offset: Int64, length: Int64)) {
+		self.init(offset: range.offset, length: range.length)
+	}
 }

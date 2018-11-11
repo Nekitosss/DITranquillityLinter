@@ -10,7 +10,8 @@ let package = Package(
         .package(url: "https://github.com/jpsim/SourceKitten.git", from: "0.21.2"),
 		.package(url: "https://github.com/tuist/xcodeproj.git", .upToNextMajor(from: "6.0.1")),
 		.package(url: "https://github.com/kylef/PathKit.git", .upToNextMajor(from: "0.9.2")),
-    ],
+		.package(url: "https://github.com/apple/swift-protobuf.git", from: "1.2.0")
+		],
     targets: [
 		.target(
 			name: "DITranquillityLinter",
@@ -23,6 +24,7 @@ let package = Package(
 				"SourceKittenFramework",
 				"xcodeproj",
 				"PathKit",
+				"SwiftProtobuf",
 			]),
 		.testTarget(
 			name: "DITranquillityLinterTests",
