@@ -19,7 +19,7 @@ final class Typealias: NSObject, Typed, Codable, ProtobufBridgable {
 	}
 	
 	static func fromProtoMessage(_ message: Protobuf_Typealias) -> Typealias {
-		var res = Typealias(aliasName: message.aliasName,
+		let res = Typealias(aliasName: message.aliasName,
 							typeName: .fromProtoMessage(message.typeName),
 							parent: message.parent.toValue.flatMap({ .fromProtoMessage($0) }),
 							filePath: message.filePath)

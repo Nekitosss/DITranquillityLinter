@@ -36,7 +36,7 @@ func extractRegistrationInfo(containerInfo: ContainerPart, maximumRegistrationCo
 
 func validateGraph(fileName: String) throws -> [GraphError] {
 	let fileURL = pathToSourceFile(with: fileName)
-	let tokenizer = Tokenizer()
+	let tokenizer = Tokenizer(isTestEnvironment: true)
 	let collectedInfo = tokenizer.collectInfo(files: [fileURL])
 	let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 	guard let containerInfo = ContainerInitializatorFinder.findContainerStructure(parsingContext: context) else {
@@ -48,7 +48,7 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 }
 
 func findContainerStructure(fileName: String) throws -> ContainerPart {
-	let tokenizer = Tokenizer()
+	let tokenizer = Tokenizer(isTestEnvironment: true)
 	let fileURL = pathToSourceFile(with: fileName)
 	let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 	guard let containerInfo = ContainerInitializatorFinder.findContainerStructure(parsingContext: context) else {
@@ -58,6 +58,6 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 }
 
 func pathToSourceFile(with name: String) -> String {
-	let pathToTestableSource = "/Users/nikitapatskov/Develop/DITranquillityLinter/LintableProject/LintableProject/Testable/"
+	let pathToTestableSource = EnvVariable.currentProjectFolder.value()
 	return pathToTestableSource + name + ".swift"
 }

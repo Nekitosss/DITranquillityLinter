@@ -89,8 +89,8 @@ final class FileParser {
 	
 	func parse(source: [String: SourceKitRepresentable], filePath: String) throws -> FileParserResult {
 		let filePathToRecord = ((filePath as NSString).lastPathComponent) as String
-		TimeRecorder.common.start(event: .file(filePathToRecord))
-		defer { TimeRecorder.common.end(event: .file(filePathToRecord)) }
+		TimeRecorder.start(event: .file(filePathToRecord))
+		defer { TimeRecorder.end(event: .file(filePathToRecord)) }
 		let (types, typealiases) = try parseTypes(source, filePath: filePath)
 		return FileParserResult(path: path, module: module, types: types, typealiases: typealiases, inlineRanges: inlineRanges, linterVersion: linterVersion)
 	}

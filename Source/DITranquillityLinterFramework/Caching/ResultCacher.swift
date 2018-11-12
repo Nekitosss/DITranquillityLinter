@@ -17,8 +17,8 @@ final class ResultCacher {
 	private let decoder = JSONDecoder()
 	
 	func cacheBinaryFiles(list: [FileParserResult], name: String, isCommonCache: Bool) {
-		TimeRecorder.common.start(event: .encodeBinary)
-		defer { TimeRecorder.common.end(event: .encodeBinary) }
+		TimeRecorder.start(event: .encodeBinary)
+		defer { TimeRecorder.end(event: .encodeBinary) }
 		do {
 			let cacheDicectoryPlace = cachePath(isCommonCache: isCommonCache)
 			let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
@@ -37,8 +37,8 @@ final class ResultCacher {
 	}
 	
 	func getCachedBinaryFiles(name: String, isCommonCache: Bool) -> [FileParserResult]? {
-		TimeRecorder.common.start(event: .decodeBinary)
-		defer { TimeRecorder.common.end(event: .decodeBinary) }
+		TimeRecorder.start(event: .decodeBinary)
+		defer { TimeRecorder.end(event: .decodeBinary) }
 		
 		let cacheDicectoryPlace = cachePath(isCommonCache: isCommonCache)
 		let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
@@ -46,9 +46,9 @@ final class ResultCacher {
 		do {
 			let data = try Data(contentsOf: cacheURL, options: [])
 			let decodedDataNotUnwrapped = try Protobuf_FileParserResultList(serializedData: data).value
-			TimeRecorder.common.start(event: .mapBinary)
+			TimeRecorder.start(event: .mapBinary)
 			let decodedData = decodedDataNotUnwrapped.map { FileParserResult.fromProtoMessage($0) }
-			TimeRecorder.common.end(event: .mapBinary)
+			TimeRecorder.end(event: .mapBinary)
 			decodedData.forEach({ $0.updateRelationshipAfterDecoding() })
 			return decodedData
 		} catch {
@@ -57,8 +57,8 @@ final class ResultCacher {
 	}
 	
 	func getCachedFileParseResult(contents: String) -> FileParserResult? {
-		TimeRecorder.common.start(event: .decodeCachedSource)
-		defer { TimeRecorder.common.end(event: .decodeCachedSource) }
+		TimeRecorder.start(event: .decodeCachedSource)
+		defer { TimeRecorder.end(event: .decodeCachedSource) }
 		let cacheDicectoryPlace = cachePath(isCommonCache: false)
 		let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
 		let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: contents))
@@ -73,7 +73,7 @@ final class ResultCacher {
 	}
 	
 	func setCachedFileParseResult(result: FileParserResult, contents: String) {
-		defer { TimeRecorder.common.end(event: .encodeBinary) }
+		defer { TimeRecorder.end(event: .encodeBinary) }
 		do {
 			let cacheDicectoryPlace = cachePath(isCommonCache: false)
 			let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
@@ -89,7 +89,7 @@ final class ResultCacher {
 	func cachePath(isCommonCache: Bool) -> String {
 		if isCommonCache {
 			return ResultCacher.commonCacheDirectory
-		} else if let srcRoot = ProcessInfo.processInfo.environment[XcodeEnvVariable.srcRoot.rawValue] {
+		} else if let srcRoot = XcodeEnvVariable.srcRoot.value() {
 			print("SRCROOT: ", srcRoot)
 			return srcRoot + "/"
 		} else {

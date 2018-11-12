@@ -28,7 +28,7 @@ extension Array {
 		let uuid = NSUUID().uuidString
 		let jobCount = Int(ceil(Double(count) / Double(maxConcurrentJobs)))
 		
-		let queueLabelPrefix = "io.pixle.Sourcery.map.\(uuid)"
+		let queueLabelPrefix = "io.pixle.DILint.map.\(uuid)"
 		let resultAccumulatorQueue = DispatchQueue(label: "\(queueLabelPrefix).resultAccumulator")
 		
 		var mapError: Error?

@@ -8,7 +8,7 @@ import PathKit
 func projectFiles(project: XcodeProj, srcRoot: String) -> [String] {
 	let srcAbsolute = Path(srcRoot)
 	let sourceFileReferences: [PBXFileElement]
-	if let productName = ProcessInfo.processInfo.environment[XcodeEnvVariable.productName.rawValue],
+	if let productName = XcodeEnvVariable.productName.value(),
 		let target = project.pbxproj.targets(named: productName).first,
 		let sourceFiles = try? target.sourceFiles() {
 		sourceFileReferences = sourceFiles
@@ -25,32 +25,36 @@ func projectFiles(project: XcodeProj, srcRoot: String) -> [String] {
 }
 
 DispatchQueue.global().async {
-	let tokenizer = Tokenizer()
+	let tokenizer = Tokenizer(isTestEnvironment: false)
 	var files: [String] = []
 	
-	let enironment = ProcessInfo.processInfo.environment
-	if let srcRoot = enironment[XcodeEnvVariable.srcRoot.rawValue] {
+	if let srcRoot = XcodeEnvVariable.srcRoot.value() {
 		print("Found $SRCROOT.")
-		if let mainProjPath = enironment[XcodeEnvVariable.projectFilePath.rawValue],
+		if let mainProjPath = XcodeEnvVariable.projectFilePath.value(),
 			let mainProj = try? XcodeProj(pathString: mainProjPath) {
 			print("Found main project.")
-			TimeRecorder.common.start(event: .collectSource)
+			TimeRecorder.start(event: .collectSource)
 			files += projectFiles(project: mainProj, srcRoot: srcRoot)
-			TimeRecorder.common.end(event: .collectSource)
+			TimeRecorder.end(event: .collectSource)
 		}
 	} else {
 		// TMP for debug
 		print("Using tmp debug path")
-		let srcRoot = "/Users/nikita/development/fooddly/Fooddly/"
-		let project = try! XcodeProj(pathString: srcRoot + "Fooddly.xcodeproj")
-		TimeRecorder.common.start(event: .collectSource)
-		let source = projectFiles(project: project, srcRoot: srcRoot)
-		TimeRecorder.common.end(event: .collectSource)
-		files = source
+		let srcRoot = EnvVariable.testableProjectFolder.value()
+		let testableProjectName = EnvVariable.testableProjectName.value()
+		do {
+			let project = try XcodeProj(pathString: srcRoot + testableProjectName)
+			TimeRecorder.start(event: .collectSource)
+			let source = projectFiles(project: project, srcRoot: srcRoot)
+			TimeRecorder.end(event: .collectSource)
+			files = source
+		} catch {
+			print("XCode project could not be parsed")
+		}
 	}
 	
 	let result = tokenizer.process(files: Array(Set(files)))
-	TimeRecorder.common.end(event: .total)
+	TimeRecorder.end(event: .total)
 	if result {
 		exit(EXIT_SUCCESS)
 	} else {

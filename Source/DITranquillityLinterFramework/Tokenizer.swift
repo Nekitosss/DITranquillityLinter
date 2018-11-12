@@ -16,32 +16,40 @@ public let linterVersion = "0.0.2"
 
 public class Tokenizer {
 	
-	typealias SourceKitTuple = (structure: Structure, file: File)
+	private let isTestEnvironment: Bool
 	
-	public init() {}
+	public init(isTestEnvironment: Bool) {
+		self.isTestEnvironment = isTestEnvironment
+	}
 	
 	let container = FileContainer()
 	public func process(files: [String]) -> Bool {
-		let filteredFiles = files.filter({ $0.hasSuffix(".swift") && !$0.hasSuffix("generated.swift") && !$0.hasSuffix("pb.swift") })
+		let filteredFiles = files.filter(shouldBeParsed)
 		let collectedInfo = collectInfo(files: filteredFiles)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
-		TimeRecorder.common.start(event: .createTokens)
+		
+		TimeRecorder.start(event: .createTokens)
 		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(parsingContext: parsingContext) {
-			TimeRecorder.common.end(event: .createTokens)
+			TimeRecorder.end(event: .createTokens)
 			guard parsingContext.errors.isEmpty else {
 				display(errorList: parsingContext.errors)
 				return false
 			}
 			
-			TimeRecorder.common.start(event: .validate)
+			TimeRecorder.start(event: .validate)
 			let validator = GraphValidator()
 			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
-			TimeRecorder.common.end(event: .validate)
+			TimeRecorder.end(event: .validate)
 			display(errorList: errorList)
 			return errorList.isEmpty
 		}
 		
 		return true
+	}
+	
+	private func shouldBeParsed(fileName: String) -> Bool {
+		let parsingExcludedSuffixes = ["generated.swift", "pb.swift"]
+		return fileName.hasSuffix(".swift") && !parsingExcludedSuffixes.contains(where: { fileName.hasSuffix($0) })
 	}
 	
 	func display(errorList: [GraphError]) {
@@ -58,15 +66,24 @@ public class Tokenizer {
 			return FileParser(contents: file.contents, path: $0, module: nil)
 		}) else { return [:] }
 		
-		TimeRecorder.common.start(event: .parseSourceAndDependencies)
-		var allResults = (try? filesParsers.parallelMap({ try! $0?.parse() }).compactMap({ $0 })) ?? []
-		TimeRecorder.common.end(event: .parseSourceAndDependencies)
-		TimeRecorder.common.start(event: .parseBinary)
-		allResults += parseBinaryModules(fileContainer: container)
-		TimeRecorder.common.end(event: .parseBinary)
-		TimeRecorder.common.start(event: .compose)
+		TimeRecorder.start(event: .parseSourceAndDependencies)
+		var allResults: [FileParserResult] = []
+		do {
+			allResults = try filesParsers.parallelMap({ try $0?.parse() }).compactMap({ $0 })
+		} catch {
+			print("Error during file parsing", error)
+			exit(EXIT_FAILURE)
+		}
+		TimeRecorder.end(event: .parseSourceAndDependencies)
+		
+		if !isTestEnvironment {
+			TimeRecorder.start(event: .parseBinary)
+			allResults += parseBinaryModules(fileContainer: container)
+			TimeRecorder.end(event: .parseBinary)
+		}
+		TimeRecorder.start(event: .compose)
 		defer {
-			TimeRecorder.common.end(event: .compose)
+			TimeRecorder.end(event: .compose)
 		}
 		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [], linterVersion: linterVersion)) { acc, next in
 			acc.typealiases += next.typealiases
@@ -78,27 +95,25 @@ public class Tokenizer {
 	}
 	
 	private func parseBinaryModules(fileContainer: FileContainer) -> [FileParserResult] {
-		let enironment = ProcessInfo.processInfo.environment
+		var target = EnvVariable.defaultTarget.value()
+		var sdk = EnvVariable.defaultSDK.value()
 		
-		var target = "x86_64-apple-ios11.4"
-		var sdk = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.1.sdk"
-		
-		if let arch = enironment[XcodeEnvVariable.platformPreferredArch.rawValue],
-			let targetPrefix = enironment[XcodeEnvVariable.targetPrefix.rawValue],
-			let deploymentTarget = enironment[XcodeEnvVariable.deploymentTarget.rawValue] {
+		if let arch = XcodeEnvVariable.platformPreferredArch.value(),
+			let targetPrefix = XcodeEnvVariable.targetPrefix.value(),
+			let deploymentTarget = XcodeEnvVariable.deploymentTarget.value() {
 			//		"${PLATFORM_PREFERRED_ARCH}-apple-${SWIFT_PLATFORM_TARGET_PREFIX}${IPHONEOS_DEPLOYMENT_TARGET}"
 			target = "\(arch)-apple-\(targetPrefix)\(deploymentTarget)"
 			print("Found environment info.")
 		} else {
 			print("Environment info not found. Will be used default")
 		}
-		if let sdkRoot = enironment[XcodeEnvVariable.sdkRoot.rawValue] {
+		if let sdkRoot = XcodeEnvVariable.sdkRoot.value() {
 			sdk = sdkRoot
 		}
 		
 		// Parse all binary frameworks (Carthage + Cooapods-created)
 		var frameworkInfoList: [(path: String, name: String)] = []
-		if let frameworkPathsString = enironment[XcodeEnvVariable.frameworkSearchPaths.rawValue] {
+		if let frameworkPathsString = XcodeEnvVariable.frameworkSearchPaths.value() {
 			let frameworkPaths = frameworkPathsString.split(separator: "\"").filter({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
 			
 			for frameworkPath in frameworkPaths {
@@ -122,7 +137,7 @@ public class Tokenizer {
 		var result: [FileParserResult] = []
 		result += parseFrameworkInfoList(frameworkInfoList, target: target, sdk: sdk, fileContainer: fileContainer, isCommon: false)
 		
-		// Parse common frameworks (UIKit + Foundation)
+		// Parse common frameworks (UIKit + Cocoa)
 		let commonFrameworksPath = sdk + "/System/Library/Frameworks"
 		
 		var commonFrameworkInfoList: [(path: String, name: String)] = []
@@ -175,7 +190,7 @@ public class Tokenizer {
 				let toolchains = ["com.apple.dt.toolchain.XcodeDefault"]
 				let fullFrameworkName = self.fullFrameworkName(moduleName: moduleName, frameworkName: frameworkName)
 				let skObject: SourceKitObject = [
-					"key.request": UID("source.request.editor.open.interface"),
+					"key.request": "source.request.editor.open.interface",
 					"key.name": UUID().uuidString,
 					"key.compilerargs": compilerArguments,
 					"key.modulename": fullFrameworkName,

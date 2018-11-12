@@ -36,6 +36,14 @@ public final class TimeRecorder {
 		start(event: .total)
 	}
 	
+	public static func start(event: Event) {
+		common.start(event: event)
+	}
+	
+	public static func end(event: Event) {
+		common.end(event: event)
+	}
+	
 	public func start(event: Event) {
 		objc_sync_enter(monitor)
 		defer { objc_sync_exit(monitor) }
