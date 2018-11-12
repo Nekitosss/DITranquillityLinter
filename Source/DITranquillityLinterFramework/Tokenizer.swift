@@ -190,7 +190,7 @@ public class Tokenizer {
 				let toolchains = ["com.apple.dt.toolchain.XcodeDefault"]
 				let fullFrameworkName = self.fullFrameworkName(moduleName: moduleName, frameworkName: frameworkName)
 				let skObject: SourceKitObject = [
-					"key.request": "source.request.editor.open.interface",
+					"key.request": UID("source.request.editor.open.interface"),
 					"key.name": UUID().uuidString,
 					"key.compilerargs": compilerArguments,
 					"key.modulename": fullFrameworkName,
