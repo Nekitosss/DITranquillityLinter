@@ -28,9 +28,11 @@ Dependency graph validator for [DITranquillity](https://github.com/ivlevAstef/DI
 ![](https://github.com/Nekitosss/DITranquillityLinter/blob/feature/prepare-for-beta/Img/pathToScript.png)
 
 **Carthage:**
-Not implemented yet
+Add path to script placed in framework bundle based on your target (iOS, macOS, tvOS)
 
-*Note:* at first launch or target change of script several heavy operations will be performed. Result will be cached and reused. **That heavy launch may take up to 3 minutes.** Keep calm and make yourself a coffee :)
+![](https://github.com/Nekitosss/DITranquillityLinter/blob/feature/prepare-for-beta/Img/pathToScriptCarthage.png)
+
+*Note:* at first launch of script or target change several heavy operations will be performed. Result will be cached and reused. **That heavy launch may take up to 3 minutes.** Keep calm and make yourself a coffee :)
 
 ## Known issues
 * Nothing here yet...
