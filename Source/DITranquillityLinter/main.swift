@@ -5,7 +5,7 @@ import xcodeproj
 import PathKit
 
 
-func projectFiles(project: XcodeProj, srcRoot: String) -> [String] {
+private func projectFiles(project: XcodeProj, srcRoot: String) -> [String] {
 	let srcAbsolute = Path(srcRoot)
 	let sourceFileReferences: [PBXFileElement]
 	if let productName = XcodeEnvVariable.productName.value(),
@@ -24,7 +24,7 @@ func projectFiles(project: XcodeProj, srcRoot: String) -> [String] {
 	})
 }
 
-DispatchQueue.global().async {
+func executeScript() {
 	let tokenizer = Tokenizer(isTestEnvironment: false)
 	var files: [String] = []
 	
@@ -62,4 +62,5 @@ DispatchQueue.global().async {
 	}
 }
 
+DispatchQueue.global().async(execute: executeScript)
 dispatchMain()

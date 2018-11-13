@@ -13,6 +13,7 @@ Dependency graph validator for [DITranquillity](https://github.com/ivlevAstef/DI
 * Circular dependencies validation
 * Several DI containers
 * Containers in Unit tests
+* Foundation types injection
 
 ## Usage
 * Add repository, using Cocoapods or Carthage.
@@ -24,7 +25,7 @@ Dependency graph validator for [DITranquillity](https://github.com/ivlevAstef/DI
 
 ![](https://github.com/Nekitosss/DITranquillityLinter/blob/feature/prepare-for-beta/Img/newRunScript.png)
 
-* Add path to script in shell window
+* Add path to script in shell window after compilation phase
 
 **Cocoapods:**
 

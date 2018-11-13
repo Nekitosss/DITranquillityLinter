@@ -47,17 +47,27 @@ public class Tokenizer {
 		return true
 	}
 	
+	/// Include of exclude file from analyzed file list.
+	///
+	/// - Parameter fileName: Analyzing file.
+	/// - Returns: Should file be analyzed.
 	private func shouldBeParsed(fileName: String) -> Bool {
 		let parsingExcludedSuffixes = ["generated.swift", "pb.swift"]
 		return fileName.hasSuffix(".swift") && !parsingExcludedSuffixes.contains(where: { fileName.hasSuffix($0) })
 	}
 	
+	/// Prints all founded errors to XCode
 	func display(errorList: [GraphError]) {
 		errorList.forEach {
 			print($0.xcodeMessage)
 		}
 	}
 	
+	/// Parse source files to Type info map. Also, parse necessary bynary frameworks under the hood.
+	/// Cococapod source code parse as a binary framework.
+	///
+	/// - Parameter files: Input source files.
+	/// - Returns: All collected information dictionary. With as much as possible resolved types.
 	func collectInfo(files: [String]) -> [String: Type] {
 		let paths = files.map({ Path($0) })
 		guard let filesParsers: [FileParser?] = try? paths.parallelMap({
@@ -94,6 +104,7 @@ public class Tokenizer {
 		return Composer().composedTypes(parserResult)
 	}
 	
+	/// Parse OS related bynary frameworks and frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
 	private func parseBinaryModules(fileContainer: FileContainer) -> [FileParserResult] {
 		var target = EnvVariable.defaultTarget.value()
 		var sdk = EnvVariable.defaultSDK.value()
@@ -151,7 +162,8 @@ public class Tokenizer {
 		return result
 	}
 	
-	func parseFrameworkInfoList(_ frameworkInfoList: [(path: String, name: String)], target: String, sdk: String, fileContainer: FileContainer, isCommon: Bool) -> [FileParserResult] {
+	/// Parse concrete binary framework.
+	private func parseFrameworkInfoList(_ frameworkInfoList: [(path: String, name: String)], target: String, sdk: String, fileContainer: FileContainer, isCommon: Bool) -> [FileParserResult] {
 		
 		var result: [FileParserResult] = []
 		let cacher = ResultCacher()
@@ -178,7 +190,7 @@ public class Tokenizer {
 		return result
 	}
 	
-	
+	/// Parse Binary framework path. Framework may be separate into several ".h" files. Method parse passed "***.h" file.
 	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String], fileContainer: FileContainer) -> [FileParserResult] {
 		print("Parse module: \(moduleName)")
 		let frameworksURL = URL(fileURLWithPath: frameworksPath + "/\(moduleName).framework/Headers", isDirectory: true)
@@ -213,10 +225,12 @@ public class Tokenizer {
 		return parsedFilesResults
 	}
 	
+	/// Concatenate framework part with framework name for SourceKit parser.
 	private func fullFrameworkName(moduleName: String, frameworkName: String) -> String {
 		return moduleName == frameworkName ? frameworkName : moduleName + "." + frameworkName
 	}
 	
+	/// Collects all framework parts ("*.h" files).
 	private func collectFrameworkNames(frameworksURL: URL) throws -> [String] {
 		let fileURLs = try FileManager.default.contentsOfDirectory(at: frameworksURL, includingPropertiesForKeys: nil)
 		return fileURLs.filter({ $0.pathExtension == "h" }).map({ $0.lastPathComponent }).map({ $0.droppedSuffix(".h") })

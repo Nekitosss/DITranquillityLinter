@@ -11,6 +11,7 @@ import xcodeproj
 
 final class ContainerInitializatorFinder {
 	
+	/// Trying to find container initialization and parse dependency praph.
 	static func findContainerStructure(parsingContext: ParsingContext) -> ContainerPart? {
 		var possibleContainerValues = parsingContext.collectedInfo.values.filter({ $0.inheritedTypes.contains(DIKeywords.diPart.rawValue) || $0.inheritedTypes.contains(DIKeywords.diFramework.rawValue) })
 		
