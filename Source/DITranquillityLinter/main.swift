@@ -34,7 +34,7 @@ func executeScript() {
 			let mainProj = try? XcodeProj(pathString: mainProjPath) {
 			print("Found main project.")
 			TimeRecorder.start(event: .collectSource)
-			files += projectFiles(project: mainProj, srcRoot: srcRoot)
+			files = projectFiles(project: mainProj, srcRoot: srcRoot)
 			TimeRecorder.end(event: .collectSource)
 		}
 	} else {
@@ -53,9 +53,9 @@ func executeScript() {
 		}
 	}
 	
-	let result = tokenizer.process(files: Array(Set(files)))
+	let successed = tokenizer.process(files: Array(Set(files)))
 	TimeRecorder.end(event: .total)
-	if result {
+	if successed {
 		exit(EXIT_SUCCESS)
 	} else {
 		exit(EXIT_FAILURE)

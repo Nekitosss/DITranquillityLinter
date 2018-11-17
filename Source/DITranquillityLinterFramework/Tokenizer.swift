@@ -69,39 +69,34 @@ public class Tokenizer {
 	/// - Parameter files: Input source files.
 	/// - Returns: All collected information dictionary. With as much as possible resolved types.
 	func collectInfo(files: [String]) -> [String: Type] {
-		let paths = files.map({ Path($0) })
-		guard let filesParsers: [FileParser?] = try? paths.parallelMap({
-			guard let file = File(path: $0.string) else { return nil }
-			container[$0.string] = file
-			return FileParser(contents: file.contents, path: $0, module: nil)
-		}) else { return [:] }
-		
-		TimeRecorder.start(event: .parseSourceAndDependencies)
-		var allResults: [FileParserResult] = []
 		do {
-			allResults = try filesParsers.parallelMap({ try $0?.parse() }).compactMap({ $0 })
+			TimeRecorder.start(event: .parseSourceAndDependencies)
+			var allResults = try files.parallelFlatMap({ (fileName) -> FileParserResult? in
+				guard let file = File(path: fileName) else { return nil }
+				container[fileName] = file
+				return try FileParser(contents: file.contents, path: fileName, module: nil).parse()
+			})
+			TimeRecorder.end(event: .parseSourceAndDependencies)
+			
+			if !isTestEnvironment {
+				TimeRecorder.start(event: .parseBinary)
+				allResults += parseBinaryModules(fileContainer: container)
+				TimeRecorder.end(event: .parseBinary)
+			}
+			
+			TimeRecorder.start(event: .compose)
+			defer { TimeRecorder.end(event: .compose) }
+			
+			let parserResult = allResults.reduce(into: FileParserResult(path: nil, module: nil, types: [], linterVersion: linterVersion)) {
+				$0.typealiases += $1.typealiases
+				$0.types += $1.types
+			}
+			
+			return Composer().composedTypes(parserResult)
 		} catch {
 			print("Error during file parsing", error)
 			exit(EXIT_FAILURE)
 		}
-		TimeRecorder.end(event: .parseSourceAndDependencies)
-		
-		if !isTestEnvironment {
-			TimeRecorder.start(event: .parseBinary)
-			allResults += parseBinaryModules(fileContainer: container)
-			TimeRecorder.end(event: .parseBinary)
-		}
-		TimeRecorder.start(event: .compose)
-		defer {
-			TimeRecorder.end(event: .compose)
-		}
-		let parserResult = allResults.reduce(FileParserResult(path: nil, module: nil, types: [], typealiases: [], linterVersion: linterVersion)) { acc, next in
-			acc.typealiases += next.typealiases
-			acc.types += next.types
-			return acc
-		}
-		
-		return Composer().composedTypes(parserResult)
 	}
 	
 	/// Parse OS related bynary frameworks and frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
@@ -212,10 +207,10 @@ public class Tokenizer {
 				let request = Request.customRequest(request: skObject)
 				let result = try request.send()
 				guard let contents = result["key.sourcetext"] as? String else { continue }
-				let path = Path(frameworksURL.path + "/" + fullFrameworkName + ".h")
-				let parser = FileParser(contents: contents, path: path, module: moduleName)
+				let fileName = frameworksURL.path + "/" + fullFrameworkName + ".h"
+				let parser = FileParser(contents: contents, path: fileName, module: moduleName)
 				let fileParserResult = try parser.parse()
-				fileContainer[path.string] = parser.file
+				fileContainer[fileName] = parser.file
 				parsedFilesResults.append(fileParserResult)
 			} catch {
 				print(error)

@@ -45,29 +45,22 @@ public final class TimeRecorder {
 	}
 	
 	public func start(event: Event) {
+		guard isRecording else { return }
 		objc_sync_enter(monitor)
 		defer { objc_sync_exit(monitor) }
-		guard isRecording else { return }
 		events[event] = Date()
 		print("Start \(event)")
 	}
 	
-	var infoDict = [(String, TimeInterval)]()
 	public func end(event: Event) {
+		guard isRecording else { return }
 		objc_sync_enter(monitor)
 		defer { objc_sync_exit(monitor) }
-		guard isRecording else { return }
 		guard let startDate = events[event] else {
 			print("Not found \(event) for logging")
 			return
 		}
 		let interval = Date().timeIntervalSince(startDate)
 		print("End \(event) with time: \(interval)")
-		switch event {
-		case .file(let path):
-			infoDict.append((path, interval))
-		default:
-			break
-		}
 	}
 }

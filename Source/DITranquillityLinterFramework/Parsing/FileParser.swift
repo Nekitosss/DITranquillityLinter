@@ -53,8 +53,8 @@ final class FileParser {
     ///   - contents: Contents to parse.
     ///   - path: Path to file.
     /// - Throws: parsing errors.
-    init(contents: String, path: Path, module: String? = nil) {
-        self.path = path.string
+    init(contents: String, path: String, module: String? = nil) {
+        self.path = path
         self.module = module
         self.initialContents = contents
     }
