@@ -41,7 +41,7 @@ public enum EnvVariable: String {
 		case .testableProjectName:
 			return "Fooddly.xcodeproj"
 		case .currentProjectFolder:
-			return "/Users/nikitapatskov/Develop/DITranquillityLinter/LintableProject/LintableProject/Testable/"
+			return "/Users/nikita/development/DITranquillityLinter"
 		}
 	}
 	

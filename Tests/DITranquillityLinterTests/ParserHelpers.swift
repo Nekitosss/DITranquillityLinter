@@ -58,6 +58,6 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 }
 
 func pathToSourceFile(with name: String) -> String {
-	let pathToTestableSource = EnvVariable.currentProjectFolder.value()
+	let pathToTestableSource = EnvVariable.currentProjectFolder.value() + "/LintableProject/LintableProject/Testable/"
 	return pathToTestableSource + name + ".swift"
 }
