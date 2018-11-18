@@ -29,7 +29,7 @@ final class AppendContainerTokenBuilder {
 			let loadContainerStructure = swiftType.substructure.first(where: { $0.get(.name, of: String.self) == DIKeywords.loadContainer.rawValue })
 			else { return nil }
 		
-		let anotherFile = parsingContext.fileContainer[swiftType.filePath]!
+		let anotherFile = parsingContext.fileContainer.getOrCreate(swiftType.filePath)!
 		let oldContainerName = parsingContext.currentContainerName
 		parsingContext.currentContainerName = DIKeywords.container.rawValue
 		let containerPart = ContainerPart(substructureList: loadContainerStructure.substructures, file: anotherFile, parsingContext: parsingContext, currentPartName: typeName)

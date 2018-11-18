@@ -20,7 +20,7 @@ final class ContainerInitializatorFinder {
 		}
 		
 		for structureInfo in possibleContainerValues {
-			guard let file = parsingContext.fileContainer[structureInfo.filePath] else {
+			guard let file = parsingContext.fileContainer.getOrCreate(structureInfo.filePath) else {
 				continue
 			}
 			if let mainContainerPart = recursivelyFindContainerInitialization(list: structureInfo.substructure, file: file, parsingContext: parsingContext) {

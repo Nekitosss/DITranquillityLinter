@@ -21,6 +21,17 @@ public enum XcodeEnvVariable: String {
 	public func value() -> String? {
 		return ProcessInfo.processInfo.environment[self.rawValue]
 	}
+	
+	public var defaultValue: String {
+		switch self {
+		case .srcRoot:
+			return EnvVariable.testableProjectFolder.value()
+		case .projectFilePath:
+			return EnvVariable.testableProjectFolder.value() + EnvVariable.testableProjectName.value()
+		default:
+			return ""
+		}
+	}
 }
 
 public enum EnvVariable: String {
@@ -35,9 +46,9 @@ public enum EnvVariable: String {
 		case .defaultTarget:
 			return "x86_64-apple-ios11.4"
 		case .defaultSDK:
-			return "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.1.sdk"
+			return "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk"
 		case .testableProjectFolder:
-			return "/Users/nikitapatskov/Develop/fooddly/Fooddly/"
+			return "/Users/nikita/development/fooddly/Fooddly/"
 		case .testableProjectName:
 			return "Fooddly.xcodeproj"
 		case .currentProjectFolder:

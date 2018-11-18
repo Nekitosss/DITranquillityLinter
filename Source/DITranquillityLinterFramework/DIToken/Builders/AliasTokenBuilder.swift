@@ -38,7 +38,9 @@ final class AliasTokenBuilder {
 		// Variable injection could also be passed here "$0.a = $1".
 		// It parses ok but we may got something with comma on right side of the assignment. Tagged injection, for example.
 		// Last used because of first substructure can be further contiguous registration "c.register(...).injection(We are here)"
-		guard !body.contains("=") else { return [ArgumentInfo(name: "_", value: body, structure: substructureList.last ?? [:])] }
+		guard !body.contains("=") else {
+			return [ArgumentInfo(name: "_", value: body, structure: substructureList.last ?? [:])]
+		}
 		return body.split(separator: ",").compactMap({ parseArgument(argument: String($0)) })
 	}
 	

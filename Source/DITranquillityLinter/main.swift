@@ -17,47 +17,33 @@ private func projectFiles(project: XcodeProj, srcRoot: String) -> [String] {
 		print("Get all source files")
 		sourceFileReferences = project.pbxproj.sourcesBuildPhases.flatMap({ $0.files.compactMap({ $0.file }) })
 	}
-	return sourceFileReferences.compactMap({ (element: PBXFileElement) -> String? in
-		guard let fullPath = (try? element.fullPath(sourceRoot: srcAbsolute))??.string else { return nil }
+	return sourceFileReferences.compactMap({
 		// Warning: URL with spaces not allowed, file will be excluded if we will use Foundation.URL, so we use strings
-		return fullPath
+		(try? $0.fullPath(sourceRoot: srcAbsolute))??.string
 	})
 }
 
 func executeScript() {
-	let tokenizer = Tokenizer(isTestEnvironment: false)
-	var files: [String] = []
-	
-	if let srcRoot = XcodeEnvVariable.srcRoot.value() {
-		print("Found $SRCROOT.")
-		if let mainProjPath = XcodeEnvVariable.projectFilePath.value(),
-			let mainProj = try? XcodeProj(pathString: mainProjPath) {
-			print("Found main project.")
-			TimeRecorder.start(event: .collectSource)
-			files = projectFiles(project: mainProj, srcRoot: srcRoot)
-			TimeRecorder.end(event: .collectSource)
+	do {
+		let tokenizer = Tokenizer(isTestEnvironment: false)
+		let srcRoot = XcodeEnvVariable.srcRoot.value() ?? XcodeEnvVariable.srcRoot.defaultValue
+		let defaultProjectFile = EnvVariable.testableProjectFolder.value() + EnvVariable.testableProjectName.value()
+		let mainProjectPath = XcodeEnvVariable.projectFilePath.value() ?? defaultProjectFile
+		let project = try XcodeProj(pathString: mainProjectPath)
+		
+		TimeRecorder.start(event: .collectSource)
+		let files = projectFiles(project: project, srcRoot: srcRoot)
+		TimeRecorder.end(event: .collectSource)
+		
+		let successed = tokenizer.process(files: Array(Set(files)))
+		TimeRecorder.end(event: .total)
+		if successed {
+			exit(EXIT_SUCCESS)
+		} else {
+			exit(EXIT_FAILURE)
 		}
-	} else {
-		// TMP for debug
-		print("Using tmp debug path")
-		let srcRoot = EnvVariable.testableProjectFolder.value()
-		let testableProjectName = EnvVariable.testableProjectName.value()
-		do {
-			let project = try XcodeProj(pathString: srcRoot + testableProjectName)
-			TimeRecorder.start(event: .collectSource)
-			let source = projectFiles(project: project, srcRoot: srcRoot)
-			TimeRecorder.end(event: .collectSource)
-			files = source
-		} catch {
-			print("XCode project could not be parsed")
-		}
-	}
-	
-	let successed = tokenizer.process(files: Array(Set(files)))
-	TimeRecorder.end(event: .total)
-	if successed {
-		exit(EXIT_SUCCESS)
-	} else {
+	} catch {
+		print(error)
 		exit(EXIT_FAILURE)
 	}
 }

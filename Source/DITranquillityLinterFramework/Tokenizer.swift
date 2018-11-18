@@ -17,6 +17,8 @@ public let linterVersion = "0.0.2"
 public class Tokenizer {
 	
 	private let isTestEnvironment: Bool
+	private let validator = GraphValidator()
+	private let composer = Composer()
 	
 	public init(isTestEnvironment: Bool) {
 		self.isTestEnvironment = isTestEnvironment
@@ -37,7 +39,6 @@ public class Tokenizer {
 			}
 			
 			TimeRecorder.start(event: .validate)
-			let validator = GraphValidator()
 			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
 			TimeRecorder.end(event: .validate)
 			display(errorList: errorList)
@@ -73,7 +74,7 @@ public class Tokenizer {
 			TimeRecorder.start(event: .parseSourceAndDependencies)
 			var allResults = try files.parallelFlatMap({ (fileName) -> FileParserResult? in
 				guard let file = File(path: fileName) else { return nil }
-				container[fileName] = file
+				container.set(value: file, for: fileName)
 				return try FileParser(contents: file.contents, path: fileName, module: nil).parse()
 			})
 			TimeRecorder.end(event: .parseSourceAndDependencies)
@@ -92,7 +93,7 @@ public class Tokenizer {
 				$0.types += $1.types
 			}
 			
-			return Composer().composedTypes(parserResult)
+			return composer.composedTypes(parserResult)
 		} catch {
 			print("Error during file parsing", error)
 			exit(EXIT_FAILURE)
@@ -189,28 +190,23 @@ public class Tokenizer {
 	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String], fileContainer: FileContainer) -> [FileParserResult] {
 		print("Parse module: \(moduleName)")
 		let frameworksURL = URL(fileURLWithPath: frameworksPath + "/\(moduleName).framework/Headers", isDirectory: true)
-		guard let frameworks = try? collectFrameworkNames(frameworksURL: frameworksURL) else { return [] }
+		guard let frameworks = try? collectFrameworkNames(frameworksURL: frameworksURL) else {
+			return []
+		}
 		var parsedFilesResults: [FileParserResult] = []
 		for frameworkName in frameworks {
 			print("Parse framework: \(frameworkName)")
 			do {
-				let toolchains = ["com.apple.dt.toolchain.XcodeDefault"]
 				let fullFrameworkName = self.fullFrameworkName(moduleName: moduleName, frameworkName: frameworkName)
-				let skObject: SourceKitObject = [
-					"key.request": UID("source.request.editor.open.interface"),
-					"key.name": UUID().uuidString,
-					"key.compilerargs": compilerArguments,
-					"key.modulename": fullFrameworkName,
-					"key.toolchains": toolchains,
-					"key.synthesizedextensions": 1
-				]
-				let request = Request.customRequest(request: skObject)
+				let request = createSourceKitRequest(compilerArguments, fullFrameworkName: fullFrameworkName)
 				let result = try request.send()
-				guard let contents = result["key.sourcetext"] as? String else { continue }
+				guard let contents = result["key.sourcetext"] as? String else {
+					continue
+				}
 				let fileName = frameworksURL.path + "/" + fullFrameworkName + ".h"
 				let parser = FileParser(contents: contents, path: fileName, module: moduleName)
 				let fileParserResult = try parser.parse()
-				fileContainer[fileName] = parser.file
+				fileContainer.set(value: parser.file, for: fileName)
 				parsedFilesResults.append(fileParserResult)
 			} catch {
 				print(error)
@@ -218,6 +214,19 @@ public class Tokenizer {
 			}
 		}
 		return parsedFilesResults
+	}
+	
+	private func createSourceKitRequest(_ compilerArguments: [String], fullFrameworkName: String) -> Request {
+		let toolchains = ["com.apple.dt.toolchain.XcodeDefault"]
+		let skObject: SourceKitObject = [
+			"key.request": UID("source.request.editor.open.interface"),
+			"key.name": UUID().uuidString,
+			"key.compilerargs": compilerArguments,
+			"key.modulename": fullFrameworkName,
+			"key.toolchains": toolchains,
+			"key.synthesizedextensions": 1
+		]
+		return Request.customRequest(request: skObject)
 	}
 	
 	/// Concatenate framework part with framework name for SourceKit parser.
@@ -228,9 +237,8 @@ public class Tokenizer {
 	/// Collects all framework parts ("*.h" files).
 	private func collectFrameworkNames(frameworksURL: URL) throws -> [String] {
 		let fileURLs = try FileManager.default.contentsOfDirectory(at: frameworksURL, includingPropertiesForKeys: nil)
-		return fileURLs.filter({ $0.pathExtension == "h" }).map({ $0.lastPathComponent }).map({ $0.droppedSuffix(".h") })
+		return fileURLs.filter({ $0.pathExtension == "h" }).map({ $0.lastPathComponent.droppedSuffix(".h") })
 	}
-	
 }
 
 
