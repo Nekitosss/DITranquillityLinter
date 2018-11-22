@@ -33,9 +33,10 @@ final class ParserTests: XCTestCase {
 		let tokenizer = Tokenizer(isTestEnvironment: true)
 		let fileURL = pathToSourceFile(with: "TestInvalidMethodCallingRegistration")
 		let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
-		guard let _ = ContainerInitializatorFinder.findContainerStructure(parsingContext: context) else {
-			throw TestError.containerInfoNotFound
-		}
+		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
+		let containerPart = containerBuilder.findContainerStructure()
+		
+		XCTAssertNotNil(containerPart, TestError.containerInfoNotFound.rawValue)
 		XCTAssertFalse(context.errors.isEmpty, "Should not allow container passing between methods")
 	}
 	
@@ -44,9 +45,10 @@ final class ParserTests: XCTestCase {
 		let tokenizer = Tokenizer(isTestEnvironment: true)
 		let fileURL = pathToSourceFile(with: "TestInitialDefinitionInvalidMethodCallingRegistration")
 		let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
-		guard let _ = ContainerInitializatorFinder.findContainerStructure(parsingContext: context) else {
-			throw TestError.containerInfoNotFound
-		}
+		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
+		let containerPart = containerBuilder.findContainerStructure()
+		
+		XCTAssertNotNil(containerPart, TestError.containerInfoNotFound.rawValue)
 		XCTAssertFalse(context.errors.isEmpty, "Should not allow container passing between methods")
 	}
 	

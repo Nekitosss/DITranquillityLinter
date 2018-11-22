@@ -11,6 +11,10 @@ import Foundation
 /// Injection information for registration
 struct InjectionToken: DIToken {
 	
+	var isIntermediate: Bool {
+		return true
+	}
+	
 	/// Injection name. Injecting type variable name or method parameter name
 	let name: String
 	

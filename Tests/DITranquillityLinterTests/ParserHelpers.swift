@@ -39,7 +39,8 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 	let tokenizer = Tokenizer(isTestEnvironment: true)
 	let collectedInfo = tokenizer.collectInfo(files: [fileURL])
 	let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
-	guard let containerInfo = ContainerInitializatorFinder.findContainerStructure(parsingContext: context) else {
+	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
+	guard let containerInfo = containerBuilder.findContainerStructure() else {
 		throw TestError.containerInfoNotFound
 	}
 	XCTAssertFalse(containerInfo.tokenInfo.isEmpty)
@@ -51,7 +52,8 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 	let tokenizer = Tokenizer(isTestEnvironment: true)
 	let fileURL = pathToSourceFile(with: fileName)
 	let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
-	guard let containerInfo = ContainerInitializatorFinder.findContainerStructure(parsingContext: context) else {
+	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
+	guard let containerInfo = containerBuilder.findContainerStructure() else {
 		throw TestError.containerInfoNotFound
 	}
 	return containerInfo

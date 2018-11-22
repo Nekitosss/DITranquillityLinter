@@ -10,16 +10,21 @@ import SourceKittenFramework
 import xcodeproj
 
 /// Trying to create InjectionToken (without injection type resolving)
-final class InjectionTokenBuilder {
+final class InjectionTokenBuilder: TokenBuilder {
 	
-	static func build(functionName: String, argumentStack: [ArgumentInfo], content: NSString, substructureList: [SourceKitStructure], location: Location) -> InjectionToken? {
-		guard functionName == DIKeywords.injection.rawValue else { return nil }
+	private let content: NSString
+	
+	init(content: NSString) {
+		self.content = content
+	}
+	
+	func build(using info: TokenBuilderInfo) -> DIToken? {
+		guard info.functionName == DIKeywords.injection.rawValue else { return nil }
 		var cycle = false
 		var name = ""
 		var modificators: [InjectionModificator] = []
 		
-		
-		for argument in argumentStack {
+		for argument in info.argumentStack {
 			let isEmptyArgumentName = argument.name.isEmpty || argument.name == "_"
 			if argument.name == DIKeywords.cycle.rawValue {
 				// injection(cycle: true, ...)
@@ -51,7 +56,7 @@ final class InjectionTokenBuilder {
 			}
 		}
 		// Type name will be resolved later
-		return InjectionToken(name: name, typeName: "", plainTypeName: "", cycle: cycle, optionalInjection: false, methodInjection: false, modificators: modificators, injectionSubstructureList: substructureList.last?.substructures ?? substructureList, location: location)
+		return InjectionToken(name: name, typeName: "", plainTypeName: "", cycle: cycle, optionalInjection: false, methodInjection: false, modificators: modificators, injectionSubstructureList: info.substructureList.last?.substructures ?? info.substructureList, location: info.location)
 	}
 	
 	static func parseTaggedAndManyInjectionInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
@@ -63,7 +68,7 @@ final class InjectionTokenBuilder {
 				else { continue }
 			
 			if name == DIKeywords.by.rawValue {
-				let arguments = ContainerPart.argumentInfo(substructures: substructure.substructures, content: content)
+				let arguments = ContainerPartBuilder.argumentInfo(substructures: substructure.substructures, content: content)
 				guard let tagType = arguments.first(where: { $0.name == DIKeywords.tag.rawValue }) else { continue }
 				let tagTypeName = tagType.value.droppedDotSelf()
 				result.append(.tagged(tagTypeName))

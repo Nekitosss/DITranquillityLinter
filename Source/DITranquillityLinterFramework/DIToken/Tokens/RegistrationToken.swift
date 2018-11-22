@@ -11,6 +11,10 @@ import Foundation
 /// Total collected info about registration
 struct RegistrationToken: DIToken {
 	
+	var isIntermediate: Bool {
+		return false
+	}
+	
 	/// Unique type name of registration. With resolved generic constraints and typealiases
 	let typeName: String
 	

@@ -7,7 +7,7 @@ final class FileContainer {
 	private var value: [String: File] = [:]
 	private let monitor = NSObject()
 	
-	func getOrCreate(_ key: String) -> File? {
+	func getOrCreateFile(by key: String) -> File? {
 		objc_sync_enter(monitor)
 		defer { objc_sync_exit(monitor) }
 		

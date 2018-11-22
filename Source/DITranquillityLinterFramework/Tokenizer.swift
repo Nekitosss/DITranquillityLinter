@@ -14,38 +14,39 @@ public let linterVersion = "0.0.2"
 
 public class Tokenizer {
 	
+	let container = FileContainer()
+	
 	private let isTestEnvironment: Bool
 	private let validator = GraphValidator()
 	private let composer = Composer()
 	private let binaryFrameworkParser = BinaryFrameworkParser()
 	
+	
 	public init(isTestEnvironment: Bool) {
 		self.isTestEnvironment = isTestEnvironment
 	}
 	
-	let container = FileContainer()
+	
 	public func process(files: [String]) -> Bool {
 		let filteredFiles = files.filter(shouldBeParsed)
 		let collectedInfo = collectInfo(files: filteredFiles)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
+		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
-		TimeRecorder.start(event: .createTokens)
-		if let initContainerStructure = ContainerInitializatorFinder.findContainerStructure(parsingContext: parsingContext) {
-			TimeRecorder.end(event: .createTokens)
-			guard parsingContext.errors.isEmpty else {
-				display(errorList: parsingContext.errors)
-				return false
-			}
-			
-			TimeRecorder.start(event: .validate)
-			let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
-			TimeRecorder.end(event: .validate)
-			display(errorList: errorList)
-			return errorList.isEmpty
+		guard let initContainerStructure = containerBuilder.findContainerStructure() else {
+			print("Could not find DIContainer creation")
+			return false
 		}
-		
-		return true
+		guard parsingContext.errors.isEmpty else {
+			display(errorList: parsingContext.errors)
+			return false
+		}
+
+		let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
+		display(errorList: errorList)
+		return errorList.isEmpty
 	}
+	
 	
 	/// Include of exclude file from analyzed file list.
 	///
@@ -56,12 +57,6 @@ public class Tokenizer {
 		return fileName.hasSuffix(".swift") && !parsingExcludedSuffixes.contains(where: { fileName.hasSuffix($0) })
 	}
 	
-	/// Prints all founded errors to XCode
-	func display(errorList: [GraphError]) {
-		errorList.forEach {
-			print($0.xcodeMessage)
-		}
-	}
 	
 	/// Parse source files to Type info map. Also, parse necessary bynary frameworks under the hood.
 	/// Cococapod source code parse as a binary framework.
@@ -95,6 +90,14 @@ public class Tokenizer {
 		} catch {
 			print("Error during file parsing", error)
 			exit(EXIT_FAILURE)
+		}
+	}
+	
+	
+	/// Prints all founded errors to XCode
+	private func display(errorList: [GraphError]) {
+		errorList.forEach {
+			print($0.xcodeMessage)
 		}
 	}
 }

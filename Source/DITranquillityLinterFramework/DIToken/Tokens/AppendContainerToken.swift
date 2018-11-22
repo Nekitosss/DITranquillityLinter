@@ -13,6 +13,10 @@ import Foundation
 /// container.append(part: MyPart.self) or .append(framework: MyFramework.self)
 struct AppendContainerToken: DIToken {
 	
+	var isIntermediate: Bool {
+		return false
+	}
+	
 	/// Location of registration token (For printing message in XCode)
 	let location: Location
 	

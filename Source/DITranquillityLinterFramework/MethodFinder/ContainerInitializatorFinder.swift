@@ -11,19 +11,23 @@ import xcodeproj
 
 final class ContainerInitializatorFinder {
 	
+	private let parsingContext: ParsingContext
+	
+	init(parsingContext: ParsingContext) {
+		self.parsingContext = parsingContext
+	}
+	
 	/// Trying to find container initialization and parse dependency praph.
-	static func findContainerStructure(parsingContext: ParsingContext) -> ContainerPart? {
-		var possibleContainerValues = parsingContext.collectedInfo.values.filter({ $0.inheritedTypes.contains(DIKeywords.diPart.rawValue) || $0.inheritedTypes.contains(DIKeywords.diFramework.rawValue) })
+	func findContainerStructure() -> ContainerPart? {
+		TimeRecorder.start(event: .createTokens)
+		defer { TimeRecorder.end(event: .createTokens) }
 		
-		if let appDelegateClass = parsingContext.collectedInfo[DIKeywords.appDelegate.rawValue] {
-			possibleContainerValues.insert(appDelegateClass, at: 0)
-		}
-		
+		let possibleContainerValues = getProssibleContainerTypeHolders()
 		for structureInfo in possibleContainerValues {
-			guard let file = parsingContext.fileContainer.getOrCreate(structureInfo.filePath) else {
+			guard let file = parsingContext.fileContainer.getOrCreateFile(by: structureInfo.filePath) else {
 				continue
 			}
-			if let mainContainerPart = recursivelyFindContainerInitialization(list: structureInfo.substructure, file: file, parsingContext: parsingContext) {
+			if let mainContainerPart = self.recursivelyFindContainerAndBuildGraph(list: structureInfo.substructure, file: file) {
 				return mainContainerPart
 			}
 		}
@@ -31,24 +35,39 @@ final class ContainerInitializatorFinder {
 		return nil
 	}
 	
-	private static func recursivelyFindContainerInitialization(list: [SourceKitStructure], file: File, parsingContext: ParsingContext) -> ContainerPart? {
-		let isContainerInitialization: (SourceKitStructure) -> Bool = {
-			let name = $0.get(.name, of: String.self)
-			return (name == DIKeywords.initDIContainer.rawValue || name == DIKeywords.diContainer.rawValue)
-				&& $0.get(.kind, of: String.self) == SwiftExpressionKind.call.rawValue
+	
+	private func getProssibleContainerTypeHolders() -> [Type] {
+		var possibleContainerValues = parsingContext.collectedInfo.values.filter {
+			$0.inheritedTypes.contains(DIKeywords.diPart.rawValue) || $0.inheritedTypes.contains(DIKeywords.diFramework.rawValue)
 		}
-
+		if let appDelegateClass = parsingContext.collectedInfo[DIKeywords.appDelegate.rawValue] {
+			possibleContainerValues.insert(appDelegateClass, at: 0)
+		}
+		return possibleContainerValues
+	}
+	
+	
+	private func recursivelyFindContainerAndBuildGraph(list: [SourceKitStructure], file: File) -> ContainerPart? {
 		// .init call should be after variable name declaration. So index should be greater than 0
-		if let containerInitIndex = list.index(where: isContainerInitialization), containerInitIndex > 0 {
+		if let containerInitIndex = list.index(where: self.isContainerInitialization), containerInitIndex > 0 {
 			parsingContext.currentContainerName = list[containerInitIndex - 1].get(.name) ?? DIKeywords.container.rawValue
 			return ContainerPart(substructureList: list, file: file, parsingContext: parsingContext, currentPartName: nil)
 		}
 
 		for substructureInfo in list {
-			if let mainContainerPart = recursivelyFindContainerInitialization(list: substructureInfo.substructures, file: file, parsingContext: parsingContext) {
+			if let mainContainerPart = self.recursivelyFindContainerAndBuildGraph(list: substructureInfo.substructures, file: file) {
 				return mainContainerPart
 			}
 		}
 		return nil
+	}
+	
+	
+	private func isContainerInitialization(structure: SourceKitStructure) -> Bool {
+		let name = structure.get(.name, of: String.self)
+		let isDiContainerInitializerMethodName = name == DIKeywords.initDIContainer.rawValue || name == DIKeywords.diContainer.rawValue
+		
+		return isDiContainerInitializerMethodName
+			&& structure.get(.kind, of: String.self) == SwiftExpressionKind.call.rawValue
 	}
 }

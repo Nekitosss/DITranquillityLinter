@@ -9,44 +9,54 @@ import Foundation
 import SourceKittenFramework
 
 /// Trying to create RegsitrationToken. Resolves containing InjectionToken types.
-final class RegistrationTokenBuilder {
+final class RegistrationTokenBuilder: TokenBuilder {
 	
 	typealias RegistrationInfo = (typeName: String, plainTypeName: String, tokenList: [DIToken])
 	
-	static func build(functionName: String, invocationBody: String, tokenList: [DIToken], parsingContext: ParsingContext, substructureList: [[String : SourceKitRepresentable]], content: NSString, bodyOffset: Int64, file: File) -> RegistrationToken? {
-		guard functionName == DIKeywords.register.rawValue || functionName == DIKeywords.register1.rawValue else {
+	private let parsingContext: ParsingContext
+	private let content: NSString
+	private let file: File
+	
+	init(parsingContext: ParsingContext, content: NSString, file: File) {
+		self.parsingContext = parsingContext
+		self.content = content
+		self.file = file
+	}
+	
+	func build(using info: TokenBuilderInfo) -> DIToken? {
+		guard info.functionName == DIKeywords.register.rawValue || info.functionName == DIKeywords.register1.rawValue else {
 			return nil
 		}
 		
-		var info: RegistrationInfo = ("", "", tokenList)
+		var registrationInfo: RegistrationInfo = ("", "", info.tokenList)
 		
 		// TODO: process generics here
-		if let typedRegistration = invocationBody.firstMatch(RegExp.trailingTypeInfo) {
+		if let typedRegistration = info.invocationBody.firstMatch(RegExp.trailingTypeInfo) {
 			// container.register(MyClass.self)
-			info.typeName = typedRegistration.droppedDotSelf()
-			info.plainTypeName = TypeFinder.parseTypeName(name: info.typeName).typeName
+			registrationInfo.typeName = typedRegistration.droppedDotSelf()
+			registrationInfo.plainTypeName = TypeFinder.parseTypeName(name: registrationInfo.typeName).typeName
 		}
-		let plainInfo = extractPlainRegistration(substructureList: substructureList, invocationBody: invocationBody, parsingContext: parsingContext, file: file, bodyOffset: bodyOffset)
-			?? extractClosureRegistration(substructureList: substructureList, parsingContext: parsingContext, content: content, file: file, bodyOffset: bodyOffset)
+		let plainInfo = extractPlainRegistration(substructureList: info.substructureList, invocationBody: info.invocationBody, parsingContext: parsingContext, file: file, bodyOffset: info.bodyOffset)
+			?? extractClosureRegistration(substructureList: info.substructureList, parsingContext: parsingContext, content: content, file: file, bodyOffset: info.bodyOffset)
 		if let plainInfo = plainInfo {
-			info.typeName = plainInfo.typeName
-			info.plainTypeName = plainInfo.plainTypeName
-			info.tokenList += plainInfo.tokenList
+			registrationInfo.typeName = plainInfo.typeName
+			registrationInfo.plainTypeName = plainInfo.plainTypeName
+			registrationInfo.tokenList += plainInfo.tokenList
 		}
-		info.typeName = parsingContext.collectedInfo[info.typeName]?.name ?? info.typeName
-		info.typeName = info.typeName.trimmingCharacters(in: .whitespacesAndNewlines)
-		info.plainTypeName = info.plainTypeName.trimmingCharacters(in: .whitespacesAndNewlines)
+		registrationInfo.typeName = parsingContext.collectedInfo[registrationInfo.typeName]?.name ?? registrationInfo.typeName
+		registrationInfo.typeName = registrationInfo.typeName.trimmingCharacters(in: .whitespacesAndNewlines)
+		registrationInfo.plainTypeName = registrationInfo.plainTypeName.trimmingCharacters(in: .whitespacesAndNewlines)
 		
 		// Class registration by default available by its own type without tag.
-		let location = Location(file: file, byteOffset: bodyOffset)
-		let aliasToken = AliasToken(typeName: info.typeName, tag: "", location: location)
-		info.tokenList.append(aliasToken)
+		let location = Location(file: file, byteOffset: info.bodyOffset)
+		let aliasToken = AliasToken(typeName: registrationInfo.typeName, tag: "", location: location)
+		registrationInfo.tokenList.append(aliasToken)
 		
-		info.tokenList = fillTokenListWithInfo(input: info.tokenList, registrationTypeName: info.typeName, parsingContext: parsingContext, content: content, file: file)
-		return RegistrationToken(typeName: info.typeName, plainTypeName: info.plainTypeName, location: location, tokenList: info.tokenList)
+		registrationInfo.tokenList = RegistrationTokenBuilder.fillTokenListWithInfo(input: registrationInfo.tokenList, registrationTypeName: registrationInfo.typeName, parsingContext: parsingContext, content: content, file: file)
+		return RegistrationToken(typeName: registrationInfo.typeName, plainTypeName: registrationInfo.plainTypeName, location: location, tokenList: registrationInfo.tokenList)
 	}
 	
-	private static func extractPlainRegistration(substructureList: [SourceKitStructure], invocationBody: String, parsingContext: ParsingContext, file: File, bodyOffset: Int64) -> RegistrationInfo? {
+	private func extractPlainRegistration(substructureList: [SourceKitStructure], invocationBody: String, parsingContext: ParsingContext, file: File, bodyOffset: Int64) -> RegistrationInfo? {
 		// container.register(MyClass.init)
 		guard substructureList.isEmpty && !invocationBody.hasSuffix(".self") else { return nil }
 		let (typeName, fullTypeName, genericType) = TypeFinder.parseTypeName(name: invocationBody)
@@ -61,7 +71,7 @@ final class RegistrationTokenBuilder {
 		return (fullTypeName, typeName, tokenList)
 	}
 	
-	private static func extractClosureRegistration(substructureList: [SourceKitStructure], parsingContext: ParsingContext, content: NSString, file: File, bodyOffset: Int64)  -> RegistrationInfo? {
+	private func extractClosureRegistration(substructureList: [SourceKitStructure], parsingContext: ParsingContext, content: NSString, file: File, bodyOffset: Int64)  -> RegistrationInfo? {
 		// container.register { MyClass.init($0, $1) }
 		guard substructureList.count == 1 else { return nil }
 		var substructure = substructureList[0]

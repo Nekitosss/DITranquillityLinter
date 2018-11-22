@@ -9,10 +9,10 @@ import Foundation
 import SourceKittenFramework
 
 /// Trying to create IsDefaultToken
-final class IsDefaultTokenBuilder {
+final class IsDefaultTokenBuilder: TokenBuilder {
 	
-	static func build(functionName: String) -> IsDefaultToken? {
-		guard functionName == DIKeywords.default.rawValue else { return nil }
+	func build(using info: TokenBuilderInfo) -> DIToken? {
+		guard info.functionName == DIKeywords.default.rawValue else { return nil }
 		return IsDefaultToken()
 	}
 	

@@ -12,6 +12,10 @@ import Foundation
 /// Contains information about aliasing c.register(...).as(MyProtocol.self)
 struct AliasToken: DIToken {
 	
+	var isIntermediate: Bool {
+		return true
+	}
+	
 	/// Unique type name of injection. With resolved generic constraints and typealiases
 	let typeName: String
 	

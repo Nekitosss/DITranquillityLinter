@@ -21,7 +21,6 @@ final class BinaryFrameworkParser {
 	private let cacher = ResultCacher()
 	
 	
-	
 	/// Parse OS related bynary frameworks and frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
 	func parseBinaryModules(fileContainer: FileContainer) throws -> [FileParserResult] {
 		TimeRecorder.start(event: .parseBinary)
@@ -120,16 +119,19 @@ final class BinaryFrameworkParser {
 		print("Parse module: \(moduleName)")
 		let frameworksURL = URL(fileURLWithPath: frameworksPath + "/\(moduleName).framework/Headers", isDirectory: true)
 		let frameworks = try self.collectFrameworkNames(frameworksURL: frameworksURL)
-		return try frameworks.map { frameworkName in
+		return frameworks.compactMap { frameworkName in
 			print("Parse framework: \(frameworkName)")
 			let fullFrameworkName = self.fullFrameworkName(moduleName: moduleName, frameworkName: frameworkName)
 			let fileName = frameworksURL.path + "/" + fullFrameworkName + ".h"
-			
-			let contents = try self.createSwiftSourcetext(for: fullFrameworkName, use: compilerArguments)
-			let parser = FileParser(contents: contents, path: fileName, module: moduleName)
-			let fileParserResult = try parser.parse()
-			fileContainer.set(value: parser.file, for: fileName)
-			return fileParserResult
+			do {
+				let contents = try self.createSwiftSourcetext(for: fullFrameworkName, use: compilerArguments)
+				let parser = FileParser(contents: contents, path: fileName, module: moduleName)
+				let fileParserResult = try parser.parse()
+				fileContainer.set(value: parser.file, for: fileName)
+				return fileParserResult
+			} catch {
+				return nil
+			}
 		}
 	}
 	

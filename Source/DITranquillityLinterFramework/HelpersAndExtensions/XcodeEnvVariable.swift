@@ -46,7 +46,7 @@ public enum EnvVariable: String {
 		case .defaultTarget:
 			return "x86_64-apple-ios11.4"
 		case .defaultSDK:
-			return "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk"
+			return "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
 		case .testableProjectFolder:
 			return "/Users/nikita/development/fooddly/Fooddly/"
 		case .testableProjectName:

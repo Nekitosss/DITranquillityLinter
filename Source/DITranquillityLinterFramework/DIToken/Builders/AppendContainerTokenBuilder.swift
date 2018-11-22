@@ -9,33 +9,41 @@ import Foundation
 import SourceKittenFramework
 
 /// Trying to create AppendContainerToken
-final class AppendContainerTokenBuilder {
+final class AppendContainerTokenBuilder: TokenBuilder {
 	
-	static func build(functionName: String, parsingContext: ParsingContext, argumentStack: [ArgumentInfo], currentPartName: String?, location: Location) -> AppendContainerToken? {
-		guard functionName == DIKeywords.append.rawValue,
-			let appendInfo = argumentStack.first,
-			argumentStack.count == 1 else { return nil }
-		
-		let value = appendInfo.value.droppedDotSelf()
-		let isDIPart: (ArgumentInfo) -> Bool = {
-			return ($0.name == "part" && (parsingContext.collectedInfo[value]?.inheritedTypes ?? []).contains(DIKeywords.diPart.rawValue))
-				|| ($0.name == "framework" && (parsingContext.collectedInfo[value]?.inheritedTypes ?? []).contains(DIKeywords.diFramework.rawValue))
-		}
-		let typeName = value
-		guard isDIPart(appendInfo),
-			typeName != currentPartName // Circular append block. TODO: Throw XCode error
-			else { return nil }
-		guard let swiftType = parsingContext.collectedInfo[typeName],
-			let loadContainerStructure = swiftType.substructure.first(where: { $0.get(.name, of: String.self) == DIKeywords.loadContainer.rawValue })
+	private let parsingContext: ParsingContext
+	
+	init(parsingContext: ParsingContext) {
+		self.parsingContext = parsingContext
+	}
+	
+	func build(using info: TokenBuilderInfo) -> DIToken? {
+		guard info.functionName == DIKeywords.append.rawValue,
+			let appendInfo = info.argumentStack.first,
+			info.argumentStack.count == 1
 			else { return nil }
 		
-		let anotherFile = parsingContext.fileContainer.getOrCreate(swiftType.filePath)!
+		let typeName = appendInfo.value.droppedDotSelf()
+		
+		guard
+			let swiftType = parsingContext.collectedInfo[typeName],
+			self.isDIPart(appendInfo, swiftType: swiftType),
+			typeName != info.currentPartName, // Circular append block. TODO: Throw XCode error
+			let loadContainerStructure = swiftType.substructure.first(where: { $0.get(.name, of: String.self) == DIKeywords.loadContainer.rawValue }),
+			let newContainerPartFile = parsingContext.fileContainer.getOrCreateFile(by: swiftType.filePath)
+			else { return nil }
+		
 		let oldContainerName = parsingContext.currentContainerName
 		parsingContext.currentContainerName = DIKeywords.container.rawValue
-		let containerPart = ContainerPart(substructureList: loadContainerStructure.substructures, file: anotherFile, parsingContext: parsingContext, currentPartName: typeName)
+		let containerPart = ContainerPart(substructureList: loadContainerStructure.substructures, file: newContainerPartFile, parsingContext: parsingContext, currentPartName: typeName)
 		parsingContext.currentContainerName = oldContainerName
 		
-		return AppendContainerToken(location: location, typeName: typeName, containerPart: containerPart)
+		return AppendContainerToken(location: info.location, typeName: typeName, containerPart: containerPart)
+	}
+	
+	private func isDIPart(_ argumentInfo: ArgumentInfo, swiftType: Type) -> Bool {
+		return (argumentInfo.name == "part" && swiftType.inheritedTypes.contains(DIKeywords.diPart.rawValue))
+			|| (argumentInfo.name == "framework" && swiftType.inheritedTypes.contains(DIKeywords.diFramework.rawValue))
 	}
 	
 }

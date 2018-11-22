@@ -25,6 +25,8 @@ final class GraphValidator {
 	let autoimplementedTypes: Set<String> = ["AnyObject", "Any"]
 	
 	func validate(containerPart: ContainerPart, collectedInfo: [String: Type]) -> [GraphError] {
+		TimeRecorder.start(event: .validate)
+		defer { TimeRecorder.end(event: .validate) }
 		var errors: [GraphError] = []
 		
 		for (_, registrations) in containerPart.tokenInfo {
