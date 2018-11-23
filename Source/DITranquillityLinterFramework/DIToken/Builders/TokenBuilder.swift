@@ -3,6 +3,7 @@
 
 
 import SourceKittenFramework
+import Foundation
 
 
 struct TokenBuilderInfo {
@@ -14,6 +15,9 @@ struct TokenBuilderInfo {
 	let currentPartName: String?
 	let argumentStack: [ArgumentInfo]
 	let location: Location
+	let parsingContext: ParsingContext
+	let content: NSString
+	let file: File
 }
 
 

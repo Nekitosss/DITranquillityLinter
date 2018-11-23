@@ -12,12 +12,6 @@ import xcodeproj
 /// Trying to create InjectionToken (without injection type resolving)
 final class InjectionTokenBuilder: TokenBuilder {
 	
-	private let content: NSString
-	
-	init(content: NSString) {
-		self.content = content
-	}
-	
 	func build(using info: TokenBuilderInfo) -> DIToken? {
 		guard info.functionName == DIKeywords.injection.rawValue else { return nil }
 		var cycle = false
@@ -25,39 +19,66 @@ final class InjectionTokenBuilder: TokenBuilder {
 		var modificators: [InjectionModificator] = []
 		
 		for argument in info.argumentStack {
-			let isEmptyArgumentName = argument.name.isEmpty || argument.name == "_"
-			if argument.name == DIKeywords.cycle.rawValue {
-				// injection(cycle: true, ...)
-				cycle = argument.value == "\(true)"
-			} else if isEmptyArgumentName && argument.value.starts(with: RegExp.implicitKeyPath.rawValue) {
-				// injection(\.myPath)
-				name = String(argument.value.dropFirst(2))
-			} else if let dotIndex = argument.value.index(of: "."), isEmptyArgumentName && argument.value.firstMatch(RegExp.explicitKeyPath.rawValue) != nil  {
-				// injection(\RegistrationType.myPath)
-				name = String(argument.value[argument.value.index(after: dotIndex)...])
-			} else if let nameFromPattern = argument.value.firstMatch(RegExp.nameFromParameterInjection) {
-				// injection { $0.name = $1 }
-				name = String(nameFromPattern.dropFirst(3))
-			}
-			if let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: argument.structure, content: content), !taggedModificators.isEmpty {
-				// For tagged variable injection structure always on "closure" level
-				modificators += taggedModificators
-				
-			} else if let closureSubstructure = argument.structure.substructures.first,
-				let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: closureSubstructure, content: content), !taggedModificators.isEmpty {
-				// Tag stores in argument -> closure -> expressionCall
-				// parseTaggedInjection can parse sinse "closure" level. So we unwrap single time
-				modificators += taggedModificators
-			}
-			if var typeFromPattern = argument.value.firstMatch(.forcedType) {
-				// $0 "as String }"
-				typeFromPattern = typeFromPattern.filter({ $0 != "}" }).trimmingCharacters(in: .whitespacesAndNewlines)
-				modificators.append(.typed(typeFromPattern))
-			}
+			self.extractCycleInfo(from: argument, into: &cycle)
+			self.extractNameInfo(from: argument, into: &name)
+			self.extractModificators(from: argument, info: info, into: &modificators)
 		}
 		// Type name will be resolved later
-		return InjectionToken(name: name, typeName: "", plainTypeName: "", cycle: cycle, optionalInjection: false, methodInjection: false, modificators: modificators, injectionSubstructureList: info.substructureList.last?.substructures ?? info.substructureList, location: info.location)
+		return InjectionToken(name: name,
+							  typeName: "",
+							  plainTypeName: "",
+							  cycle: cycle,
+							  optionalInjection: false,
+							  methodInjection: false,
+							  modificators: modificators,
+							  injectionSubstructureList: info.substructureList.last?.substructures ?? info.substructureList,
+							  location: info.location)
 	}
+	
+	private func extractCycleInfo(from argument: ArgumentInfo, into cycle: inout Bool) {
+		if argument.name == DIKeywords.cycle.rawValue {
+			// injection(cycle: true, ...)
+			cycle = argument.value == "\(true)"
+		}
+	}
+	
+	
+	private func extractNameInfo(from argument: ArgumentInfo, into name: inout String) {
+		let isEmptyArgumentName = argument.name.isEmpty || argument.name == "_"
+		if isEmptyArgumentName && argument.value.starts(with: RegExp.implicitKeyPath.rawValue) {
+			// injection(\.myPath)
+			name = String(argument.value.dropFirst(2))
+			
+		} else if let dotIndex = argument.value.index(of: "."), isEmptyArgumentName && argument.value.firstMatch(RegExp.explicitKeyPath.rawValue) != nil  {
+			// injection(\RegistrationType.myPath)
+			name = String(argument.value[argument.value.index(after: dotIndex)...])
+			
+		} else if let nameFromPattern = argument.value.firstMatch(RegExp.nameFromParameterInjection) {
+			// injection { $0.name = $1 }
+			name = String(nameFromPattern.dropFirst(3))
+		}
+	}
+	
+	
+	private func extractModificators(from argument: ArgumentInfo, info: TokenBuilderInfo, into modificators: inout [InjectionModificator]) {
+		if let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: argument.structure, content: info.content) {
+			// For tagged variable injection structure always on "closure" level
+			modificators += taggedModificators
+			
+		} else if let closureSubstructure = argument.structure.substructures.first,
+			let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: closureSubstructure, content: info.content) {
+			// Tag stores in argument -> closure -> expressionCall
+			// parseTaggedInjection can parse sinse "closure" level. So we unwrap single time
+			modificators += taggedModificators
+		}
+		
+		if var typeFromPattern = argument.value.firstMatch(.forcedType) {
+			// $0 "as String }"
+			typeFromPattern = typeFromPattern.filter({ $0 != "}" }).trimmingCharacters(in: .whitespacesAndNewlines)
+			modificators.append(.typed(typeFromPattern))
+		}
+	}
+	
 	
 	static func parseTaggedAndManyInjectionInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
 		var result: [InjectionModificator] = []
@@ -76,7 +97,11 @@ final class InjectionTokenBuilder: TokenBuilder {
 				result.append(.many)
 			}
 		}
-		return result
+		if result.isEmpty {
+			return nil
+		} else {
+			return result
+		}
 	}
 	
 }

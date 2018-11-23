@@ -11,12 +11,6 @@ import SourceKittenFramework
 /// Trying to create AliasToken
 final class AliasTokenBuilder: TokenBuilder {
 	
-	private let parsingContext: ParsingContext
-	
-	init(parsingContext: ParsingContext) {
-		self.parsingContext = parsingContext
-	}
-	
 	func build(using info: TokenBuilderInfo) -> DIToken? {
 		guard info.functionName == DIKeywords.as.rawValue else { return nil }
 		var typeName = ""
@@ -28,7 +22,7 @@ final class AliasTokenBuilder: TokenBuilder {
 				 "_" where argument.value.hasSuffix(".self"),
 				 DIKeywords.check.rawValue:
 				typeName = argument.value.droppedDotSelf().bracketsBalancing()
-				if let type = parsingContext.collectedInfo[typeName] {
+				if let type = info.parsingContext.collectedInfo[typeName] {
 					typeName = type.name
 				}
 			case DIKeywords.tag.rawValue:

@@ -49,11 +49,11 @@ final class ContainerPartBuilder {
 		self.currentPartName = currentPartName
 		self.content = file.contents.bridge()
 		
-		self.aliasTokenBuiler = AliasTokenBuilder(parsingContext: parsingContext)
-		self.injectionTokenBuilder = InjectionTokenBuilder(content: content)
-		self.registrationTokenBuilder = RegistrationTokenBuilder(parsingContext: parsingContext, content: content, file: file)
+		self.aliasTokenBuiler = AliasTokenBuilder()
+		self.injectionTokenBuilder = InjectionTokenBuilder()
+		self.registrationTokenBuilder = RegistrationTokenBuilder()
 		self.isDefaultTokenBuilder = IsDefaultTokenBuilder()
-		self.appendContainerTokenBuilder = AppendContainerTokenBuilder(parsingContext: parsingContext)
+		self.appendContainerTokenBuilder = AppendContainerTokenBuilder()
 	}
 	
 	
@@ -206,9 +206,9 @@ final class ContainerPartBuilder {
 			let name: String = loadContainerBodyPart.get(.name),
 			let bodyOffset: Int64 = loadContainerBodyPart.get(.bodyOffset),
 			let bodyLength: Int64 = loadContainerBodyPart.get(.bodyLength),
-			kind == SwiftExpressionKind.call.rawValue
+			kind == SwiftExpressionKind.call.rawValue,
+			let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength)
 			else { return nil }
-		let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength)!
 		let functionName = extractActualFuncionInvokation(name: name)
 		
 		let substructureList = loadContainerBodyPart.substructures
@@ -225,7 +225,10 @@ final class ContainerPartBuilder {
 								bodyOffset: bodyOffset,
 								currentPartName: currentPartName,
 								argumentStack: argumentStack,
-								location: location)
+								location: location,
+								parsingContext: parsingContext,
+								content: content,
+								file: file)
 	}
 	
 	
@@ -236,11 +239,11 @@ final class ContainerPartBuilder {
 		guard !body.contains("=") else {
 			return [ArgumentInfo(name: "_", value: body, structure: substructureList.last ?? [:])]
 		}
-		return body.split(separator: ",").compactMap({ parseArgument(argument: String($0)) })
+		return body.split(separator: ",").compactMap(self.parseArgument)
 	}
 	
 	
-	private func parseArgument(argument: String) -> ArgumentInfo? {
+	private func parseArgument(argument: String.SubSequence) -> ArgumentInfo? {
 		let parts = argument.split(separator: ":")
 		var result: (outerName: String, innerName: String, value: String) = ("", "", "")
 		if parts.count == 0 {
@@ -262,6 +265,7 @@ final class ContainerPartBuilder {
 		}
 		return ArgumentInfo(name: result.outerName, value: result.value, structure: [:])
 	}
+	
 	
 	private func tryBuildToken(use info: TokenBuilderInfo) -> DIToken? {
 		for tokenBuilder in allTokenBuilders {
