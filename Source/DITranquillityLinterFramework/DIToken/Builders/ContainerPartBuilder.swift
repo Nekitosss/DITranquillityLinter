@@ -32,28 +32,20 @@ final class ContainerPartBuilder {
 	private let parsingContext: ParsingContext
 	private let currentPartName: String?
 	private let content: NSString
+	private let allTokenBuilders: [TokenBuilder]
 	
-	private let aliasTokenBuiler: AliasTokenBuilder
-	private let injectionTokenBuilder: InjectionTokenBuilder
-	private let registrationTokenBuilder: RegistrationTokenBuilder
-	private let isDefaultTokenBuilder: IsDefaultTokenBuilder
-	private let appendContainerTokenBuilder: AppendContainerTokenBuilder
-	
-	private var allTokenBuilders: [TokenBuilder] {
-		return [aliasTokenBuiler, injectionTokenBuilder, registrationTokenBuilder, isDefaultTokenBuilder, appendContainerTokenBuilder]
-	}
 	
 	init(file: File, parsingContext: ParsingContext, currentPartName: String?) {
 		self.file = file
 		self.parsingContext = parsingContext
 		self.currentPartName = currentPartName
 		self.content = file.contents.bridge()
-		
-		self.aliasTokenBuiler = AliasTokenBuilder()
-		self.injectionTokenBuilder = InjectionTokenBuilder()
-		self.registrationTokenBuilder = RegistrationTokenBuilder()
-		self.isDefaultTokenBuilder = IsDefaultTokenBuilder()
-		self.appendContainerTokenBuilder = AppendContainerTokenBuilder()
+		self.allTokenBuilders = [AliasTokenBuilder(),
+								 InjectionTokenBuilder(),
+								 RegistrationTokenBuilder(),
+								 IsDefaultTokenBuilder(),
+								 AppendContainerTokenBuilder()
+		]
 	}
 	
 	
@@ -209,7 +201,7 @@ final class ContainerPartBuilder {
 			kind == SwiftExpressionKind.call.rawValue,
 			let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength)
 			else { return nil }
-		let functionName = extractActualFuncionInvokation(name: name)
+		let functionName = TypeFinder.restoreMethodName(initial: name)
 		
 		let substructureList = loadContainerBodyPart.substructures
 		var argumentStack = ContainerPartBuilder.argumentInfo(substructures: substructureList, content: content)
@@ -275,13 +267,4 @@ final class ContainerPartBuilder {
 		}
 		return nil
 	}
-	
-	
-	private func extractActualFuncionInvokation(name: String) -> String {
-		guard let dotIndex = name.lastIndex(of: ".") else {
-			return name
-		}
-		return String(name[name.index(after: dotIndex)...])
-	}
-	
 }

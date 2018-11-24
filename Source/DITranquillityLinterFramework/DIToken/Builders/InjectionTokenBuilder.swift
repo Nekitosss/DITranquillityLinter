@@ -61,12 +61,12 @@ final class InjectionTokenBuilder: TokenBuilder {
 	
 	
 	private func extractModificators(from argument: ArgumentInfo, info: TokenBuilderInfo, into modificators: inout [InjectionModificator]) {
-		if let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: argument.structure, content: info.content) {
+		if let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjection(structure: argument.structure, content: info.content) {
 			// For tagged variable injection structure always on "closure" level
 			modificators += taggedModificators
 			
 		} else if let closureSubstructure = argument.structure.substructures.first,
-			let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: closureSubstructure, content: info.content) {
+			let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjection(structure: closureSubstructure, content: info.content) {
 			// Tag stores in argument -> closure -> expressionCall
 			// parseTaggedInjection can parse sinse "closure" level. So we unwrap single time
 			modificators += taggedModificators
@@ -80,7 +80,7 @@ final class InjectionTokenBuilder: TokenBuilder {
 	}
 	
 	
-	static func parseTaggedAndManyInjectionInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
+	static func parseTaggedAndManyInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
 		var result: [InjectionModificator] = []
 		for substructure in structure.substructures {
 			guard let name: String = substructure.get(.name),

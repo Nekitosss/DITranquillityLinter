@@ -98,7 +98,7 @@ final class RegistrationTokenBuilder: TokenBuilder {
 		// NestedClass can be class name, but it also can be expression call. So we check is MyClass.NestedClass available class name
 		// and if if exists, adds ".init" at the end of initialization call
 		let nameWithInitializer = parsingContext.collectedInfo[name] != nil && !name.hasSuffix(".init") ? name + ".init" : name
-		let methodName = TypeFinder.restoreMethodName(registrationName: nameWithInitializer)
+		let methodName = TypeFinder.restoreMethodName(initial: nameWithInitializer)
 		let signature = TypeFinder.restoreSignature(name: methodName, substructureList: expressionCallInitSubstructure.substructures, content: content)
 		let tokenList = TypeFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, parsingContext: parsingContext, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset, forcedAllInjection: false) ?? []
 		

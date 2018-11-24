@@ -9,7 +9,7 @@
 import SourceKittenFramework
 import Foundation
 
-class TypeFinder {
+final class TypeFinder {
 	
 	
 	static func parseTypeName(name: String) -> (typeName: String, fullTypeName: String, genericType: GenericType?) {
@@ -25,16 +25,17 @@ class TypeFinder {
 		}
 	}
 	
-	static func restoreMethodName(registrationName: String) -> String {
-		if let dotIndex = registrationName.reversed().index(of: ".")?.base {
-			return String(registrationName[dotIndex...])
-		} else {
-			return ""
+	
+	static func restoreMethodName(initial name: String, defaultMethodName: String = "init") -> String {
+		guard let dotIndex = name.lastIndex(of: ".") else {
+			return defaultMethodName
 		}
+		return String(name[name.index(after: dotIndex)...])
 	}
 	
+	
 	static func restoreSignature(name: String, substructureList: [[String: SourceKitRepresentable]], content: NSString) -> MethodSignature {
-		var signatureName = name.isEmpty ? "init" : name
+		var signatureName = name
 		var injectableArguments: [(Int, Int64)] = []
 		var injectionModificators: [Int : [InjectionModificator]] = [:]
 		if !substructureList.isEmpty {
@@ -55,9 +56,9 @@ class TypeFinder {
 				injectableArguments.append((argumentNumber, bodyOffset))
 			}
 			if let forcedType = body.firstMatch(RegExp.forcedType)?.trimmingCharacters(in: .whitespacesAndNewlines) {
-				injectionModificators[argumentNumber, default: []].append(InjectionModificator.typed(forcedType))
+				injectionModificators[argumentNumber, default: []].append(.typed(forcedType))
 			}
-			if let taggedInjection = InjectionTokenBuilder.parseTaggedAndManyInjectionInjection(structure: substucture, content: content) {
+			if let taggedInjection = InjectionTokenBuilder.parseTaggedAndManyInjection(structure: substucture, content: content) {
 				injectionModificators[argumentNumber, default: []].append(contentsOf: taggedInjection)
 			}
 			
@@ -70,24 +71,30 @@ class TypeFinder {
 		return MethodSignature(name: signatureName, injectableArgumentInfo: injectableArguments, injectionModificators: injectionModificators)
 	}
 	
+	
+	static func findArgumentTypeInfo(typeName: String, tokenName: String, parsingContext: ParsingContext, modificators: [InjectionModificator]) -> (typeName: String, plainTypeName: String, optionalInjection: Bool)? {
+		let (plainTypeName, _, genericType) = self.parseTypeName(name: typeName)
+		guard let ownerType = parsingContext.collectedInfo[plainTypeName] else { return nil }
+		if let variable = ownerType.allVariables.first(where: { $0.name == tokenName }) {
+			let (typeName, plainTypeName) = extractTypeName(parameter: variable, swiftType: ownerType, genericType: genericType, parsingContext: parsingContext, modificators: modificators)
+			return (typeName, plainTypeName, variable.isOptional)
+		}
+		return nil
+	}
+	
+	
 	static func findMethodTypeInfo(typeName: String, parsingContext: ParsingContext, content: NSString, file: File, token: InjectionToken) -> [DIToken] {
 		guard let substructure = token.injectionSubstructureList.last,
 			var methodName: String = substructure.get(.name),
 			let offset: Int64 = substructure.get(.offset)
 			else { return [] }
-		
-		if let dotIndex = methodName.index(of: ".") {
-			methodName = String(methodName[methodName.index(after: dotIndex)...])
-		}
-		let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitStructure].self) ?? []
-		let signature = restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
+		methodName = restoreMethodName(initial: methodName, defaultMethodName: methodName)
+		let signature = restoreSignature(name: methodName, substructureList: substructure.substructures, content: content)
 		
 		let (plainTypeName, _, genericType) = self.parseTypeName(name: typeName)
-		if let methodInjection = TypeFinder.findMethodInfo(methodSignature: signature, initialObjectName: plainTypeName, parsingContext: parsingContext, file: file, genericType: genericType, methodCallBodyOffset: offset, forcedAllInjection: false) {
-			return methodInjection
-		}
-		return []
+		return findMethodInfo(methodSignature: signature, initialObjectName: plainTypeName, parsingContext: parsingContext, file: file, genericType: genericType, methodCallBodyOffset: offset, forcedAllInjection: false) ?? []
 	}
+	
 	
 	static func findMethodInfo(methodSignature: MethodSignature, initialObjectName: String, parsingContext: ParsingContext, file: File, genericType: GenericType?, methodCallBodyOffset: Int64, forcedAllInjection: Bool) -> [InjectionToken]? {
 		guard let swiftType = parsingContext.collectedInfo[initialObjectName] else { return [] }
@@ -111,24 +118,17 @@ class TypeFinder {
 		return nil
 	}
 	
-	static func findArgumentTypeInfo(typeName: String, tokenName: String, parsingContext: ParsingContext, modificators: [InjectionModificator]) -> (typeName: String, plainTypeName: String, optionalInjection: Bool)? {
-		let (plainTypeName, _, genericType) = self.parseTypeName(name: typeName)
-		guard let ownerType = parsingContext.collectedInfo[plainTypeName] else { return nil }
-		if let variable = ownerType.allVariables.first(where: { $0.name == tokenName }) {
-			let (typeName, plainTypeName) = extractTypeName(parameter: variable, swiftType: ownerType, genericType: genericType, parsingContext: parsingContext, modificators: modificators)
-			return (typeName, plainTypeName, variable.isOptional)
-		}
-		return nil
-	}
 	
-	static func extractArgumentInfo(swiftType: Type, methodSignature: MethodSignature, parameters: [MethodParameter], file: File, methodCallBodyOffset: Int64, genericType: GenericType?, parsingContext: ParsingContext, forcedAllInjection: Bool) -> [InjectionToken] {
+	private static func extractArgumentInfo(swiftType: Type, methodSignature: MethodSignature, parameters: [MethodParameter], file: File, methodCallBodyOffset: Int64, genericType: GenericType?, parsingContext: ParsingContext, forcedAllInjection: Bool) -> [InjectionToken] {
 		var argumentInfo: [InjectionToken] = []
 		var argumentIndex = -1
 		for parameter in parameters {
 			argumentIndex += 1
 			
 			let injectableArgInfo = methodSignature.injectableArgumentInfo.first(where: { $0.argumentCount == argumentIndex }) ?? (-1, methodCallBodyOffset)
-			guard forcedAllInjection || injectableArgInfo.argumentCount == argumentIndex else { continue }
+			guard forcedAllInjection || injectableArgInfo.argumentCount == argumentIndex else {
+				continue
+			}
 			let modificators = methodSignature.injectionModificators[argumentIndex] ?? []
 			let (typeName, plainTypeName) = extractTypeName(parameter: parameter, swiftType: swiftType, genericType: genericType, parsingContext: parsingContext, modificators: modificators)
 			let location = Location(file: file, byteOffset: injectableArgInfo.argumentBodyOffset)
@@ -147,9 +147,7 @@ class TypeFinder {
 				case .typed(let forcedType):
 					injection.typeName = forcedType
 					injection.plainTypeName = TypeName.unwrapTypeName(name: forcedType).unwrappedTypeName
-				case .tagged:
-					break
-				case .many:
+				default:
 					break
 				}
 			}
@@ -157,6 +155,7 @@ class TypeFinder {
 		}
 		return argumentInfo
 	}
+	
 	
 	private static func extractTypeName(parameter: Typed, swiftType: Type, genericType: GenericType?, parsingContext: ParsingContext, modificators: [InjectionModificator]) -> (typeName: String, plainTypeName: String) {
 		

@@ -19,8 +19,7 @@ struct ContainerPart {
 	
 	init(substructureList: [SourceKitStructure], file: File, parsingContext: ParsingContext, currentPartName: String?) {
 		let builer = ContainerPartBuilder(file: file, parsingContext: parsingContext, currentPartName: currentPartName)
-		let ti = builer.build(substructureList: substructureList)
-		self.tokenInfo = ti
+		self.tokenInfo = builer.build(substructureList: substructureList)
 	}
 	
 }
