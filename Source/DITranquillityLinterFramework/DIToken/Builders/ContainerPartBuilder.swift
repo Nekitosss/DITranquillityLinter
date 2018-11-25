@@ -33,6 +33,7 @@ final class ContainerPartBuilder {
 	private let currentPartName: String?
 	private let content: NSString
 	private let allTokenBuilders: [TokenBuilder]
+	private let registrationTokenBuilder: RegistrationTokenBuilder
 	
 	
 	init(file: File, parsingContext: ParsingContext, currentPartName: String?) {
@@ -40,16 +41,17 @@ final class ContainerPartBuilder {
 		self.parsingContext = parsingContext
 		self.currentPartName = currentPartName
 		self.content = file.contents.bridge()
+		self.registrationTokenBuilder = RegistrationTokenBuilder()
 		self.allTokenBuilders = [AliasTokenBuilder(),
 								 InjectionTokenBuilder(),
-								 RegistrationTokenBuilder(),
+								 self.registrationTokenBuilder,
 								 IsDefaultTokenBuilder(),
 								 AppendContainerTokenBuilder()
 		]
 	}
 	
 	
-	func build(substructureList: [SourceKitStructure])  -> [RegistrationAccessor: [RegistrationToken]] {
+	func build(substructureList: [SourceKitStructure]) -> [RegistrationAccessor: [RegistrationToken]] {
 		var intermediateTokenList: [DIToken] = []
 		var assignedRegistrations: [String: RegistrationToken] = [:]
 		var otherRegistrations: [DIToken] = []
@@ -95,7 +97,9 @@ final class ContainerPartBuilder {
 		
 		if let registrationTokenIndex = collectedTokens.index(where: { $0 is RegistrationToken }) {
 			// get registration token. Should be 0 or 1 count. Remember that container.append(part:).register() is available
+			// swiftlint:disable force_cast
 			let registrationToken = collectedTokens.remove(at: registrationTokenIndex) as! RegistrationToken
+			// swiftlint:enable force_cast
 			
 			if let assignee = assignee {
 				assignedRegistrations[assignee] = registrationToken
@@ -111,11 +115,11 @@ final class ContainerPartBuilder {
 			// let r = container.register(_:)  (processed earlier)
 			// r.inject(_:)  (processed in that if block)
 			let inputTokenList = registrationToken.tokenList + collectedTokens + intermediateTokenList
-			let tokenList = RegistrationTokenBuilder.fillTokenListWithInfo(input: inputTokenList,
-																		   registrationTypeName: registrationToken.plainTypeName,
-																		   parsingContext: parsingContext,
-																		   content: content,
-																		   file: file)
+			let tokenList = self.registrationTokenBuilder.fillTokenListWithInfo(input: inputTokenList,
+																				registrationTypeName: registrationToken.plainTypeName,
+																				parsingContext: parsingContext,
+																				content: content,
+																				file: file)
 			let newToken = RegistrationToken(typeName: registrationToken.typeName,
 											 plainTypeName: registrationToken.plainTypeName,
 											 location: registrationToken.location,
@@ -167,7 +171,7 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private func processLoadContainerBodyPart(loadContainerBodyPart: [String : SourceKitRepresentable], tokenList: inout [DIToken]) -> [DIToken] {
+	private func processLoadContainerBodyPart(loadContainerBodyPart: SourceKitStructure, tokenList: inout [DIToken]) -> [DIToken] {
 		guard let info = self.getTokenInfo(from: loadContainerBodyPart, tokenList: tokenList) else {
 			return []
 		}
@@ -193,7 +197,7 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private func getTokenInfo(from loadContainerBodyPart: [String : SourceKitRepresentable], tokenList: [DIToken]) -> TokenBuilderInfo? {
+	private func getTokenInfo(from loadContainerBodyPart: SourceKitStructure, tokenList: [DIToken]) -> TokenBuilderInfo? {
 		guard let kind: String = loadContainerBodyPart.get(.kind),
 			let name: String = loadContainerBodyPart.get(.name),
 			let bodyOffset: Int64 = loadContainerBodyPart.get(.bodyOffset),

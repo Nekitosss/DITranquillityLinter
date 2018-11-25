@@ -48,7 +48,7 @@ extension Structure: Codable, ProtobufBridgable {
 		try container.encode(codableInfo, forKey: .dictionary)
 	}
 	
-	static func ==(lhs: Structure, rhs: Structure) -> Bool {
+	static func == (lhs: Structure, rhs: Structure) -> Bool {
 		return true
 	}
 }

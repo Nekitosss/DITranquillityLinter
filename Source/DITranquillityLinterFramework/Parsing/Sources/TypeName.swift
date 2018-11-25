@@ -402,7 +402,7 @@ final class ArrayType: Codable, Equatable, ProtobufBridgable {
 	/// Array element type, if known
 	var elementType: Type?
 	
-	static func ==(lhs: ArrayType, rhs: ArrayType) -> Bool {
+	static func == (lhs: ArrayType, rhs: ArrayType) -> Bool {
 		return lhs.name == rhs.name && lhs.elementTypeName == rhs.elementTypeName
 	}
 

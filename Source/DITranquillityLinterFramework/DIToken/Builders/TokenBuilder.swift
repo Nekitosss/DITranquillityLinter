@@ -10,7 +10,7 @@ struct TokenBuilderInfo {
 	let functionName: String
 	let invocationBody: String
 	let tokenList: [DIToken]
-	let substructureList: [[String : SourceKitRepresentable]]
+	let substructureList: [SourceKitStructure]
 	let bodyOffset: Int64
 	let currentPartName: String?
 	let argumentStack: [ArgumentInfo]

@@ -43,7 +43,7 @@ final class AssociatedValue: NSObject, Typed, Annotated, Codable {
 }
 
 /// Defines enum case
-final class EnumCase: NSObject, AutoDescription, Annotated, Codable {
+final class EnumCase: NSObject, Annotated, Codable {
 
     /// Enum case name
     let name: String

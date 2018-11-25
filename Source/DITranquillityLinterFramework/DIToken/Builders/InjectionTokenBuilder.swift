@@ -49,7 +49,7 @@ final class InjectionTokenBuilder: TokenBuilder {
 			// injection(\.myPath)
 			name = String(argument.value.dropFirst(2))
 			
-		} else if let dotIndex = argument.value.index(of: "."), isEmptyArgumentName && argument.value.firstMatch(RegExp.explicitKeyPath.rawValue) != nil  {
+		} else if let dotIndex = argument.value.index(of: "."), isEmptyArgumentName && argument.value.firstMatch(RegExp.explicitKeyPath.rawValue) != nil {
 			// injection(\RegistrationType.myPath)
 			name = String(argument.value[argument.value.index(after: dotIndex)...])
 			

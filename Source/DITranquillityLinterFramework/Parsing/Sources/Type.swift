@@ -55,7 +55,7 @@ class Type: Annotated, Codable, Equatable {
 		res.supertype = message.supertype.toValue.flatMap({ .fromProtoMessage($0) })
 		res.attributes = message.attributes.mapValues({ .fromProtoMessage($0) })
 		res.parserData = message.parserData.toValue.flatMap({ .fromProtoMessage($0) })
-		res.__path = message._Path
+		res.path = message._Path
 		
 		return res
 	}
@@ -91,7 +91,7 @@ class Type: Annotated, Codable, Equatable {
 		res.supertype = .init(value: supertype?.toProtoMessage)
 		res.attributes = self.attributes.mapValues({ $0.toProtoMessage })
 		res.parserData = .init(value: parserData?.toProtoMessage)
-		res._Path = self.__path ?? ""
+		res._Path = self.path ?? ""
 		return res
 	}
 	
@@ -356,54 +356,54 @@ class Type: Annotated, Codable, Equatable {
     // Path to file where the type is defined
     // sourcery: skipDescription, skipEquality, skipJSExport
     /// :nodoc:
-    var __path: String?
+    var path: String?
 
-    /// :nodoc:
-    init(name: String = "",
-                parent: Type? = nil,
-                accessLevel: AccessLevel = .internal,
-                isExtension: Bool = false,
-                variables: [Variable] = [],
-                methods: [Method] = [],
-                subscripts: [Subscript] = [],
-                inheritedTypes: [String] = [],
-                containedTypes: [Type] = [],
-                typealiases: [Typealias] = [],
-                attributes: [String: Attribute] = [:],
-                annotations: Annotations = [:],
-				isGeneric: Bool = false,
-				genericTypeParameters: [GenericTypeParameter] = [],
-				filePath: String) {
-
-        self.localName = name
-        self.accessLevel = accessLevel.rawValue
-        self.isExtension = isExtension
-        self.variables = variables
-        self.methods = methods
-        self.subscripts = subscripts
-        self.inheritedTypes = inheritedTypes
-        self.containedTypes = containedTypes
-        self.typealiases = [:]
-        self.parent = parent
-        self.parentName = parent?.name
-        self.attributes = attributes
-        self.annotations = annotations
-        self.isGeneric = isGeneric
+	/// :nodoc:
+	init(name: String = "",
+		 parent: Type? = nil,
+		 accessLevel: AccessLevel = .internal,
+		 isExtension: Bool = false,
+		 variables: [Variable] = [],
+		 methods: [Method] = [],
+		 subscripts: [Subscript] = [],
+		 inheritedTypes: [String] = [],
+		 containedTypes: [Type] = [],
+		 typealiases: [Typealias] = [],
+		 attributes: [String: Attribute] = [:],
+		 annotations: Annotations = [:],
+		 isGeneric: Bool = false,
+		 genericTypeParameters: [GenericTypeParameter] = [],
+		 filePath: String) {
+		
+		self.localName = name
+		self.accessLevel = accessLevel.rawValue
+		self.isExtension = isExtension
+		self.variables = variables
+		self.methods = methods
+		self.subscripts = subscripts
+		self.inheritedTypes = inheritedTypes
+		self.containedTypes = containedTypes
+		self.typealiases = [:]
+		self.parent = parent
+		self.parentName = parent?.name
+		self.attributes = attributes
+		self.annotations = annotations
+		self.isGeneric = isGeneric
 		self.genericTypeParameters = genericTypeParameters
 		self.filePath = filePath
-
-        containedTypes.forEach {
-            containedType[$0.localName] = $0
-            $0.parent = self
-        }
-        inheritedTypes.forEach { name in
-            self.based[name] = name
-        }
-        typealiases.forEach({
-            $0.parent = self
-            self.typealiases[$0.aliasName] = $0
-        })
-    }
+		
+		containedTypes.forEach {
+			containedType[$0.localName] = $0
+			$0.parent = self
+		}
+		inheritedTypes.forEach { name in
+			self.based[name] = name
+		}
+		typealiases.forEach({
+			$0.parent = self
+			self.typealiases[$0.aliasName] = $0
+		})
+	}
 
     /// :nodoc:
     func extend(_ type: Type) {
@@ -443,7 +443,7 @@ class Type: Annotated, Codable, Equatable {
 //		try container.encode(parent, forKey: .parent)
 		try container.encode(supertype, forKey: .supertype)
 		try container.encode(attributes, forKey: .attributes)
-		try container.encode(__path, forKey: .__path)
+		try container.encode(path, forKey: .path)
 		try container.encode(filePath, forKey: .filePath)
 		try container.encode(parserData, forKey: .parserData)
 		try container.encode(genericTypeParameters, forKey: .genericTypeParameters)

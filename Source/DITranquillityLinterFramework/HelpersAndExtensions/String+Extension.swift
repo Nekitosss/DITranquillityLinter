@@ -25,13 +25,17 @@ extension String {
 	}
 	
 	func listMatches(_ pattern: String) -> [String] {
-		let regex = try! NSRegularExpression(pattern: pattern, options: [])
-		let range = NSMakeRange(0, self.count)
-		let matches = regex.matches(in: self, options: [], range: range)
-		
-		return matches.map {
-			let range = $0.range
-			return (self as NSString).substring(with: range)
+		do {
+			let regex = try NSRegularExpression(pattern: pattern, options: [])
+			let range = NSRange(location: 0, length: self.count)
+			let matches = regex.matches(in: self, options: [], range: range)
+			
+			return matches.map {
+				let range = $0.range
+				return (self as NSString).substring(with: range)
+			}
+		} catch {
+			return []
 		}
 	}
 	

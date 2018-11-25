@@ -13,7 +13,7 @@ protocol Parsable {
 
 extension Parsable {
     /// Source structure used by the parser
-    fileprivate var __underlyingSource: [String: SourceKitRepresentable] {
+    fileprivate var underlyingSource: [String: SourceKitRepresentable] {
         return parserData?.dictionary ?? [:]
     }
 
@@ -150,7 +150,7 @@ final class FileParser {
             type.attributes = parseDeclarationAttributes(source)
             type.bodyBytesRange = Substring.body.range(for: source).map { BytesRange(range: $0) }
             type.setSource(source)
-            type.__path = path
+            type.path = path
             types.append(type)
             return type
         }
@@ -244,7 +244,7 @@ final class FileParser {
         case let (parameter as MethodParameter):
             //add only parameters that are in range of method name 
             guard let nameRange = Substring.name.range(for: containedIn.source),
-                let paramKeyRange = Substring.key.range(for: parameter.__underlyingSource),
+                let paramKeyRange = Substring.key.range(for: parameter.underlyingSource),
                 nameRange.offset + nameRange.length >= paramKeyRange.offset + paramKeyRange.length
                 else { return }
 
@@ -539,13 +539,13 @@ extension FileParser {
             if let nextStructure = nextStructure, let range = Substring.key.range(for: nextStructure) {
                 // if there is next declaration, parse until its start
                 let nextAttributesOffests = parseDeclarationAttributes(nextStructure)
-                    .values.compactMap { Substring.key.range(for: $0.__underlyingSource)?.offset }
+                    .values.compactMap { Substring.key.range(for: $0.underlyingSource)?.offset }
                 if let firstNextAttributeOffset = nextAttributesOffests.min() {
                     upperBound = min(Int(range.offset), Int(firstNextAttributeOffset))
                 } else {
                     upperBound = Int(range.offset)
                 }
-            } else if let definedInSource = definedIn?.__underlyingSource, let range = Substring.key.range(for: definedInSource) {
+            } else if let definedInSource = definedIn?.underlyingSource, let range = Substring.key.range(for: definedInSource) {
                 // if there are no fiurther declarations, parse until end of containing declaration
                 upperBound = Int(range.offset) + Int(range.length) - 1
             }
@@ -617,7 +617,7 @@ extension FileParser {
         guard let (name, _, _) = parseTypeRequirements(source) else { return nil }
 
         var associatedValues: [AssociatedValue] = []
-        var rawValue: String? = nil
+        var rawValue: String?
 
         guard let keyString = extract(.key, from: source), let nameRange = keyString.range(of: name) else {
             Log.info("\(logPrefix)parseEnumCase: Unable to extract enum body from \(source)")

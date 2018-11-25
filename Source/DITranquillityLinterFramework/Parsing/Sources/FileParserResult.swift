@@ -72,7 +72,7 @@ final class FileParserResult: Codable, ProtobufBridgable {
     var contentSha: String
     var linterVersion: String
 	
-	static func ==(lhs: FileParserResult, rhs: FileParserResult) -> Bool {
+	static func == (lhs: FileParserResult, rhs: FileParserResult) -> Bool {
 		if lhs.path != rhs.path { return false }
 		if lhs.module != rhs.module { return false }
 		if lhs.types != rhs.types { return false }
