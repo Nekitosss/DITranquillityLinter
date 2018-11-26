@@ -20,10 +20,12 @@ final class BinaryFrameworkParser {
 	
 	private let cacher: ResultCacher
 	private let fileContainer: FileContainer
+	private let isTestEnvironment: Bool
 	
-	init(fileContainer: FileContainer) {
+	init(fileContainer: FileContainer, isTestEnvironment: Bool) {
 		self.cacher = ResultCacher()
 		self.fileContainer = fileContainer
+		self.isTestEnvironment = isTestEnvironment
  	}
 	
 	
@@ -173,11 +175,19 @@ final class BinaryFrameworkParser {
 	
 	/// Collects all framework parts ("*.h" files).
 	private func collectFrameworkNames(frameworksURL: URL, explicitNames: Set<String>?) throws -> [String] {
-		let fileURLs = try FileManager.default.contentsOfDirectory(at: frameworksURL, includingPropertiesForKeys: nil)
-		return fileURLs.reduce(into: []) { result, url in
-			let frameworkName = url.lastPathComponent.droppedSuffix(".h")
-			if url.pathExtension == "h" && (explicitNames?.contains(frameworkName) ?? true) {
-				result.append(frameworkName)
+		do {
+			let fileURLs = try FileManager.default.contentsOfDirectory(at: frameworksURL, includingPropertiesForKeys: nil)
+			return fileURLs.reduce(into: []) { result, url in
+				let frameworkName = url.lastPathComponent.droppedSuffix(".h")
+				if url.pathExtension == "h" && (explicitNames?.contains(frameworkName) ?? true) {
+					result.append(frameworkName)
+				}
+			}
+		} catch {
+			if isTestEnvironment {
+				return []
+			} else {
+				throw error
 			}
 		}
 	}

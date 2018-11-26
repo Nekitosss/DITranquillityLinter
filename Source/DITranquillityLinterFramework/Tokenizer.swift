@@ -26,7 +26,7 @@ public class Tokenizer {
 	public init(isTestEnvironment: Bool) {
 		self.isTestEnvironment = isTestEnvironment
 		self.container = FileContainer()
-		self.binaryFrameworkParser = BinaryFrameworkParser(fileContainer: self.container)
+		self.binaryFrameworkParser = BinaryFrameworkParser(fileContainer: self.container, isTestEnvironment: self.isTestEnvironment)
 		self.implicitDependencyTypeResolver = ImplicitFrameworkDependencyTypesResolver(binaryFrameworkParser: self.binaryFrameworkParser)
 	}
 	
