@@ -37,7 +37,6 @@ public enum XcodeEnvVariable: String {
 public enum EnvVariable: String {
 	case defaultTarget = "DI_LINTER_DEFAULT_TARGET"
 	case defaultSDK = "DI_LINTER_DEFAULT_SDK"
-	case currentProjectFolder = "DI_LINTER_PROJECT_FOLDER"
 	case testableProjectFolder = "DI_LINTER_TESTABLE_PROJECT_FOLDER"
 	case testableProjectName = "DI_LINTER_TESTABLE_PROJECT_NAME"
 	
@@ -51,8 +50,6 @@ public enum EnvVariable: String {
 			return "/Users/nikita/development/fooddly/Fooddly/"
 		case .testableProjectName:
 			return "Fooddly.xcodeproj"
-		case .currentProjectFolder:
-			return "/Users/nikita/development/DITranquillityLinter"
 		}
 	}
 	

@@ -12,8 +12,10 @@ env:
 before_install:
   - curl -L -O https://github.com/realm/SwiftLint/releases/download/0.28.2/SwiftLint.pkg
   - sudo installer -pkg SwiftLint.pkg -target /
-script:
+  - sudo bundle install
   - swift package resolve
+  - Scripts/generate-xcodeproj.sh
+script:
   - swiftlint
   - swift test
 notifications:

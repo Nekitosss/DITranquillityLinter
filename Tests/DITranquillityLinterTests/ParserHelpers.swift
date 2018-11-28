@@ -60,6 +60,6 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 }
 
 func pathToSourceFile(with name: String) -> String {
-	let pathToTestableSource = EnvVariable.currentProjectFolder.value() + "/LintableProject/LintableProject/Testable/"
-	return pathToTestableSource + name + ".swift"
+	let bundle = Bundle(path: FileManager.default.currentDirectoryPath + "/TestFiles.bundle")!
+	return bundle.path(forResource: name, ofType: "swift")!
 }

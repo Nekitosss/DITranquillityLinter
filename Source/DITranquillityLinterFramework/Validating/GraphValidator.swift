@@ -130,11 +130,6 @@ final class GraphValidator {
 	}
 	
 	
-	private func buildTooManyRegistrationsForType(registrationName: String) -> String {
-		return "Too many registrations for \"\(registrationName)\" type. Make one of registration as default or delete redundant registration."
-	}
-	
-	
 	private func buildHaseMoreThanOneDefaultRegistratioinsForType(registrationName: String) -> String {
 		return "Too many default registrations for \"\(registrationName)\" type. Make exact one of registration as default or delete redundant registration."
 	}
