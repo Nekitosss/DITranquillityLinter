@@ -29,7 +29,7 @@ final class BinaryFrameworkParser {
  	}
 	
 	
-	/// Parse OS related bynary frameworks and frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
+	/// Parse frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
 	func parseExplicitBinaryModules() throws -> [FileParserResult] {
 		TimeRecorder.start(event: .parseBinary)
 		defer { TimeRecorder.end(event: .parseBinary) }
@@ -41,6 +41,7 @@ final class BinaryFrameworkParser {
 		
 	}
 	
+	/// Parse OS related bynary frameworks and
 	func parseBinaryModules(names: Set<String>) throws -> [FileParserResult]? {
 		guard !names.isEmpty else {
 			return nil
@@ -75,7 +76,9 @@ final class BinaryFrameworkParser {
 		guard let frameworkPathsString = XcodeEnvVariable.frameworkSearchPaths.value() else {
 			return []
 		}
-		let frameworkPaths = frameworkPathsString.split(separator: "\"").filter({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+		let frameworkPaths = frameworkPathsString
+			.split(separator: "\"")
+			.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
 		
 		var frameworkInfoList: [BinaryFrameworkInfo] = []
 		for frameworkPath in frameworkPaths {
@@ -146,10 +149,9 @@ final class BinaryFrameworkParser {
 				self.fileContainer.set(value: parser.file, for: fileName)
 				self.cacher.cacheBinaryFiles(list: fileParserResult, name: cacheName, isCommonCache: isCommon)
 				return fileParserResult
-				
-			} else {
-				return []
 			}
+			
+			return []
 		}
 	}
 	

@@ -21,5 +21,52 @@ class HelpersTests: XCTestCase {
 			XCTAssertEqual(error as NSError, throwable)
 		}
 	}
+	
+	
+	func testBinaryFrameworkParsingNoCache() throws {
+		let container = FileContainer()
+		let cacher = ResultCacher()
+		try cacher.clearCaches(isCommonCache: true)
+		
+		let parser = BinaryFrameworkParser(fileContainer: container, isTestEnvironment: true)
+		let result = try parser.parseBinaryModules(names: ["UIInteraction"])
+		
+		XCTAssertNotNil(result)
+		XCTAssertFalse((result?.isEmpty ?? true))
+	}
+	
+	
+	func testProperBinaryParsingErrorHandling() throws {
+		let container = FileContainer()
+		let parser = BinaryFrameworkParser(fileContainer: container, isTestEnvironment: true)
+		let result = try parser.parseBinaryModules(names: ["NSIndexPath+UIKitAdditions"]) // That will not be parsed, but error will not be thrown
+		
+		XCTAssertNotNil(result)
+		XCTAssertTrue((result?.isEmpty ?? true))
+	}
 
+	
+	func testSkippingEmptyBinaryParsing() throws {
+		let container = FileContainer()
+		let parser = BinaryFrameworkParser(fileContainer: container, isTestEnvironment: true)
+		let result = try parser.parseBinaryModules(names: [])
+		
+		XCTAssertNil(result)
+	}
+	
+	
+	func testFileContainerSuccessRecreation() throws {
+		let container = FileContainer()
+		let filePath = pathToSourceFile(with: "TestComposedTypealiasError")
+		let file = container.getOrCreateFile(by: filePath)
+		
+		XCTAssertNotNil(file)
+	}
+	
+	func testFileContaienrFailureRecreation() throws {
+		let container = FileContainer()
+		let file = container.getOrCreateFile(by: "NotExistingFile")
+		
+		XCTAssertNil(file)
+	}
 }

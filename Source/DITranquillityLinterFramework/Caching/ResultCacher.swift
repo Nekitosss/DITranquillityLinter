@@ -16,6 +16,11 @@ final class ResultCacher {
 	private let encoder = JSONEncoder()
 	private let decoder = JSONDecoder()
 	
+	func clearCaches(isCommonCache: Bool) throws {
+		let cachePath = self.cachePath(isCommonCache: isCommonCache)
+		try FileManager.default.removeItem(atPath: cachePath)
+	}
+	
 	func cacheBinaryFiles(list: [FileParserResult], name: String, isCommonCache: Bool) {
 		TimeRecorder.start(event: .encodeBinary)
 		defer { TimeRecorder.end(event: .encodeBinary) }
@@ -88,7 +93,7 @@ final class ResultCacher {
 	
 	func cachePath(isCommonCache: Bool) -> String {
 		if isCommonCache {
-			return ResultCacher.commonCacheDirectory
+			return ResultCacher.commonCacheDirectory + ResultCacher.libraryCacheFolderName
 		} else if let srcRoot = XcodeEnvVariable.srcRoot.value() {
 			print("SRCROOT: ", srcRoot)
 			return srcRoot + "/"
