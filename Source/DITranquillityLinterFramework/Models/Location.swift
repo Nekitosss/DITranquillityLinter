@@ -21,9 +21,6 @@ public struct Location: CustomStringConvertible, Comparable {
 		let charString: String = character.map({ ":\($0)" }) ?? ""
 		return [fileString, lineString, charString].joined()
 	}
-	public var relativeFile: String? {
-		return file?.replacingOccurrences(of: FileManager.default.currentDirectoryPath + "/", with: "")
-	}
 	
 	public init(file: String?, line: Int? = nil, character: Int? = nil) {
 		self.file = file
@@ -34,17 +31,6 @@ public struct Location: CustomStringConvertible, Comparable {
 	public init(file: File, byteOffset offset: Int64) {
 		self.file = file.path
 		if let lineAndCharacter = file.contents.bridge().lineAndCharacter(forByteOffset: Int(offset)) {
-			line = lineAndCharacter.line
-			character = lineAndCharacter.character
-		} else {
-			line = nil
-			character = nil
-		}
-	}
-	
-	public init(file: File, characterOffset offset: Int) {
-		self.file = file.path
-		if let lineAndCharacter = file.contents.bridge().lineAndCharacter(forCharacterOffset: offset) {
 			line = lineAndCharacter.line
 			character = lineAndCharacter.character
 		} else {

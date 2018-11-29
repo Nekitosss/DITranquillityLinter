@@ -42,7 +42,9 @@ final class BinaryFrameworkParser {
 	}
 	
 	func parseBinaryModules(names: Set<String>) throws -> [FileParserResult]? {
-		guard !names.isEmpty else { return nil }
+		guard !names.isEmpty else {
+			return nil
+		}
 		let (target, sdk) = self.createCommandLineArgumentInfoForSourceKitParsing()
 		let commonFrameworks = self.getImplicitlyDependentBinaryFrameworks(sdk: sdk)
 		return try self.parseFrameworkInfoList(commonFrameworks, target: target, sdk: sdk, isCommon: true, explicitNames: names)
