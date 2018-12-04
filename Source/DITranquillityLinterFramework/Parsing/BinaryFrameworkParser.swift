@@ -60,9 +60,9 @@ final class BinaryFrameworkParser {
 			let deploymentTarget = XcodeEnvVariable.deploymentTarget.value() {
 			//		"${PLATFORM_PREFERRED_ARCH}-apple-${SWIFT_PLATFORM_TARGET_PREFIX}${IPHONEOS_DEPLOYMENT_TARGET}"
 			target = "\(arch)-apple-\(targetPrefix)\(deploymentTarget)"
-			print("Found environment info.")
+			Log.info("Found environment info.")
 		} else {
-			print("Environment info not found. Will be used default")
+			Log.info("Environment info not found. Will be used default")
 		}
 		if let sdkRoot = XcodeEnvVariable.sdkRoot.value() {
 			sdk = sdkRoot
@@ -133,7 +133,7 @@ final class BinaryFrameworkParser {
 		let frameworksURL = URL(fileURLWithPath: frameworksPath + "/\(moduleName).framework/Headers", isDirectory: true)
 		let frameworks = try self.collectFrameworkNames(frameworksURL: frameworksURL, explicitNames: explicitNames)
 		return try frameworks.flatMap { (frameworkName) -> [FileParserResult] in
-			print("Parse framework: \(frameworkName)")
+			Log.verbose("Parse framework: \(frameworkName)")
 			
 			let fullFrameworkName = self.fullFrameworkName(moduleName: moduleName, frameworkName: frameworkName)
 			let fileName = frameworksURL.path + "/" + fullFrameworkName + ".h"

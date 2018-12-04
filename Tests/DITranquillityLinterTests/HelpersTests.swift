@@ -69,4 +69,12 @@ class HelpersTests: XCTestCase {
 		
 		XCTAssertNil(file)
 	}
+	
+	func testProperFileProcessingSequence() throws {
+		let filePath = pathToSourceFile(with: "TestComposedTypealiasFailure")
+		
+		let tokenizer = Tokenizer(isTestEnvironment: true)
+		let result = try tokenizer.process(files: [filePath])
+		XCTAssertFalse(result)
+	}
 }
