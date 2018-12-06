@@ -18,23 +18,38 @@ final class BinaryFrameworkParser {
 	}
 	
 	
-	private let cacher = ResultCacher()
+	private let cacher: ResultCacher
+	private let fileContainer: FileContainer
+	private let isTestEnvironment: Bool
+	
+	init(fileContainer: FileContainer, isTestEnvironment: Bool) {
+		self.cacher = ResultCacher()
+		self.fileContainer = fileContainer
+		self.isTestEnvironment = isTestEnvironment
+ 	}
 	
 	
-	/// Parse OS related bynary frameworks and frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
-	func parseBinaryModules(fileContainer: FileContainer) throws -> [FileParserResult] {
+	/// Parse frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
+	func parseExplicitBinaryModules() throws -> [FileParserResult] {
 		TimeRecorder.start(event: .parseBinary)
 		defer { TimeRecorder.end(event: .parseBinary) }
 		
 		let (target, sdk) = self.createCommandLineArgumentInfoForSourceKitParsing()
 		let userDefinedFrameworks = try self.getUserDefinedBinaryFrameworkNames()
-		let commonFrameworks = self.getImplicitlyDependentBinaryFrameworks(sdk: sdk)
 		
-		return
-			try self.parseFrameworkInfoList(userDefinedFrameworks, target: target, sdk: sdk, fileContainer: fileContainer, isCommon: false)
-			+ self.parseFrameworkInfoList(commonFrameworks, target: target, sdk: sdk, fileContainer: fileContainer, isCommon: true)
+		return try self.parseFrameworkInfoList(userDefinedFrameworks, target: target, sdk: sdk, isCommon: false, explicitNames: nil)
+		
 	}
 	
+	/// Parse OS related bynary frameworks and
+	func parseBinaryModules(names: Set<String>) throws -> [FileParserResult]? {
+		guard !names.isEmpty else {
+			return nil
+		}
+		let (target, sdk) = self.createCommandLineArgumentInfoForSourceKitParsing()
+		let commonFrameworks = self.getImplicitlyDependentBinaryFrameworks(sdk: sdk)
+		return try self.parseFrameworkInfoList(commonFrameworks, target: target, sdk: sdk, isCommon: true, explicitNames: names)
+	}
 	
 	private func createCommandLineArgumentInfoForSourceKitParsing() -> (target: String, sdk: String) {
 		var target = EnvVariable.defaultTarget.value()
@@ -45,9 +60,9 @@ final class BinaryFrameworkParser {
 			let deploymentTarget = XcodeEnvVariable.deploymentTarget.value() {
 			//		"${PLATFORM_PREFERRED_ARCH}-apple-${SWIFT_PLATFORM_TARGET_PREFIX}${IPHONEOS_DEPLOYMENT_TARGET}"
 			target = "\(arch)-apple-\(targetPrefix)\(deploymentTarget)"
-			print("Found environment info.")
+			Log.info("Found environment info.")
 		} else {
-			print("Environment info not found. Will be used default")
+			Log.info("Environment info not found. Will be used default")
 		}
 		if let sdkRoot = XcodeEnvVariable.sdkRoot.value() {
 			sdk = sdkRoot
@@ -61,7 +76,9 @@ final class BinaryFrameworkParser {
 		guard let frameworkPathsString = XcodeEnvVariable.frameworkSearchPaths.value() else {
 			return []
 		}
-		let frameworkPaths = frameworkPathsString.split(separator: "\"").filter({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+		let frameworkPaths = frameworkPathsString
+			.split(separator: "\"")
+			.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
 		
 		var frameworkInfoList: [BinaryFrameworkInfo] = []
 		for frameworkPath in frameworkPaths {
@@ -92,46 +109,49 @@ final class BinaryFrameworkParser {
 		if sdk.range(of: "MacOSX") != nil {
 			commonFrameworkInfoList.append(BinaryFrameworkInfo(path: commonFrameworksPath, name: "Cocoa"))
 		}
+		commonFrameworkInfoList.append(BinaryFrameworkInfo(path: commonFrameworksPath, name: "Foundation"))
 		return commonFrameworkInfoList
 	}
 	
 	
 	/// Parse concrete binary framework.
-	private func parseFrameworkInfoList(_ frameworkInfoList: [BinaryFrameworkInfo], target: String, sdk: String, fileContainer: FileContainer, isCommon: Bool) throws -> [FileParserResult] {
+	private func parseFrameworkInfoList(_ frameworkInfoList: [BinaryFrameworkInfo], target: String, sdk: String, isCommon: Bool, explicitNames: Set<String>?) throws -> [FileParserResult] {
 		let templateCompilerArguments = ["-target", target, "-sdk", sdk, "-F"]
 		
 		return try frameworkInfoList.flatMap { (frameworkInfo) -> [FileParserResult] in
 			let compilerArguments = templateCompilerArguments + [frameworkInfo.path]
-			let cacheName = frameworkInfo.path + frameworkInfo.name
-			
-			if let cachedResult = cacher.getCachedBinaryFiles(name: cacheName, isCommonCache: isCommon) {
-				return cachedResult
-			} else {
-				let parsedModule = try parseModule(moduleName: frameworkInfo.name, frameworksPath: frameworkInfo.path, compilerArguments: compilerArguments, fileContainer: fileContainer)
-				cacher.cacheBinaryFiles(list: parsedModule, name: cacheName, isCommonCache: isCommon)
-				return parsedModule
-			}
+			return try self.parseModule(moduleName: frameworkInfo.name,
+										frameworksPath: frameworkInfo.path,
+										compilerArguments: compilerArguments,
+										explicitNames: explicitNames,
+										isCommon: isCommon)
 		}
 	}
 	
 	/// Parse Binary framework path. Framework may be separate into several ".h" files. Method parse passed "***.h" file.
-	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String], fileContainer: FileContainer) throws -> [FileParserResult] {
-		print("Parse module: \(moduleName)")
+	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String], explicitNames: Set<String>?, isCommon: Bool) throws -> [FileParserResult] {
 		let frameworksURL = URL(fileURLWithPath: frameworksPath + "/\(moduleName).framework/Headers", isDirectory: true)
-		let frameworks = try self.collectFrameworkNames(frameworksURL: frameworksURL)
-		return frameworks.compactMap { frameworkName in
-			print("Parse framework: \(frameworkName)")
+		let frameworks = try self.collectFrameworkNames(frameworksURL: frameworksURL, explicitNames: explicitNames)
+		return try frameworks.flatMap { (frameworkName) -> [FileParserResult] in
+			Log.verbose("Parse framework: \(frameworkName)")
+			
 			let fullFrameworkName = self.fullFrameworkName(moduleName: moduleName, frameworkName: frameworkName)
 			let fileName = frameworksURL.path + "/" + fullFrameworkName + ".h"
-			do {
-				let contents = try self.createSwiftSourcetext(for: fullFrameworkName, use: compilerArguments)
+			let cacheName = frameworksPath + moduleName + frameworkName
+			
+			if let cachedResult = self.cacher.getCachedBinaryFiles(name: cacheName, isCommonCache: isCommon) {
+				return cachedResult
+				
+			} else if let contents = try? self.createSwiftSourcetext(for: fullFrameworkName, use: compilerArguments) {
+				// We use "try?" here cause we should "eat" errors in swift source creating from objc
 				let parser = FileParser(contents: contents, path: fileName, module: moduleName)
-				let fileParserResult = try parser.parse()
-				fileContainer.set(value: parser.file, for: fileName)
+				let fileParserResult = try [parser.parse()]
+				self.fileContainer.set(value: parser.file, for: fileName)
+				self.cacher.cacheBinaryFiles(list: fileParserResult, name: cacheName, isCommonCache: isCommon)
 				return fileParserResult
-			} catch {
-				return nil
 			}
+			
+			return []
 		}
 	}
 	
@@ -158,8 +178,21 @@ final class BinaryFrameworkParser {
 	
 	
 	/// Collects all framework parts ("*.h" files).
-	private func collectFrameworkNames(frameworksURL: URL) throws -> [String] {
-		let fileURLs = try FileManager.default.contentsOfDirectory(at: frameworksURL, includingPropertiesForKeys: nil)
-		return fileURLs.filter({ $0.pathExtension == "h" }).map({ $0.lastPathComponent.droppedSuffix(".h") })
+	private func collectFrameworkNames(frameworksURL: URL, explicitNames: Set<String>?) throws -> [String] {
+		do {
+			let fileURLs = try FileManager.default.contentsOfDirectory(atPath: frameworksURL.path).compactMap(URL.init)
+			return fileURLs.reduce(into: []) { result, url in
+				let frameworkName = url.lastPathComponent.droppedSuffix(".h")
+				if url.pathExtension == "h" && (explicitNames?.contains(frameworkName) ?? true) {
+					result.append(frameworkName)
+				}
+			}
+		} catch {
+			if isTestEnvironment {
+				return []
+			} else {
+				throw error
+			}
+		}
 	}
 }

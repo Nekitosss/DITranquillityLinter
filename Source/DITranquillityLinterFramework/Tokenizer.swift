@@ -14,27 +14,33 @@ public let linterVersion = "0.0.2"
 
 public class Tokenizer {
 	
-	let container = FileContainer()
+	let container: FileContainer
 	
 	private let isTestEnvironment: Bool
 	private let validator = GraphValidator()
 	private let composer = Composer()
-	private let binaryFrameworkParser = BinaryFrameworkParser()
+	private let binaryFrameworkParser: BinaryFrameworkParser
+	private let implicitDependencyTypeResolver: ImplicitFrameworkDependencyTypesResolver
 	
 	
 	public init(isTestEnvironment: Bool) {
+		Log.level = isTestEnvironment ? .verbose : .warnings
+		
 		self.isTestEnvironment = isTestEnvironment
+		self.container = FileContainer()
+		self.binaryFrameworkParser = BinaryFrameworkParser(fileContainer: self.container, isTestEnvironment: self.isTestEnvironment)
+		self.implicitDependencyTypeResolver = ImplicitFrameworkDependencyTypesResolver(binaryFrameworkParser: self.binaryFrameworkParser)
 	}
 	
 	
-	public func process(files: [String]) -> Bool {
+	public func process(files: [String]) throws -> Bool {
 		let filteredFiles = files.filter(shouldBeParsed)
-		let collectedInfo = collectInfo(files: filteredFiles)
+		let collectedInfo = try collectInfo(files: filteredFiles)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
 		guard let initContainerStructure = containerBuilder.findContainerStructure() else {
-			print("Could not find DIContainer creation")
+			Log.warning("Could not find DIContainer creation")
 			return false
 		}
 		guard parsingContext.errors.isEmpty else {
@@ -63,41 +69,48 @@ public class Tokenizer {
 	///
 	/// - Parameter files: Input source files.
 	/// - Returns: All collected information dictionary. With as much as possible resolved types.
-	func collectInfo(files: [String]) -> [String: Type] {
-		do {
-			TimeRecorder.start(event: .parseSourceAndDependencies)
-			var allResults = try files.parallelFlatMap({ (fileName) -> FileParserResult? in
-				guard let file = File(path: fileName) else { return nil }
-				container.set(value: file, for: fileName)
-				return try FileParser(contents: file.contents, path: fileName, module: nil).parse()
-			})
-			TimeRecorder.end(event: .parseSourceAndDependencies)
-			
-			if !isTestEnvironment {
-				allResults += try binaryFrameworkParser.parseBinaryModules(fileContainer: container)
-			}
-			
-			TimeRecorder.start(event: .compose)
-			defer { TimeRecorder.end(event: .compose) }
-			
-			let parserResult = allResults.reduce(into: FileParserResult(path: nil, module: nil, types: [], linterVersion: linterVersion)) {
-				$0.typealiases += $1.typealiases
-				$0.types += $1.types
-			}
-			
-			return composer.composedTypes(parserResult)
-			
-		} catch {
-			print("Error during file parsing", error)
-			exit(EXIT_FAILURE)
+	func collectInfo(files: [String]) throws -> [String: Type] {
+		TimeRecorder.start(event: .parseSourceAndDependencies)
+		var allResults = try files.parallelFlatMap({ (fileName) -> FileParserResult? in
+			guard let file = File(path: fileName) else { return nil }
+			self.container.set(value: file, for: fileName)
+			return try FileParser(contents: file.contents, path: fileName, module: nil).parse()
+		})
+		TimeRecorder.end(event: .parseSourceAndDependencies)
+		
+		allResults += try self.binaryFrameworkParser.parseExplicitBinaryModules()
+		
+		TimeRecorder.start(event: .compose)
+		defer { TimeRecorder.end(event: .compose) }
+		
+		let composedResult = self.composeResult(from: allResults)
+		
+		let allTypes = self.mergeResult(list: allResults).types
+		if let fullyUnresolvedResult = try self.implicitDependencyTypeResolver.resolveTypesFromImplicitDependentBinaryFrameworks(in: allTypes, composedTypes: composedResult) {
+			allResults += fullyUnresolvedResult
+			return self.composeResult(from: allResults)
+		} else {
+			return composedResult
 		}
+	}
+	
+	private func mergeResult(list: [FileParserResult]) -> FileParserResult {
+		return list.reduce(into: FileParserResult(path: nil, module: nil, types: [], linterVersion: linterVersion)) {
+			$0.typealiases += $1.typealiases
+			$0.types += $1.types
+		}
+	}
+	
+	private func composeResult(from fileParserList: [FileParserResult]) -> [String: Type] {
+		let parserResult = self.mergeResult(list: fileParserList)
+		return self.composer.composedTypes(parserResult)
 	}
 	
 	
 	/// Prints all founded errors to XCode
 	private func display(errorList: [GraphError]) {
 		errorList.forEach {
-			print($0.xcodeMessage)
+			Log.error($0.xcodeMessage)
 		}
 	}
 }

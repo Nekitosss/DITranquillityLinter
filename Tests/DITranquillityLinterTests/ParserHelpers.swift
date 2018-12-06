@@ -37,8 +37,8 @@ func extractRegistrationInfo(containerInfo: ContainerPart, maximumRegistrationCo
 func validateGraph(fileName: String) throws -> [GraphError] {
 	let fileURL = pathToSourceFile(with: fileName)
 	let tokenizer = Tokenizer(isTestEnvironment: true)
-	let collectedInfo = tokenizer.collectInfo(files: [fileURL])
-	let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
+	let collectedInfo = try tokenizer.collectInfo(files: [fileURL])
+	let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 	guard let containerInfo = containerBuilder.findContainerStructure() else {
 		throw TestError.containerInfoNotFound
@@ -51,7 +51,7 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 func findContainerStructure(fileName: String) throws -> ContainerPart {
 	let tokenizer = Tokenizer(isTestEnvironment: true)
 	let fileURL = pathToSourceFile(with: fileName)
-	let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
+	let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 	guard let containerInfo = containerBuilder.findContainerStructure() else {
 		throw TestError.containerInfoNotFound
@@ -60,6 +60,6 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 }
 
 func pathToSourceFile(with name: String) -> String {
-	let pathToTestableSource = EnvVariable.currentProjectFolder.value() + "/LintableProject/LintableProject/Testable/"
-	return pathToTestableSource + name + ".swift"
+	let bundle = Bundle(path: FileManager.default.currentDirectoryPath + "/TestFiles.bundle")!
+	return bundle.path(forResource: name, ofType: "swift")!
 }

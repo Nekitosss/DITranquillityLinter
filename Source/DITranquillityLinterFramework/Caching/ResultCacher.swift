@@ -16,6 +16,22 @@ final class ResultCacher {
 	private let encoder = JSONEncoder()
 	private let decoder = JSONDecoder()
 	
+	func clearCaches(isCommonCache: Bool) throws {
+		let cachePath = self.cachePath(isCommonCache: isCommonCache)
+		do {
+			try FileManager.default.removeItem(atPath: cachePath)
+		} catch {
+			if let underlyingError = (error as NSError).userInfo["NSUnderlyingError"] as? NSError,
+				underlyingError.domain == "NSPOSIXErrorDomain",
+				underlyingError.code == 2 {
+				// No such file or directory
+				return
+			} else {
+				throw error
+			}
+		}
+	}
+	
 	func cacheBinaryFiles(list: [FileParserResult], name: String, isCommonCache: Bool) {
 		TimeRecorder.start(event: .encodeBinary)
 		defer { TimeRecorder.end(event: .encodeBinary) }
@@ -31,7 +47,7 @@ final class ResultCacher {
 			
 			try encodedData.write(to: cacheURL)
 		} catch {
-			print(error)
+			Log.error(error)
 			exit(EXIT_FAILURE)
 		}
 	}
@@ -56,41 +72,11 @@ final class ResultCacher {
 		}
 	}
 	
-	func getCachedFileParseResult(contents: String) -> FileParserResult? {
-		TimeRecorder.start(event: .decodeCachedSource)
-		defer { TimeRecorder.end(event: .decodeCachedSource) }
-		let cacheDicectoryPlace = cachePath(isCommonCache: false)
-		let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
-		let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: contents))
-		do {
-			let data = try Data(contentsOf: cacheURL, options: [])
-			let decodedData = try FileParserResult.fromProtoMessage(FileParserResult.ProtoStructure(serializedData: data))
-//			decodedData.updateRelationshipAfterDecoding()
-			return decodedData
-		} catch {
-			return nil
-		}
-	}
-	
-	func setCachedFileParseResult(result: FileParserResult, contents: String) {
-		defer { TimeRecorder.end(event: .encodeBinary) }
-		do {
-			let cacheDicectoryPlace = cachePath(isCommonCache: false)
-			let cacheURLDirectory = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
-			let cacheURL = cacheURLDirectory.appendingPathComponent(cacheName(name: contents))
-			try FileManager.default.createDirectory(atPath: cacheURLDirectory.path, withIntermediateDirectories: true, attributes: nil)
-			let encodedData = try result.toProtoMessage.serializedData()
-			try encodedData.write(to: cacheURL)
-		} catch {
-			print(error)
-		}
-	}
-	
 	func cachePath(isCommonCache: Bool) -> String {
 		if isCommonCache {
-			return ResultCacher.commonCacheDirectory
+			return ResultCacher.commonCacheDirectory + ResultCacher.libraryCacheFolderName
 		} else if let srcRoot = XcodeEnvVariable.srcRoot.value() {
-			print("SRCROOT: ", srcRoot)
+			Log.verbose("SRCROOT: " + srcRoot)
 			return srcRoot + "/"
 		} else {
 			return FileManager.default.currentDirectoryPath

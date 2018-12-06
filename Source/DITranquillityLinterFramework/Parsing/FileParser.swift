@@ -790,10 +790,6 @@ extension FileParser {
         return substringIdentifier.extract(from: source, contents: contents)
     }
 
-    fileprivate func extractLines(_ substringIdentifier: Substring, from source: [String: SourceKitRepresentable], contents: String, trimWhitespacesAndNewlines: Bool = true) -> String? {
-        return substringIdentifier.extractLines(from: source, contents: contents, trimWhitespacesAndNewlines: trimWhitespacesAndNewlines)
-    }
-
     fileprivate func extractLinesNumbers(_ substringIdentifier: Substring, from source: [String: SourceKitRepresentable], contents: String) -> (start: Int, end: Int)? {
         return substringIdentifier.extractLinesNumbers(from: source, contents: contents)
     }

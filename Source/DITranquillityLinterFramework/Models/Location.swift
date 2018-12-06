@@ -9,7 +9,7 @@
 import Foundation
 import SourceKittenFramework
 
-public struct Location: CustomStringConvertible, Comparable {
+public struct Location: CustomStringConvertible, Equatable {
 	public let file: String?
 	public let line: Int?
 	public let character: Int?
@@ -20,9 +20,6 @@ public struct Location: CustomStringConvertible, Comparable {
 		let lineString: String = ":\(line ?? 1)"
 		let charString: String = character.map({ ":\($0)" }) ?? ""
 		return [fileString, lineString, charString].joined()
-	}
-	public var relativeFile: String? {
-		return file?.replacingOccurrences(of: FileManager.default.currentDirectoryPath + "/", with: "")
 	}
 	
 	public init(file: String?, line: Int? = nil, character: Int? = nil) {
@@ -41,44 +38,10 @@ public struct Location: CustomStringConvertible, Comparable {
 			character = nil
 		}
 	}
-	
-	public init(file: File, characterOffset offset: Int) {
-		self.file = file.path
-		if let lineAndCharacter = file.contents.bridge().lineAndCharacter(forCharacterOffset: offset) {
-			line = lineAndCharacter.line
-			character = lineAndCharacter.character
-		} else {
-			line = nil
-			character = nil
-		}
-	}
-}
-
-// MARK: Comparable
-
-private func < <T: Comparable>(lhs: T?, rhs: T?) -> Bool {
-	switch (lhs, rhs) {
-	case let (lhs?, rhs?):
-		return lhs < rhs
-	case (nil, _?):
-		return true
-	default:
-		return false
-	}
 }
 
 public func == (lhs: Location, rhs: Location) -> Bool {
 	return lhs.file == rhs.file &&
 		lhs.line == rhs.line &&
 		lhs.character == rhs.character
-}
-
-public func < (lhs: Location, rhs: Location) -> Bool {
-	if lhs.file != rhs.file {
-		return lhs.file < rhs.file
-	}
-	if lhs.line != rhs.line {
-		return lhs.line < rhs.line
-	}
-	return lhs.character < rhs.character
 }

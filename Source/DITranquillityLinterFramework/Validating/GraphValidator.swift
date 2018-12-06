@@ -36,6 +36,7 @@ final class GraphValidator {
 		
 		if defaultCount == 0 {
 			// Its ok to have just many registrations for one type. Error can be thrown in not many injection
+			// TODO: Check real type in many registrations. We should not allow use two exact same registration which is same class, not same protocol?
 			return nil
 		} else if defaultCount > 1 {
 			let info = buildHaseMoreThanOneDefaultRegistratioinsForType(registrationName: validatingRegistration.typeName)
@@ -127,11 +128,6 @@ final class GraphValidator {
 			}
 		}
 		return result
-	}
-	
-	
-	private func buildTooManyRegistrationsForType(registrationName: String) -> String {
-		return "Too many registrations for \"\(registrationName)\" type. Make one of registration as default or delete redundant registration."
 	}
 	
 	

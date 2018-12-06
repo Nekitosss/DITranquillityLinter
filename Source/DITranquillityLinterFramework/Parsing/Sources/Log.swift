@@ -2,7 +2,7 @@ import Darwin
 import Foundation
 
 /// :nodoc:
-enum Log {
+public enum Log {
 
     enum Level: Int {
         case errors
@@ -13,7 +13,7 @@ enum Log {
 
     static var level: Level = .warnings
 
-    static func error(_ message: Any) {
+    public static func error(_ message: Any) {
         log(level: .errors, "error: \(message)")
         // to return error when running swift templates which is done in a different process
         if ProcessInfo().processName == "bin" {
@@ -21,15 +21,15 @@ enum Log {
         }
     }
 
-    static func warning(_ message: Any) {
+    public static func warning(_ message: Any) {
         log(level: .warnings, "warning: \(message)")
     }
 
-    static func verbose(_ message: Any) {
+    public static func verbose(_ message: Any) {
         log(level: .verbose, message)
     }
 
-    static func info(_ message: Any) {
+    public static func info(_ message: Any) {
         log(level: .info, message)
     }
 

@@ -13,10 +13,6 @@ extension Array {
 		return try parallelMap(transform).compactMap { $0 }
 	}
 	
-	func parallelFlatMap<T>(_ transform: (Element) throws -> [T]) rethrows -> [T] {
-		return try parallelMap(transform).flatMap { $0 }
-	}
-	
 	func parallelMap<T>(_ transform: (Element) throws -> T) rethrows -> [T] {
 		var result = ContiguousArray<T?>(repeating: nil, count: count)
 		return try result.withUnsafeMutableBufferPointer { buffer in
