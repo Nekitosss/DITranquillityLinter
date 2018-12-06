@@ -18,7 +18,18 @@ final class ResultCacher {
 	
 	func clearCaches(isCommonCache: Bool) throws {
 		let cachePath = self.cachePath(isCommonCache: isCommonCache)
-		try FileManager.default.removeItem(atPath: cachePath)
+		do {
+			try FileManager.default.removeItem(atPath: cachePath)
+		} catch {
+			if let underlyingError = (error as NSError).userInfo["NSUnderlyingError"] as? NSError,
+				underlyingError.domain == "NSPOSIXErrorDomain",
+				underlyingError.code == 2 {
+				// No such file or directory
+				return
+			} else {
+				throw error
+			}
+		}
 	}
 	
 	func cacheBinaryFiles(list: [FileParserResult], name: String, isCommonCache: Bool) {
