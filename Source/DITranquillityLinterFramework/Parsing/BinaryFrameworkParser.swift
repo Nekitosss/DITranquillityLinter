@@ -180,7 +180,7 @@ final class BinaryFrameworkParser {
 	/// Collects all framework parts ("*.h" files).
 	private func collectFrameworkNames(frameworksURL: URL, explicitNames: Set<String>?) throws -> [String] {
 		do {
-			let fileURLs = try FileManager.default.contentsOfDirectory(at: frameworksURL, includingPropertiesForKeys: nil)
+			let fileURLs = try FileManager.default.contentsOfDirectory(atPath: frameworksURL.path).compactMap(URL.init)
 			return fileURLs.reduce(into: []) { result, url in
 				let frameworkName = url.lastPathComponent.droppedSuffix(".h")
 				if url.pathExtension == "h" && (explicitNames?.contains(frameworkName) ?? true) {

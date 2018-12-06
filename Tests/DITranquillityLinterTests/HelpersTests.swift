@@ -29,7 +29,7 @@ class HelpersTests: XCTestCase {
 		try cacher.clearCaches(isCommonCache: true)
 		
 		let parser = BinaryFrameworkParser(fileContainer: container, isTestEnvironment: true)
-		let result = try parser.parseBinaryModules(names: ["UIInteraction"])
+		let result = try parser.parseBinaryModules(names: ["NSAutoreleasePool"])
 		
 		XCTAssertNotNil(result)
 		XCTAssertFalse((result?.isEmpty ?? true))
