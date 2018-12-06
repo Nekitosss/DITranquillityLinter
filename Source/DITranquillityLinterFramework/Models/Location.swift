@@ -45,4 +45,3 @@ public func == (lhs: Location, rhs: Location) -> Bool {
 		lhs.line == rhs.line &&
 		lhs.character == rhs.character
 }
-

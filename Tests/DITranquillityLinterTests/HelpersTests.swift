@@ -13,7 +13,7 @@ class HelpersTests: XCTestCase {
 	func testParallelArrayErrorThrowing() throws {
 		let throwable = NSError(domain: "", code: 0, userInfo: nil)
 		do {
-			_ = try [1,2,3].parallelMap { _ in
+			_ = try [1, 2, 3].parallelMap { _ in
 				throw throwable
 			}
 			XCTFail("Parallel map error did not trwowed")
