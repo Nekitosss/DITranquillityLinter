@@ -110,7 +110,7 @@ public class Tokenizer {
 	/// Prints all founded errors to XCode
 	private func display(errorList: [GraphError]) {
 		errorList.forEach {
-			Log.error($0.xcodeMessage)
+			print($0.xcodeMessage)
 		}
 	}
 }
