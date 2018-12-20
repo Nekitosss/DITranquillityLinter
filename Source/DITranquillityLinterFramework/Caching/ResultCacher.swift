@@ -65,7 +65,7 @@ final class ResultCacher {
 		do {
 			let data = try Data(contentsOf: cacheURL, options: [])
 			let decodedData = try FileParserResult.fromProtoMessage(FileParserResult.ProtoStructure(serializedData: data))
-//			decodedData.updateRelationshipAfterDecoding()
+			decodedData.updateRelationshipAfterDecoding()
 			return decodedData
 		} catch {
 			return nil

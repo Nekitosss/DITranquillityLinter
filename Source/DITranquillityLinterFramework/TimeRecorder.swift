@@ -28,7 +28,7 @@ public final class TimeRecorder {
 	public static let common = TimeRecorder()
 	
 	var events: [Event: Date] = [:]
-	private let monitor = NSObject()
+	private let mutex = PThreadMutex(normal: ())
 	
 	let isRecording = true
 	
@@ -46,21 +46,21 @@ public final class TimeRecorder {
 	
 	public func start(event: Event) {
 		guard isRecording else { return }
-		objc_sync_enter(monitor)
-		defer { objc_sync_exit(monitor) }
-		events[event] = Date()
-		print("Start \(event)")
+		mutex.sync {
+			events[event] = Date()
+			print("Start \(event)")
+		}
 	}
 	
 	public func end(event: Event) {
 		guard isRecording else { return }
-		objc_sync_enter(monitor)
-		defer { objc_sync_exit(monitor) }
-		guard let startDate = events[event] else {
-			print("Not found \(event) for logging")
-			return
+		mutex.sync {
+			guard let startDate = events[event] else {
+				print("Not found \(event) for logging")
+				return
+			}
+			let interval = Date().timeIntervalSince(startDate)
+			print("End \(event) with time: \(interval)")
 		}
-		let interval = Date().timeIntervalSince(startDate)
-		print("End \(event) with time: \(interval)")
 	}
 }
