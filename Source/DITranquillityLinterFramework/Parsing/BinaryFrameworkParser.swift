@@ -29,7 +29,7 @@ final class BinaryFrameworkParser {
  	}
 	
 	
-	/// Parse OS related bynary frameworks and frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
+	/// Parse frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
 	func parseExplicitBinaryModules() throws -> [FileParserResult] {
 		TimeRecorder.start(event: .parseBinary)
 		defer { TimeRecorder.end(event: .parseBinary) }
@@ -41,8 +41,11 @@ final class BinaryFrameworkParser {
 		
 	}
 	
+	/// Parse OS related bynary frameworks and
 	func parseBinaryModules(names: Set<String>) throws -> [FileParserResult]? {
-		guard !names.isEmpty else { return nil }
+		guard !names.isEmpty else {
+			return nil
+		}
 		let (target, sdk) = self.createCommandLineArgumentInfoForSourceKitParsing()
 		let commonFrameworks = self.getImplicitlyDependentBinaryFrameworks(sdk: sdk)
 		return try self.parseFrameworkInfoList(commonFrameworks, target: target, sdk: sdk, isCommon: true, explicitNames: names)
@@ -57,9 +60,9 @@ final class BinaryFrameworkParser {
 			let deploymentTarget = XcodeEnvVariable.deploymentTarget.value() {
 			//		"${PLATFORM_PREFERRED_ARCH}-apple-${SWIFT_PLATFORM_TARGET_PREFIX}${IPHONEOS_DEPLOYMENT_TARGET}"
 			target = "\(arch)-apple-\(targetPrefix)\(deploymentTarget)"
-			print("Found environment info.")
+			Log.info("Found environment info.")
 		} else {
-			print("Environment info not found. Will be used default")
+			Log.info("Environment info not found. Will be used default")
 		}
 		if let sdkRoot = XcodeEnvVariable.sdkRoot.value() {
 			sdk = sdkRoot
@@ -73,7 +76,9 @@ final class BinaryFrameworkParser {
 		guard let frameworkPathsString = XcodeEnvVariable.frameworkSearchPaths.value() else {
 			return []
 		}
-		let frameworkPaths = frameworkPathsString.split(separator: "\"").filter({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+		let frameworkPaths = frameworkPathsString
+			.split(separator: "\"")
+			.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
 		
 		var frameworkInfoList: [BinaryFrameworkInfo] = []
 		for frameworkPath in frameworkPaths {
@@ -128,7 +133,7 @@ final class BinaryFrameworkParser {
 		let frameworksURL = URL(fileURLWithPath: frameworksPath + "/\(moduleName).framework/Headers", isDirectory: true)
 		let frameworks = try self.collectFrameworkNames(frameworksURL: frameworksURL, explicitNames: explicitNames)
 		return try frameworks.flatMap { (frameworkName) -> [FileParserResult] in
-			print("Parse framework: \(frameworkName)")
+			Log.verbose("Parse framework: \(frameworkName)")
 			
 			let fullFrameworkName = self.fullFrameworkName(moduleName: moduleName, frameworkName: frameworkName)
 			let fileName = frameworksURL.path + "/" + fullFrameworkName + ".h"
@@ -144,10 +149,9 @@ final class BinaryFrameworkParser {
 				self.fileContainer.set(value: parser.file, for: fileName)
 				self.cacher.cacheBinaryFiles(list: fileParserResult, name: cacheName, isCommonCache: isCommon)
 				return fileParserResult
-				
-			} else {
-				return []
 			}
+			
+			return []
 		}
 	}
 	
@@ -176,7 +180,7 @@ final class BinaryFrameworkParser {
 	/// Collects all framework parts ("*.h" files).
 	private func collectFrameworkNames(frameworksURL: URL, explicitNames: Set<String>?) throws -> [String] {
 		do {
-			let fileURLs = try FileManager.default.contentsOfDirectory(at: frameworksURL, includingPropertiesForKeys: nil)
+			let fileURLs = try FileManager.default.contentsOfDirectory(atPath: frameworksURL.path).compactMap(URL.init)
 			return fileURLs.reduce(into: []) { result, url in
 				let frameworkName = url.lastPathComponent.droppedSuffix(".h")
 				if url.pathExtension == "h" && (explicitNames?.contains(frameworkName) ?? true) {

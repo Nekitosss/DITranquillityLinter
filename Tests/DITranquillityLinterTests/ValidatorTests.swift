@@ -69,4 +69,29 @@ class ValidatorTests: XCTestCase {
 		XCTAssertTrue(errorList.isEmpty)
 	}
 	
+	func testSeveralRegistrationError() throws {
+		let errorList = try validateGraph(fileName: "TestSeveralRegistrationError")
+		XCTAssertTrue(errorList.isEmpty, "We should allow two NOT default registration exists and validate in only during injection")
+	}
+	
+	func testSeveralDefaultRegistrationError() throws {
+		let errorList = try validateGraph(fileName: "TestSeveralDefaultRegistrationError")
+		XCTAssertEqual(errorList.count, 2, "Should be exact two errors when two equals default registration exists")
+	}
+	
+	func testGraphErrorPrinting() throws {
+		let location = Location(file: "filename", line: 2, character: 2)
+		let graphError = GraphError(infoString: "Error", location: location)
+		let resultMessage = "filename:2:2: error: Error"
+		
+		XCTAssertEqual(graphError.xcodeMessage, resultMessage)
+	}
+	
+	func testEmptyFileGraphErrorPrinting() throws {
+		let location = Location(file: nil, line: nil, character: nil)
+		let graphError = GraphError(infoString: "Error", location: location)
+		let resultMessage = "<nopath>:1: error: Error"
+		
+		XCTAssertEqual(graphError.xcodeMessage, resultMessage)
+	}
 }

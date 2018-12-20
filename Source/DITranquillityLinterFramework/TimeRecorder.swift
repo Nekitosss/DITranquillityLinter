@@ -49,7 +49,7 @@ public final class TimeRecorder {
 		objc_sync_enter(monitor)
 		defer { objc_sync_exit(monitor) }
 		events[event] = Date()
-		print("Start \(event)")
+		Log.info("Start \(event)")
 	}
 	
 	public func end(event: Event) {
@@ -57,10 +57,10 @@ public final class TimeRecorder {
 		objc_sync_enter(monitor)
 		defer { objc_sync_exit(monitor) }
 		guard let startDate = events[event] else {
-			print("Not found \(event) for logging")
+			Log.warning("Not found \(event) for logging")
 			return
 		}
 		let interval = Date().timeIntervalSince(startDate)
-		print("End \(event) with time: \(interval)")
+		Log.info("End \(event) with time: \(interval)")
 	}
 }

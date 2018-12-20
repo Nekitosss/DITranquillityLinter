@@ -16,9 +16,8 @@ final class FileContainer {
 		} else if let file = File(path: key) {
 			set(value: file, for: key)
 			return file
-		} else {
-			return nil
 		}
+		return nil
 	}
 	
 	func set(value newValue: File?, for key: String) {

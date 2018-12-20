@@ -35,7 +35,7 @@ func executeScript() {
 		let files = projectFiles(project: project, srcRoot: srcRoot)
 		TimeRecorder.end(event: .collectSource)
 		
-		let successed = tokenizer.process(files: Array(Set(files)))
+		let successed = try tokenizer.process(files: Array(Set(files)))
 		TimeRecorder.end(event: .total)
 		if successed {
 			exit(EXIT_SUCCESS)
@@ -43,7 +43,7 @@ func executeScript() {
 			exit(EXIT_FAILURE)
 		}
 	} catch {
-		print(error)
+		Log.error("Error during file parsing \(error)")
 		exit(EXIT_FAILURE)
 	}
 }

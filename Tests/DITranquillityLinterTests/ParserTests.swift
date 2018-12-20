@@ -32,7 +32,7 @@ final class ParserTests: XCTestCase {
 	func testInvalidMethodCallingRegistration() throws {
 		let tokenizer = Tokenizer(isTestEnvironment: true)
 		let fileURL = pathToSourceFile(with: "TestInvalidMethodCallingRegistration")
-		let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
+		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		let containerPart = containerBuilder.findContainerStructure()
 		
@@ -44,7 +44,7 @@ final class ParserTests: XCTestCase {
 	func testInitialDefinitionInvalidMethodCallingRegistration() throws {
 		let tokenizer = Tokenizer(isTestEnvironment: true)
 		let fileURL = pathToSourceFile(with: "TestInitialDefinitionInvalidMethodCallingRegistration")
-		let context = ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
+		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		let containerPart = containerBuilder.findContainerStructure()
 		
