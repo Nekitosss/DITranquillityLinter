@@ -1,0 +1,20 @@
+PODS:
+  - DITranquillity (3.5.1):
+    - SwiftLazy
+  - SwiftLazy (1.1.0)
+
+DEPENDENCIES:
+  - DITranquillity
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - DITranquillity
+    - SwiftLazy
+
+SPEC CHECKSUMS:
+  DITranquillity: bf0e4be6562a490818c4d11d766c83623dd92a51
+  SwiftLazy: 90d61205fa3c2e492da870310ba719c0a63cdce3
+
+PODFILE CHECKSUM: 64cc994ea1a40caed1a263d3eafa0632ceb2c12c
+
+COCOAPODS: 1.5.3

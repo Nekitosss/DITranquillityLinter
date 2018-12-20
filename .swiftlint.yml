@@ -1,0 +1,25 @@
+included: # paths to include during linting. `--path` is ignored if present.
+  - Source
+  - Tests
+excluded: # paths to ignore during linting. Takes precedence over `included`.
+  - Source/DITranquillityLinterFramework/Models/Models.pb.swift
+  - Source/DITranquillityLinterFramework/HelpersAndExtensions/SHA256.swift
+  - Source/DITranquillityLinterFramework/Parsing/Utils/AnnotationsParser.swift
+  - Source/DITranquillityLinterFramework/Parsing/FileParser.swift
+  - Source/DITranquillityLinterFramework/Parsing/Composer.swift
+  - Source/DITranquillityLinterFramework/Parsing/Sources/Type.swift
+  - Source/DITranquillityLinterFramework/Parsing/Utils/Substring.swift
+  - Source/DITranquillityLinterFramework/Parsing/Sources/*.generated.swift
+  - Source/DITranquillityLinterFramework/Parsing/Sources/TypeName.swift
+
+disabled_rules: 
+  - vertical_whitespace # enable it when maxEmptyLines configuration exists
+  - trailing_whitespace
+  - large_tuple
+  - line_length
+  - function_parameter_count
+  - vertical_parameter_alignment #do not work with tabs
+  - leading_whitespace
+  - todo
+  - identifier_name
+  - trailing_comma

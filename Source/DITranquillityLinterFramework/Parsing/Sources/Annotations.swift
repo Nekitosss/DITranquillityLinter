@@ -1,0 +1,24 @@
+import Foundation
+
+/// Describes annotated declaration, i.e. type, method, variable, enum case
+protocol Annotated {
+    /**
+     All annotations of declaration stored by their name. Value can be `Bool`, `String`, `Float` `NSNumber`
+     or `Array` of those types if you use several annotations with the same name.
+    
+     **Example:**
+     
+     ```
+     //sourcery: booleanAnnotation
+     //sourcery: stringAnnotation = "value"
+     //sourcery: numericAnnotation = 0.5
+     
+     [
+      "booleanAnnotation": true,
+      "stringAnnotation": "value",
+      "numericAnnotation": 0.5
+     ]
+     ```
+    */
+    var annotations: Annotations { get }
+}
