@@ -32,7 +32,7 @@ final class RegistrationTokenBuilder: TokenBuilder {
 		if let extractedInfo = extractPlainRegistration(using: info) ?? extractClosureRegistration(using: info) {
 			registrationInfo.typeName = extractedInfo.typeName
 			registrationInfo.plainTypeName = extractedInfo.plainTypeName
-			registrationInfo.tokenList = extractedInfo.tokenList
+			registrationInfo.tokenList += extractedInfo.tokenList
 		}
 		registrationInfo.typeName = info.parsingContext.collectedInfo[registrationInfo.typeName]?.name ?? registrationInfo.typeName
 		registrationInfo.typeName = registrationInfo.typeName.trimmingCharacters(in: .whitespacesAndNewlines)
