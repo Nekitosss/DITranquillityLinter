@@ -19,9 +19,9 @@ final class InjectionTokenBuilder: TokenBuilder {
 		var modificators: [InjectionModificator] = []
 		
 		for argument in info.argumentStack {
-			self.extractCycleInfo(from: argument, into: &cycle)
-			self.extractNameInfo(from: argument, into: &name)
-			self.extractModificators(from: argument, info: info, into: &modificators)
+			cycle = self.extractCycleInfo(from: argument) ?? cycle
+			name = self.extractNameInfo(from: argument) ?? name
+			modificators += self.extractModificators(from: argument, info: info)
 		}
 		// Type name will be resolved later
 		return InjectionToken(name: name,
@@ -35,15 +35,17 @@ final class InjectionTokenBuilder: TokenBuilder {
 							  location: info.location)
 	}
 	
-	private func extractCycleInfo(from argument: ArgumentInfo, into cycle: inout Bool) {
+	private func extractCycleInfo(from argument: ArgumentInfo) -> Bool? {
 		if argument.name == DIKeywords.cycle.rawValue {
 			// injection(cycle: true, ...)
-			cycle = argument.value == "\(true)"
+			return argument.value == "\(true)"
 		}
+		return nil
 	}
 	
 	
-	private func extractNameInfo(from argument: ArgumentInfo, into name: inout String) {
+	private func extractNameInfo(from argument: ArgumentInfo) -> String? {
+		var name: String?
 		let isEmptyArgumentName = argument.name.isEmpty || argument.name == "_"
 		if isEmptyArgumentName && argument.value.starts(with: RegExp.implicitKeyPath.rawValue) {
 			// injection(\.myPath)
@@ -57,10 +59,12 @@ final class InjectionTokenBuilder: TokenBuilder {
 			// injection { $0.name = $1 }
 			name = String(nameFromPattern.dropFirst(3))
 		}
+		return name
 	}
 	
 	
-	private func extractModificators(from argument: ArgumentInfo, info: TokenBuilderInfo, into modificators: inout [InjectionModificator]) {
+	private func extractModificators(from argument: ArgumentInfo, info: TokenBuilderInfo) -> [InjectionModificator] {
+		var modificators: [InjectionModificator] = []
 		if let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjection(structure: argument.structure, content: info.content) {
 			// For tagged variable injection structure always on "closure" level
 			modificators += taggedModificators
@@ -77,6 +81,7 @@ final class InjectionTokenBuilder: TokenBuilder {
 			typeFromPattern = typeFromPattern.filter({ $0 != "}" }).trimmingCharacters(in: .whitespacesAndNewlines)
 			modificators.append(.typed(typeFromPattern))
 		}
+		return modificators
 	}
 	
 	
