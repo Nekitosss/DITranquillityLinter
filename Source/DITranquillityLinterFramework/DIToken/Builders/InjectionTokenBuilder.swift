@@ -69,7 +69,8 @@ final class InjectionTokenBuilder: TokenBuilder {
 			// For tagged variable injection structure always on "closure" level
 			modificators += taggedModificators
 			
-		} else if let closureSubstructure = argument.structure.substructures.first,
+		}
+		if let closureSubstructure = argument.structure.substructures.first,
 			let taggedModificators = InjectionTokenBuilder.parseTaggedAndManyInjection(structure: closureSubstructure, content: info.content) {
 			// Tag stores in argument -> closure -> expressionCall
 			// parseTaggedInjection can parse sinse "closure" level. So we unwrap single time
@@ -86,19 +87,19 @@ final class InjectionTokenBuilder: TokenBuilder {
 	
 	
 	static func parseTaggedAndManyInjection(structure: SourceKitStructure, content: NSString) -> [InjectionModificator]? {
-		var result: [InjectionModificator] = []
-		for substructure in structure.substructures {
-			guard let name: String = substructure.get(.name),
-				let kind: String = substructure.get(.kind),
-				kind == SwiftExpressionKind.call.rawValue
-				else { continue }
+		let result = structure.substructures.reduce(into: [InjectionModificator]()) { result, substructure in
+			guard substructure.isKind(of: SwiftExpressionKind.call) else {
+				return
+			}
 			
-			if name == DIKeywords.by.rawValue {
+			if substructure.nameIs(DIKeywords.by) {
 				let arguments = ContainerPartBuilder.argumentInfo(substructures: substructure.substructures, content: content)
-				guard let tagType = arguments.first(where: { $0.name == DIKeywords.tag.rawValue }) else { continue }
+				guard let tagType = arguments.first(where: { $0.name == DIKeywords.tag.rawValue }) else {
+					return
+				}
 				let tagTypeName = tagType.value.droppedDotSelf()
 				result.append(.tagged(tagTypeName))
-			} else if name == DIKeywords.many.rawValue {
+			} else if substructure.nameIs(DIKeywords.many) {
 				result.append(.many)
 			}
 		}

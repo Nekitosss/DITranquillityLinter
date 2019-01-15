@@ -64,10 +64,7 @@ final class ContainerInitializatorFinder {
 	
 	
 	private func isContainerInitialization(structure: SourceKitStructure) -> Bool {
-		let name = structure.get(.name, of: String.self)
-		let isDiContainerInitializerMethodName = name == DIKeywords.initDIContainer.rawValue || name == DIKeywords.diContainer.rawValue
-		
-		return isDiContainerInitializerMethodName
-			&& structure.get(.kind, of: String.self) == SwiftExpressionKind.call.rawValue
+		let isDiContainerInitializerMethodName = structure.nameIs(DIKeywords.initDIContainer) || structure.nameIs(DIKeywords.diContainer)
+		return isDiContainerInitializerMethodName && structure.isKind(of: SwiftExpressionKind.call)
 	}
 }

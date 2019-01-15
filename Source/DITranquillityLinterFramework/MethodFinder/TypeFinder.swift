@@ -45,11 +45,10 @@ final class TypeFinder {
 		for substucture in substructureList {
 			
 			let name = substucture.get(.name, of: String.self) ?? "_"
-			guard let kind: String = substucture.get(.kind),
-				let bodyLenght: Int64 = substucture.get(.bodyLength),
-				let bodyOffset: Int64 = substucture.get(.bodyOffset),
-				kind == SwiftExpressionKind.argument.rawValue,
-				let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLenght)?.bracketsBalancing()
+			guard
+				let bodyOffset = substucture.getBodyInfo()?.offset,
+				substucture.isKind(of: SwiftExpressionKind.argument),
+				let body = substucture.body(using: content)?.bracketsBalancing()
 				else { continue }
 			
 			if body.firstMatch(RegExp.implicitClosureArgument) != nil {

@@ -70,21 +70,16 @@ final class RegistrationTokenBuilder: TokenBuilder {
 		guard
 			let substructure = info.substructureList.first,
 			info.substructureList.count == 1,
-			let closureKind: String = substructure.get(.kind),
-			closureKind == SwiftExpressionKind.closure.rawValue
+			substructure.isKind(of: SwiftExpressionKind.closure)
 			else { return nil }
 		
 		if let expressionCallInitSubstructure = substructure.substructures.first,
-			let kind: String = expressionCallInitSubstructure.get(.kind),
 			let name: String = expressionCallInitSubstructure.get(.name),
-			kind == SwiftExpressionKind.call.rawValue {
+			expressionCallInitSubstructure.isKind(of: SwiftExpressionKind.call) {
 			
 			return extractStaticMethodRegistration(expressionCallInitSubstructure: expressionCallInitSubstructure, name: name, parsingContext: info.parsingContext, content: info.content, file: info.file, bodyOffset: info.bodyOffset)
 			
-		} else if let bodyOffset: Int64 = substructure.get(.bodyOffset),
-			let bodyLength: Int64 = substructure.get(.bodyLength),
-			let body = info.content.substringUsingByteRange(start: bodyOffset, length: bodyLength)?.trimmingCharacters(in: .whitespacesAndNewlines) {
-			
+		} else if let body = substructure.body(using: info.content)?.trimmingCharacters(in: .whitespacesAndNewlines) {
 			return extractStaticVariableRegistration(body: body, parsingContext: info.parsingContext)
 		}
 		

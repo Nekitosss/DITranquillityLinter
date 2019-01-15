@@ -23,7 +23,7 @@ final class AppendContainerTokenBuilder: TokenBuilder {
 			let swiftType = info.parsingContext.collectedInfo[typeName],
 			self.isDIPart(appendInfo, swiftType: swiftType),
 			typeName != info.currentPartName, // Circular append block. TODO: Throw XCode error
-			let loadContainerStructure = swiftType.substructure.first(where: { $0.get(.name) == DIKeywords.loadContainer.rawValue }),
+			let loadContainerStructure = swiftType.substructure.first(where: { $0.nameIs(DIKeywords.loadContainer) }),
 			let newContainerPartFile = info.parsingContext.fileContainer.getOrCreateFile(by: swiftType.filePath)
 			else { return nil }
 		

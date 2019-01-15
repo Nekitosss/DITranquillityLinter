@@ -42,4 +42,3 @@ final class PThreadMutex {
     return execute()
   }
 }
-

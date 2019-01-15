@@ -13,15 +13,12 @@ final class ContainerPartBuilder {
 	
 	static func argumentInfo(substructures: [SourceKitStructure], content: NSString) -> [ArgumentInfo] {
 		return substructures.compactMap { structure in
+			
 			guard
-				let kind: String = structure.get(.kind),
-				kind == SwiftExpressionKind.argument.rawValue,
-				let bodyOffset: Int64 = structure.get(.bodyOffset),
-				let bodyLength: Int64 = structure.get(.bodyLength),
-				let nameLength: Int64 = structure.get(.nameLength),
-				let nameOffset: Int64 = structure.get(.nameOffset)
+				structure.isKind(of: SwiftExpressionKind.argument),
+				let body = structure.body(using: content),
+				let (nameOffset, nameLength) = structure.getNameInfo()
 				else { return nil }
-			let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength) ?? ""
 			let name = nameLength > 0 ? content.substringUsingByteRange(start: nameOffset, length: nameLength) ?? "_" : "_"
 			return ArgumentInfo(name: name, value: body, structure: structure)
 		}
@@ -198,12 +195,11 @@ final class ContainerPartBuilder {
 	
 	
 	private func getTokenInfo(from loadContainerBodyPart: SourceKitStructure, tokenList: [DIToken]) -> TokenBuilderInfo? {
-		guard let kind: String = loadContainerBodyPart.get(.kind),
+		guard
+			loadContainerBodyPart.isKind(of: SwiftExpressionKind.call),
 			let name: String = loadContainerBodyPart.get(.name),
-			let bodyOffset: Int64 = loadContainerBodyPart.get(.bodyOffset),
-			let bodyLength: Int64 = loadContainerBodyPart.get(.bodyLength),
-			kind == SwiftExpressionKind.call.rawValue,
-			let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength)
+			let bodyOffset = loadContainerBodyPart.getBodyInfo()?.offset,
+			let body = loadContainerBodyPart.body(using: content)
 			else { return nil }
 		let functionName = TypeFinder.restoreMethodName(initial: name)
 		
