@@ -139,7 +139,7 @@ final class BinaryFrameworkParser {
 			let fileName = frameworksURL.path + "/" + fullFrameworkName + ".h"
 			let cacheName = frameworksPath + moduleName + frameworkName
 			
-			if let cachedResult = self.cacher.getCachedBinaryFiles(name: cacheName, isCommonCache: isCommon) {
+			if let cachedResult = try? self.cacher.getCachedBinaryFiles(name: cacheName, isCommonCache: isCommon) {
 				return cachedResult
 				
 			} else if let contents = try? self.createSwiftSourcetext(for: fullFrameworkName, use: compilerArguments) {
@@ -147,7 +147,7 @@ final class BinaryFrameworkParser {
 				let parser = FileParser(contents: contents, path: fileName, module: moduleName)
 				let fileParserResult = try [parser.parse()]
 				self.fileContainer.set(value: parser.file, for: fileName)
-				self.cacher.cacheBinaryFiles(list: fileParserResult, name: cacheName, isCommonCache: isCommon)
+				try self.cacher.cacheBinaryFiles(list: fileParserResult, name: cacheName, isCommonCache: isCommon)
 				return fileParserResult
 			}
 			
