@@ -14,9 +14,8 @@ final class FileContainer {
 			} else if let file = File(path: key) {
 				value[key] = file
 				return file
-			} else {
-				return nil
 			}
+			return nil
 		}
 	}
 	

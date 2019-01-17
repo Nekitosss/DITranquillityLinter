@@ -11,17 +11,12 @@ final class Class: Type {
 		guard let rhs = object as? Class else { return false }
 		return super.isEqual(rhs)
 	}
-	
-    /// Whether type is final 
-    var isFinal: Bool {
-        return attributes[Attribute.Identifier.final.name] != nil
-    }
 
     /// :nodoc:
-    override init(name: String = "",
+    override init(name: String,
                          parent: Type? = nil,
-                         accessLevel: AccessLevel = .internal,
-                         isExtension: Bool = false,
+                         accessLevel: AccessLevel,
+                         isExtension: Bool,
                          variables: [Variable] = [],
                          methods: [Method] = [],
                          subscripts: [Subscript] = [],
