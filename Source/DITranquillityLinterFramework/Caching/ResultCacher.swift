@@ -42,9 +42,7 @@ final class ResultCacher {
 		TimeRecorder.start(event: .encodeBinary)
 		defer { TimeRecorder.end(event: .encodeBinary) }
 		
-		var listResult = Protobuf_FileParserResultList()
-		listResult.value = list.map({ $0.toProtoMessage })
-		let encodedData = try listResult.serializedData()
+		let encodedData = try encoder.encode(list)
 		let (cacheDirectory, cacheFileName) = self.getCacheURL(name: name, isCommonCache: isCommonCache)
 		try FileManager.default.createDirectory(atPath: cacheDirectory.path, withIntermediateDirectories: true, attributes: nil)
 		try encodedData.write(to: cacheFileName)
@@ -56,10 +54,9 @@ final class ResultCacher {
 		
 		let cacheFileName = self.getCacheURL(name: name, isCommonCache: isCommonCache).fileName
 		let data = try Data(contentsOf: cacheFileName, options: [])
-		let decodedDataNotUnwrapped = try Protobuf_FileParserResultList(serializedData: data).value
 		TimeRecorder.start(event: .mapBinary)
-		let decodedData = decodedDataNotUnwrapped.map { FileParserResult.fromProtoMessage($0) }
 		TimeRecorder.end(event: .mapBinary)
+		let decodedData = try decoder.decode([FileParserResult].self, from: data)
 		decodedData.forEach({ $0.updateRelationshipAfterDecoding() })
 		return decodedData
 	}
