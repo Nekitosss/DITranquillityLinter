@@ -3,24 +3,10 @@
 
 import Foundation
 
-struct BytesRange: Codable, Equatable, ProtobufBridgable {
+struct BytesRange: Codable, Equatable {
 
     let offset: Int64
     let length: Int64
-
-	typealias ProtoStructure = Protobuf_BytesRange
-	
-	var toProtoMessage: BytesRange.ProtoStructure {
-		var res = ProtoStructure()
-		res.offset = offset
-		res.length = length
-		return res
-	}
-	
-	static func fromProtoMessage(_ message: Protobuf_BytesRange) -> BytesRange {
-		return .init(offset: message.offset, length: message.length)
-	}
-	
 }
 
 extension BytesRange {

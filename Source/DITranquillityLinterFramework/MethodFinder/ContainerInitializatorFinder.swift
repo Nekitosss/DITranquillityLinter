@@ -7,7 +7,6 @@
 
 import Foundation
 import SourceKittenFramework
-import xcodeproj
 
 final class ContainerInitializatorFinder {
 	

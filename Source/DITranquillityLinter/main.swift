@@ -1,6 +1,5 @@
 import Commandant
 import Dispatch
-import Foundation
 import DITranquillityLinterFramework
 
 DispatchQueue.global().async {

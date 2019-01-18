@@ -6,48 +6,7 @@
 import Foundation
 import SourceKittenFramework
 
-enum TypedCodableValue: Codable, Equatable, ProtobufBridgable {
-	
-	typealias ProtoStructure = Protobuf_TypedCodableValue
-	static func fromProtoMessage(_ message: TypedCodableValue.ProtoStructure) -> TypedCodableValue {
-		switch message.value! {
-		case .floatValue(let value):
-			return .floatValue(value)
-		case .boolValue(let value):
-			return .boolValue(value)
-		case .stringValue(let value):
-			return .stringValue(value)
-		case .int64Value(let value):
-			return .int64Value(value)
-		case .arrayValue(let array):
-			return .arrayValue(array.values.map({ fromProtoMessage($0) }))
-		case .dictionaryValue(let value):
-			return .dictionaryValue(value.mapValue.mapValues({ fromProtoMessage($0) }))
-		}
-	}
-	
-	var toProtoMessage: TypedCodableValue.ProtoStructure {
-		var structure = ProtoStructure()
-		switch self {
-		case .floatValue(let value):
-			structure.value = .floatValue(value)
-		case .boolValue(let value):
-			structure.value = .boolValue(value)
-		case .stringValue(let value):
-			structure.value = .stringValue(value)
-		case .int64Value(let value):
-			structure.value = .int64Value(value)
-		case .arrayValue(let array):
-			var listValue = Protobuf_ListValue()
-			listValue.values = array.map({ $0.toProtoMessage })
-			structure.value = ProtoStructure.OneOf_Value.arrayValue(listValue)
-		case .dictionaryValue(let value):
-			var mapValue = Protobuf_MapValue()
-			mapValue.mapValue = value.mapValues({ $0.toProtoMessage })
-			structure.value = ProtoStructure.OneOf_Value.dictionaryValue(mapValue)
-		}
-		return structure
-	}
+enum TypedCodableValue: Codable, Equatable {
 	
 	case floatValue(Float)
 	case boolValue(Bool)

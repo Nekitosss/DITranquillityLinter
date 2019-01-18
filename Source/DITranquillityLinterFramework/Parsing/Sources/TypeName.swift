@@ -30,36 +30,7 @@ protocol Typed {
 }
 
 /// Describes name of the type used in typed declaration (variable, method parameter or return value etc.)
-final class TypeName: NSObject, LosslessStringConvertible, Codable, ProtobufBridgable {
-
-	typealias ProtoStructure = Protobuf_TypeName
-	
-	var toProtoMessage: TypeName.ProtoStructure {
-		var res = ProtoStructure()
-		res.name = self.name
-		res.generic = .init(value: self.generic?.toProtoMessage)
-		res.actualTypeName = .init(value: actualTypeName?.toProtoMessage)
-		res.attributes = self.attributes.mapValues({ $0.toProtoMessage })
-		res.isOptional = self.isOptional
-		res.isImplicitlyUnwrappedOptional = self.isImplicitlyUnwrappedOptional
-		res.unwrappedTypeName = self.unwrappedTypeName
-		res.tuple = .init(value: self.tuple?.toProtoMessage)
-		res.array = .init(value: self.array?.toProtoMessage)
-		res.dictionary = .init(value: self.dictionary?.toProtoMessage)
-		res.closure = .init(value: self.closure?.toProtoMessage)
-		return res
-	}
-	
-	static func fromProtoMessage(_ message: TypeName.ProtoStructure) -> TypeName {
-		return TypeName(message.name,
-						actualTypeName: message.actualTypeName.toValue.flatMap({ .fromProtoMessage($0) }),
-						attributes: message.attributes.mapValues({ .fromProtoMessage($0) }),
-						tuple: message.tuple.toValue.flatMap({ .fromProtoMessage($0) }), 
-						array: message.array.toValue.flatMap({ .fromProtoMessage($0) }),
-						dictionary: message.dictionary.toValue.flatMap({ .fromProtoMessage($0) }),
-						closure: message.closure.toValue.flatMap({ .fromProtoMessage($0) }),
-						generic: message.generic.toValue.flatMap({ .fromProtoMessage($0) }))
-	}
+final class TypeName: NSObject, LosslessStringConvertible, Codable {
 
     /// Type name used in declaration
     let name: String
@@ -259,22 +230,8 @@ final class TypeName: NSObject, LosslessStringConvertible, Codable, ProtobufBrid
 }
 
 /// Descibes Swift generic type parameter
-final class GenericTypeParameter: NSObject, Codable, ProtobufBridgable {
+final class GenericTypeParameter: NSObject, Codable {
 
-	typealias ProtoStructure = Protobuf_GenericTypeParameter
-	
-	var toProtoMessage: GenericTypeParameter.ProtoStructure {
-		var res = ProtoStructure()
-		res.typeName = self.typeName.toProtoMessage
-		res.type = .init(value: self.type?.toProtoMessage)
-		return res
-	}
-	
-	static func fromProtoMessage(_ message: GenericTypeParameter.ProtoStructure) -> GenericTypeParameter {
-		return GenericTypeParameter(typeName: TypeName.fromProtoMessage(message.typeName),
-									type: message.type.toValue.flatMap({ .fromProtoMessage($0) }))
-	}
-	
     /// Generic parameter type name
     let typeName: TypeName
 
@@ -290,21 +247,7 @@ final class GenericTypeParameter: NSObject, Codable, ProtobufBridgable {
 }
 
 /// Descibes Swift generic type
-struct GenericType: Codable, Equatable, ProtobufBridgable {
-	
-	typealias ProtoStructure = Protobuf_GenericType
-	
-	var toProtoMessage: GenericType.ProtoStructure {
-		var res = ProtoStructure()
-		res.name = self.name
-		res.typeParameters = self.typeParameters.map({ $0.toProtoMessage })
-		return res
-	}
-	
-	static func fromProtoMessage(_ message: GenericType.ProtoStructure) -> GenericType {
-		return GenericType(name: message.name,
-						   typeParameters: message.typeParameters.map({ .fromProtoMessage($0) }))
-	}
+struct GenericType: Codable, Equatable {
 	
     /// The name of the base type, i.e. `Array` for `Array<Int>`
     let name: String
@@ -314,24 +257,8 @@ struct GenericType: Codable, Equatable, ProtobufBridgable {
 }
 
 /// Describes tuple type element
-final class TupleElement: NSObject, Typed, Codable, ProtobufBridgable {
+final class TupleElement: NSObject, Typed, Codable {
 
-	typealias ProtoStructure = Protobuf_TupleElement
-	
-	var toProtoMessage: TupleElement.ProtoStructure {
-		var res = ProtoStructure()
-		res.name = self.name
-		res.typeName = self.typeName.toProtoMessage
-		res.type = .init(value: type?.toProtoMessage)
-		return res
-	}
-	
-	static func fromProtoMessage(_ message: TupleElement.ProtoStructure) -> TupleElement {
-		return TupleElement(name: message.name,
-							typeName: .fromProtoMessage(message.typeName),
-							type: message.type.toValue.flatMap({.fromProtoMessage($0)}))
-	}
-	
     /// Tuple element name
     let name: String
 
@@ -351,22 +278,8 @@ final class TupleElement: NSObject, Typed, Codable, ProtobufBridgable {
 }
 
 /// Describes tuple type
-struct TupleType: Codable, Equatable, ProtobufBridgable {
+struct TupleType: Codable, Equatable {
 
-	typealias ProtoStructure = Protobuf_TupleType
-	
-	var toProtoMessage: TupleType.ProtoStructure {
-		var res = ProtoStructure()
-		res.name = self.name
-		res.elements = self.elements.map({ $0.toProtoMessage })
-		return res
-	}
-	
-	static func fromProtoMessage(_ message: TupleType.ProtoStructure) -> TupleType {
-		return TupleType(name: message.name,
-						 elements: message.elements.map({ .fromProtoMessage($0) }))
-	}
-	
     /// Type name used in declaration
     let name: String
 
@@ -375,24 +288,8 @@ struct TupleType: Codable, Equatable, ProtobufBridgable {
 }
 
 /// Describes array type
-final class ArrayType: Codable, Equatable, ProtobufBridgable {
+final class ArrayType: Codable, Equatable {
 
-	typealias ProtoStructure = Protobuf_ArrayType
-	
-	var toProtoMessage: ArrayType.ProtoStructure {
-		var res = ProtoStructure()
-		res.name = self.name
-		res.elementTypeName = self.elementTypeName.toProtoMessage
-		res.elementType = .init(value: self.elementType?.toProtoMessage)
-		return res
-	}
-	
-	static func fromProtoMessage(_ message: ArrayType.ProtoStructure) -> ArrayType {
-		return ArrayType(name: message.name,
-						 elementTypeName: .fromProtoMessage(message.elementTypeName),
-						 elementType: message.elementType.toValue.flatMap({ .fromProtoMessage($0) }))
-	}
-	
     /// Type name used in declaration
     let name: String
 
@@ -415,27 +312,7 @@ final class ArrayType: Codable, Equatable, ProtobufBridgable {
 }
 
 /// Describes dictionary type
-final class DictionaryType: NSObject, Codable, ProtobufBridgable {
-
-	typealias ProtoStructure = Protobuf_DictionaryType
-	
-	var toProtoMessage: DictionaryType.ProtoStructure {
-		var res = ProtoStructure()
-		res.name = self.name
-		res.valueTypeName = self.valueTypeName.toProtoMessage
-		res.valueType = .init(value: self.valueType?.toProtoMessage)
-		res.keyTypeName = self.keyTypeName.toProtoMessage
-		res.keyType = .init(value: self.keyType?.toProtoMessage)
-		return res
-	}
-	
-	static func fromProtoMessage(_ message: DictionaryType.ProtoStructure) -> DictionaryType {
-		return DictionaryType(name: message.name,
-							  valueTypeName: .fromProtoMessage(message.valueTypeName),
-							  valueType: message.valueType.toValue.flatMap({ .fromProtoMessage($0) }),
-							  keyTypeName: .fromProtoMessage(message.keyTypeName),
-							  keyType: message.keyType.toValue.flatMap({ .fromProtoMessage($0) }))
-	}
+final class DictionaryType: NSObject, Codable {
 	
     /// Type name used in declaration
     let name: String
@@ -465,28 +342,8 @@ final class DictionaryType: NSObject, Codable, ProtobufBridgable {
 }
 
 /// Describes closure type
-final class ClosureType: NSObject, Codable, ProtobufBridgable {
+final class ClosureType: NSObject, Codable {
 
-	typealias ProtoStructure = Protobuf_ClosureType
-	
-	var toProtoMessage: ClosureType.ProtoStructure {
-		var res = ProtoStructure()
-		res.name = self.name
-		res.parameters = self.parameters.map({ $0.toProtoMessage })
-		res.returnTypeName = self.returnTypeName.toProtoMessage
-		res.returnType = .init(value: self.returnType?.toProtoMessage)
-		res.throws = self.throws
-		return res
-	}
-	
-	static func fromProtoMessage(_ message: ClosureType.ProtoStructure) -> ClosureType {
-		return ClosureType(name: message.name,
-						   parameters: message.parameters.map({ .fromProtoMessage($0) }),
-						   returnTypeName: .fromProtoMessage(message.returnTypeName),
-						   returnType: message.returnType.toValue.flatMap({ .fromProtoMessage($0) }),
-						   throws: message.throws)
-	}
-	
     /// Type name used in declaration with stripped whitespaces and new lines
     let name: String
 

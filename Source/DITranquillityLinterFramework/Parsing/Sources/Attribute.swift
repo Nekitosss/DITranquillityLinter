@@ -1,20 +1,7 @@
 import Foundation
 import SourceKittenFramework
 
-extension Structure: Codable, ProtobufBridgable {
-	
-	typealias ProtoStructure = Protobuf_Structure
-	
-	static func fromProtoMessage(_ message: Structure.ProtoStructure) -> Structure {
-		let codableInfo = CodableInfo(codableValues: message.dictionary.mapValue.mapValues({ TypedCodableValue.fromProtoMessage($0) }))
-		return Structure(sourceKitResponse: codableInfo.sourceKitObjects)
-	}
-	
-	var toProtoMessage: Structure.ProtoStructure {
-		var structure = ProtoStructure()
-		structure.dictionary.mapValue = CodableInfo(sourceKitObjects: self.dictionary).codableValues.mapValues({ $0.toProtoMessage })
-		return structure
-	}
+extension Structure: Codable {
 	
 	enum CodingKeys: String, CodingKey {
 		case dictionary
@@ -55,27 +42,8 @@ extension Structure: Codable, ProtobufBridgable {
 
 typealias AttributeArguments = [String: TypedCodableValue]
 /// Describes Swift attribute
-struct Attribute: Codable, Equatable, ProtobufBridgable {
+struct Attribute: Codable, Equatable {
 
-	typealias ProtoStructure = Protobuf_Attribute
-	
-	var toProtoMessage: Attribute.ProtoStructure {
-		var structure = ProtoStructure()
-		structure.name = self.name
-		structure.arguments = self.arguments.mapValues({ $0.toProtoMessage })
-		structure.description_p = description
-		structure.parserData = .init(value: self.parserData?.toProtoMessage)
-		return structure
-	}
-	
-	static func fromProtoMessage(_ message: Attribute.ProtoStructure) -> Attribute {
-		var res = Attribute(name: message.name,
-						 arguments: message.arguments.mapValues({ TypedCodableValue.fromProtoMessage($0) }),
-						 description: message.description_p)
-		res.parserData = message.parserData.toValue.flatMap({ Structure.fromProtoMessage($0) })
-		return res
-	}
-	
     /// Attribute name
     let name: String
 

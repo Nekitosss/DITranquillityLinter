@@ -58,11 +58,4 @@ extension Dictionary where Value == SourceKitRepresentable, Key == String {
 		return content.substringUsingByteRange(start: bodyOffset, length: bodyLength)
 	}
 	
-	func name(using content: NSString) -> String? {
-		guard let (nameOffset, nameLength) = self.getNameInfo() else {
-			return nil
-		}
-		return content.substringUsingByteRange(start: nameOffset, length: nameLength)
-	}
-	
 }

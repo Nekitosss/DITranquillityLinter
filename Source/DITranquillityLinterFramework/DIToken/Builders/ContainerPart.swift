@@ -8,7 +8,6 @@
 
 import Foundation
 import SourceKittenFramework
-import xcodeproj
 
 
 // DIPart, DIFramework

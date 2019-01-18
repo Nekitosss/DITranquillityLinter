@@ -24,8 +24,6 @@ public class Tokenizer {
 	
 	
 	public init(isTestEnvironment: Bool) {
-		Log.level = isTestEnvironment ? .verbose : .warnings
-		
 		self.isTestEnvironment = isTestEnvironment
 		self.container = FileContainer()
 		self.binaryFrameworkParser = BinaryFrameworkParser(fileContainer: self.container, isTestEnvironment: self.isTestEnvironment)
