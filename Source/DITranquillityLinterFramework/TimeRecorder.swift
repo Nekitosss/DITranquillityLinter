@@ -30,7 +30,7 @@ public final class TimeRecorder {
 	var events: [Event: Date] = [:]
 	private let mutex = PThreadMutex(normal: ())
 	
-	let isRecording = true
+	var isRecording: Bool { return LintOptions.shared.shouldRecordTime }
 	
 	init() {
 		start(event: .total)

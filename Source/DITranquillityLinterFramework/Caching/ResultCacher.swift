@@ -10,8 +10,8 @@ import SourceKittenFramework
 
 final class ResultCacher {
 	
-	private static let commonCacheDirectory = "/Library/Caches/"
-	private static let libraryCacheFolderName = ".ditranquillitylint/"
+	private var commonCacheDirectory: String { return LintOptions.shared.commonCachePath }
+	private var libraryCacheFolderName: String { return LintOptions.shared.localCachePath }
 	
 	private let encoder = JSONEncoder()
 	private let decoder = JSONDecoder()
@@ -63,14 +63,14 @@ final class ResultCacher {
 	
 	private func getCacheURL(name: String, isCommonCache: Bool) -> (directory: URL, fileName: URL) {
 		let cacheDicectoryPlace = cachePath(isCommonCache: isCommonCache)
-		let cacheDirectoryURL = URL(fileURLWithPath: cacheDicectoryPlace + ResultCacher.libraryCacheFolderName, isDirectory: true)
+		let cacheDirectoryURL = URL(fileURLWithPath: cacheDicectoryPlace + libraryCacheFolderName, isDirectory: true)
 		let cacheFileURL = cacheDirectoryURL.appendingPathComponent(cacheName(name: name))
 		return (cacheDirectoryURL, cacheFileURL)
 	}
 	
 	private func cachePath(isCommonCache: Bool) -> String {
 		if isCommonCache {
-			return ResultCacher.commonCacheDirectory + ResultCacher.libraryCacheFolderName
+			return commonCacheDirectory + libraryCacheFolderName
 		} else if let srcRoot = XcodeEnvVariable.srcRoot.value() {
 			Log.verbose("SRCROOT: " + srcRoot)
 			return srcRoot + "/"

@@ -45,7 +45,9 @@ public enum EnvVariable: String {
 		case .defaultTarget:
 			return "x86_64-apple-ios11.4"
 		case .defaultSDK:
-			return "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
+			let commandLineToolsPath = shell(command: "xcode-select -p")?.trimmingCharacters(in: .whitespacesAndNewlines)
+				?? "/Applications/Xcode.app/Contents/Developer"
+			return commandLineToolsPath + "/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
 		case .testableProjectFolder:
 			return "/Users/nikita/development/fooddly/Fooddly/"
 		case .testableProjectName:
