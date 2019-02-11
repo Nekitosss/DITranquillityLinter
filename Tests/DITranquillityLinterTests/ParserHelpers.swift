@@ -40,12 +40,15 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 	let collectedInfo = try tokenizer.collectInfo(files: [fileURL])
 	let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
-	guard let containerInfo = containerBuilder.findContainerStructure() else {
+	let containerInfoList = containerBuilder.findContainerStructure()
+	if containerInfoList.isEmpty {
 		throw TestError.containerInfoNotFound
 	}
-	XCTAssertFalse(containerInfo.tokenInfo.isEmpty)
+	XCTAssertFalse(containerInfoList.flatMap({ $0.tokenInfo }).isEmpty)
 	let validator = GraphValidator()
-	return validator.validate(containerPart: containerInfo, collectedInfo: collectedInfo)
+	return containerInfoList.flatMap {
+		validator.validate(containerPart: $0, collectedInfo: collectedInfo)
+	}
 }
 
 func findContainerStructure(fileName: String) throws -> ContainerPart {
@@ -53,7 +56,7 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 	let fileURL = pathToSourceFile(with: fileName)
 	let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
-	guard let containerInfo = containerBuilder.findContainerStructure() else {
+	guard let containerInfo = containerBuilder.findContainerStructure().first else {
 		throw TestError.containerInfoNotFound
 	}
 	return containerInfo

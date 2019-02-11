@@ -17,27 +17,24 @@ final class ContainerInitializatorFinder {
 	}
 	
 	/// Trying to find container initialization and parse dependency praph.
-	func findContainerStructure() -> ContainerPart? {
+	func findContainerStructure() -> [ContainerPart] {
 		TimeRecorder.start(event: .createTokens)
 		defer { TimeRecorder.end(event: .createTokens) }
 		
-		let possibleContainerValues = getProssibleContainerTypeHolders()
-		for structureInfo in possibleContainerValues {
-			guard let file = parsingContext.fileContainer.getOrCreateFile(by: structureInfo.filePath) else {
-				continue
-			}
-			if let mainContainerPart = self.recursivelyFindContainerAndBuildGraph(list: structureInfo.substructure, file: file) {
-				return mainContainerPart
-			}
-		}
-		
-		return nil
+		return getProssibleContainerTypeHolders()
+			.compactMap { type in
+				self.parsingContext.fileContainer.getOrCreateFile(by: type.filePath).map {
+					self.recursivelyFindContainerAndBuildGraph(list: type.substructure, file: $0)
+				}
+			}.flatMap { $0 }
 	}
 	
 	
 	private func getProssibleContainerTypeHolders() -> [Type] {
 		var possibleContainerValues = parsingContext.collectedInfo.values.filter {
-			$0.inheritedTypes.contains(DIKeywords.diPart.rawValue) || $0.inheritedTypes.contains(DIKeywords.diFramework.rawValue)
+			$0.inheritedTypes.contains(DIKeywords.diPart.rawValue)
+				|| $0.inheritedTypes.contains(DIKeywords.diFramework.rawValue)
+				|| $0.inheritedTypes.contains(DIKeywords.xcTestCase.rawValue)
 		}
 		if let appDelegateClass = parsingContext.collectedInfo[DIKeywords.appDelegate.rawValue] {
 			possibleContainerValues.insert(appDelegateClass, at: 0)
@@ -46,19 +43,17 @@ final class ContainerInitializatorFinder {
 	}
 	
 	
-	private func recursivelyFindContainerAndBuildGraph(list: [SourceKitStructure], file: File) -> ContainerPart? {
-		// .init call should be after variable name declaration. So index should be greater than 0
-		if let containerInitIndex = list.index(where: self.isContainerInitialization), containerInitIndex > 0 {
-			parsingContext.currentContainerName = list[containerInitIndex - 1].get(.name) ?? DIKeywords.container.rawValue
-			return ContainerPart(substructureList: list, file: file, parsingContext: parsingContext, currentPartName: nil)
-		}
-
-		for substructureInfo in list {
-			if let mainContainerPart = self.recursivelyFindContainerAndBuildGraph(list: substructureInfo.substructures, file: file) {
-				return mainContainerPart
+	private func recursivelyFindContainerAndBuildGraph(list: [SourceKitStructure], file: File) -> [ContainerPart] {
+		return list
+			.enumerated()
+			.filter { self.isContainerInitialization(structure: $1) }
+			.compactMap { (containerInitIndex, _) -> ContainerPart? in
+				guard containerInitIndex >= 0 else { return nil }
+				// .init call should be after variable name declaration. So index should be greater than 0
+				parsingContext.currentContainerName = list[containerInitIndex - 1].get(.name) ?? DIKeywords.container.rawValue
+				return ContainerPart(substructureList: list, file: file, parsingContext: parsingContext, currentPartName: nil)
 			}
-		}
-		return nil
+			+ list.flatMap { self.recursivelyFindContainerAndBuildGraph(list: $0.substructures, file: file) }
 	}
 	
 	

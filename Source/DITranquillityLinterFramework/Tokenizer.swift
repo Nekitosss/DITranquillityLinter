@@ -37,17 +37,20 @@ public class Tokenizer {
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
-		guard let initContainerStructure = containerBuilder.findContainerStructure() else {
+		
+		let initContainerStructureList = containerBuilder.findContainerStructure()
+		if initContainerStructureList.isEmpty {
 			Log.warning("Could not find DIContainer creation")
 			return false
 		}
 		guard parsingContext.errors.isEmpty else {
-			display(errorList: parsingContext.errors)
+			self.display(errorList: parsingContext.errors)
 			return false
 		}
-
-		let errorList = validator.validate(containerPart: initContainerStructure, collectedInfo: collectedInfo)
-		display(errorList: errorList)
+		let errorList = initContainerStructureList
+			.flatMap { self.validator.validate(containerPart: $0, collectedInfo: collectedInfo) }
+		
+		self.display(errorList: errorList)
 		return errorList.isEmpty
 	}
 	

@@ -8,14 +8,14 @@
 
 import DITranquillity
 
-private class MyClass {
+private class MyClass2 {
 }
 
-private class ParsablePart: DIPart {
+private class ParsablePart2: DIPart {
 	
 	static let container: DIContainer = {
 		let cont = DIContainer()
-		cont.append(part: ParsablePart.self)
+		cont.append(part: ParsablePart2.self)
 		return cont
 	}()
 	
@@ -24,6 +24,6 @@ private class ParsablePart: DIPart {
 	}
 	
 	static func invalidInjectionMethod(_ c: DIContainer) {
-		c.register(MyClass.init)
+		c.register(MyClass2.init)
 	}
 }
