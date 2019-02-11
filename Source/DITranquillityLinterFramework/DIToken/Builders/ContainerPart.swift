@@ -14,10 +14,12 @@ import SourceKittenFramework
 /// Trying to collect info from container part and pack it into RegistrationTokens
 struct ContainerPart {
 	
+	let name: String?
 	let tokenInfo: [RegistrationAccessor: [RegistrationToken]]
 	
 	init(substructureList: [SourceKitStructure], file: File, parsingContext: ParsingContext, currentPartName: String?) {
 		let builer = ContainerPartBuilder(file: file, parsingContext: parsingContext, currentPartName: currentPartName)
+		self.name = currentPartName
 		self.tokenInfo = builer.build(substructureList: substructureList)
 	}
 	

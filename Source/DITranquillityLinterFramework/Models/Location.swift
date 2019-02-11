@@ -9,7 +9,7 @@
 import Foundation
 import SourceKittenFramework
 
-public struct Location: CustomStringConvertible, Equatable {
+public struct Location: CustomStringConvertible, Equatable, Codable {
 	public let file: String?
 	public let line: Int?
 	public let character: Int?

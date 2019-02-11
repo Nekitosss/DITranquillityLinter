@@ -10,7 +10,7 @@ import Foundation
 
 
 /// Contains information about aliasing c.register(...).as(MyProtocol.self)
-struct AliasToken: DIToken {
+struct AliasToken: DIToken, Codable {
 	
 	var isIntermediate: Bool {
 		return true
@@ -57,7 +57,7 @@ struct AliasToken: DIToken {
 }
 
 /// Combination of typeName and tag for unique registration identifying
-struct RegistrationAccessor: Hashable {
+struct RegistrationAccessor: Hashable, Codable {
 	let typeName: String
 	let tag: String
 	
