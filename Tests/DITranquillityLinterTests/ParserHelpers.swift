@@ -52,8 +52,12 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 }
 
 func findContainerStructure(fileName: String) throws -> ContainerPart {
-	let tokenizer = Tokenizer(isTestEnvironment: true)
 	let fileURL = pathToSourceFile(with: fileName)
+	return try findContainerStructure(fullPathToFile: fileURL)
+}
+
+func findContainerStructure(fullPathToFile fileURL: String) throws -> ContainerPart {
+	let tokenizer = Tokenizer(isTestEnvironment: true)
 	let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 	guard let containerInfo = containerBuilder.findContainerStructure().first else {
@@ -65,4 +69,9 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 func pathToSourceFile(with name: String) -> String {
 	let bundle = Bundle(path: FileManager.default.currentDirectoryPath + "/TestFiles.bundle")!
 	return bundle.path(forResource: name, ofType: "swift")!
+}
+
+func pathsToSourceFiles() -> [String] {
+	let bundle = Bundle(path: FileManager.default.currentDirectoryPath + "/TestFiles.bundle")!
+	return bundle.paths(forResourcesOfType: "swift", inDirectory: nil)
 }

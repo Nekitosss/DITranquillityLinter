@@ -77,4 +77,20 @@ class HelpersTests: XCTestCase {
 		let result = try tokenizer.process(files: [filePath])
 		XCTAssertFalse(result)
 	}
+	
+	// Takes all test source files and encode -> decode them. Change later to constant decoding checking?
+	func testAllFilesEncodingDecoding() {
+		let encoder = JSONEncoder()
+		let decoder = JSONDecoder()
+		for sourceFile in pathsToSourceFiles() {
+			do {
+				let containerInfo = try findContainerStructure(fullPathToFile: sourceFile)
+				let data = try encoder.encode(containerInfo)
+				_ = try decoder.decode(ContainerPart.self, from: data)
+				
+			} catch {
+				XCTFail(error.localizedDescription + "\nTest file: " + sourceFile)
+			}
+		}
+	}
 }
