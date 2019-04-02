@@ -49,9 +49,9 @@ final class ContainerPartBuilder {
 	
 	
 	func build(substructureList: [SourceKitStructure]) -> [RegistrationAccessor: [RegistrationToken]] {
-		var intermediateTokenList: [DIToken] = []
+		var intermediateTokenList: [DITokenConvertible] = []
 		var assignedRegistrations: [String: RegistrationToken] = [:]
-		var otherRegistrations: [DIToken] = []
+		var otherRegistrations: [DITokenConvertible] = []
 		var nextAssignee: String?
 		
 		for substructure in substructureList {
@@ -63,12 +63,12 @@ final class ContainerPartBuilder {
 		}
 		
 		let assignedRegistrationValues = Array(assignedRegistrations.values)
-		let tokenList = otherRegistrations + (assignedRegistrationValues as [DIToken])
+		let tokenList = otherRegistrations + (assignedRegistrationValues as [DITokenConvertible])
 		return compose(tokenList: tokenList)
 	}
 	
 	
-	private func processRegistrationChain(substructure: SourceKitStructure, intermediateTokenList: inout [DIToken], nextAssignee: inout String?, otherRegistrations: inout [DIToken], assignedRegistrations: inout [String: RegistrationToken]) {
+	private func processRegistrationChain(substructure: SourceKitStructure, intermediateTokenList: inout [DITokenConvertible], nextAssignee: inout String?, otherRegistrations: inout [DITokenConvertible], assignedRegistrations: inout [String: RegistrationToken]) {
 		intermediateTokenList.removeAll()
 		let assignee = nextAssignee
 		nextAssignee = nil
@@ -88,7 +88,7 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private func processExpressionKindCall(use substructure: SourceKitStructure, assignee: String?, intermediateTokenList: inout [DIToken], otherRegistrations: inout [DIToken], assignedRegistrations: inout [String: RegistrationToken]) {
+	private func processExpressionKindCall(use substructure: SourceKitStructure, assignee: String?, intermediateTokenList: inout [DITokenConvertible], otherRegistrations: inout [DITokenConvertible], assignedRegistrations: inout [String: RegistrationToken]) {
 		// Get all tokens
 		var collectedTokens = self.processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &intermediateTokenList)
 		
@@ -111,7 +111,10 @@ final class ContainerPartBuilder {
 			// something like:
 			// let r = container.register(_:)  (processed earlier)
 			// r.inject(_:)  (processed in that if block)
-			let inputTokenList = registrationToken.tokenList + collectedTokens + intermediateTokenList
+			let inputTokenList =
+				registrationToken.tokenList.map { $0.underlyingValue }
+				+ collectedTokens
+				+ intermediateTokenList
 			let tokenList = self.registrationTokenBuilder.fillTokenListWithInfo(input: inputTokenList,
 																				registrationTypeName: registrationToken.plainTypeName,
 																				parsingContext: parsingContext,
@@ -120,7 +123,7 @@ final class ContainerPartBuilder {
 			let newToken = RegistrationToken(typeName: registrationToken.typeName,
 											 plainTypeName: registrationToken.plainTypeName,
 											 location: registrationToken.location,
-											 tokenList: tokenList)
+											 tokenList: tokenList.map { $0.diTokenValue })
 			assignedRegistrations[String(name[..<firstDotIndex])] = newToken
 		} else {
 			// container.append(part:) for example
@@ -133,7 +136,7 @@ final class ContainerPartBuilder {
 	/// ```let r = container.register(_:)```
 	///
 	/// "r" is assignee name
-	private func processVarLocalDeclarationKind(use substructure: SourceKitStructure, otherRegistrations: inout [DIToken], assignedRegistrations: [String: RegistrationToken]) -> String? {
+	private func processVarLocalDeclarationKind(use substructure: SourceKitStructure, otherRegistrations: inout [DITokenConvertible], assignedRegistrations: [String: RegistrationToken]) -> String? {
 		guard let name: String = substructure.get(.name) else {
 			return nil
 		}
@@ -148,12 +151,12 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private func compose(tokenList: [DIToken]) -> [RegistrationAccessor: [RegistrationToken]] {
+	private func compose(tokenList: [DITokenConvertible]) -> [RegistrationAccessor: [RegistrationToken]] {
 		return tokenList.reduce(into: [:]) { result, token in
 			switch token {
 			case let registration as RegistrationToken:
 				registration.tokenList
-					.compactMap { $0 as? AliasToken }
+					.compactMap { $0.underlyingValue as? AliasToken }
 					.forEach { result[$0.getRegistrationAccessor(), default: []].append(registration) }
 				
 			case let appendContainer as AppendContainerToken:
@@ -168,14 +171,14 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private func processLoadContainerBodyPart(loadContainerBodyPart: SourceKitStructure, tokenList: inout [DIToken]) -> [DIToken] {
+	private func processLoadContainerBodyPart(loadContainerBodyPart: SourceKitStructure, tokenList: inout [DITokenConvertible]) -> [DITokenConvertible] {
 		guard let info = self.getTokenInfo(from: loadContainerBodyPart, tokenList: tokenList) else {
 			return []
 		}
 		
-		var result: [DIToken] = []
+		var result: [DITokenConvertible] = []
 		if let token = tryBuildToken(use: info) {
-			if token.isIntermediate {
+			if token.diTokenValue.isIntermediate {
 				tokenList.append(token)
 			} else {
 				tokenList.removeAll()
@@ -194,7 +197,7 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private func getTokenInfo(from loadContainerBodyPart: SourceKitStructure, tokenList: [DIToken]) -> TokenBuilderInfo? {
+	private func getTokenInfo(from loadContainerBodyPart: SourceKitStructure, tokenList: [DITokenConvertible]) -> TokenBuilderInfo? {
 		guard
 			loadContainerBodyPart.isKind(of: SwiftExpressionKind.call),
 			let name: String = loadContainerBodyPart.get(.name),
@@ -259,7 +262,7 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private func tryBuildToken(use info: TokenBuilderInfo) -> DIToken? {
+	private func tryBuildToken(use info: TokenBuilderInfo) -> DITokenConvertible? {
 		for tokenBuilder in allTokenBuilders {
 			if let token = tokenBuilder.build(using: info) {
 				return token

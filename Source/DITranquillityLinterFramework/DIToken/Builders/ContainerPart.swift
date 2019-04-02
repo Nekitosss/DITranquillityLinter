@@ -12,7 +12,7 @@ import SourceKittenFramework
 
 // DIPart, DIFramework
 /// Trying to collect info from container part and pack it into RegistrationTokens
-struct ContainerPart {
+struct ContainerPart: Codable {
 	
 	let name: String?
 	let tokenInfo: [RegistrationAccessor: [RegistrationToken]]

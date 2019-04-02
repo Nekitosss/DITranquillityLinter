@@ -82,7 +82,7 @@ final class TypeFinder {
 	}
 	
 	
-	func findMethodTypeInfo(typeName: String, parsingContext: ParsingContext, content: NSString, file: File, token: InjectionToken) -> [DIToken] {
+	func findMethodTypeInfo(typeName: String, parsingContext: ParsingContext, content: NSString, file: File, token: InjectionToken) -> [DITokenConvertible] {
 		guard let substructure = token.injectionSubstructureList.last,
 			var methodName: String = substructure.get(.name),
 			let offset: Int64 = substructure.get(.offset)

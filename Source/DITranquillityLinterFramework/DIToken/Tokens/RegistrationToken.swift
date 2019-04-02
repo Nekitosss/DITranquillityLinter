@@ -9,7 +9,7 @@
 import Foundation
 
 /// Total collected info about registration
-struct RegistrationToken: DIToken {
+struct RegistrationToken: Codable {
 	
 	var isIntermediate: Bool {
 		return false

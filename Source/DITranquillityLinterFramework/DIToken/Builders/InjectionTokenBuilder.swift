@@ -11,7 +11,7 @@ import SourceKittenFramework
 /// Trying to create InjectionToken (without injection type resolving)
 final class InjectionTokenBuilder: TokenBuilder {
 	
-	func build(using info: TokenBuilderInfo) -> DIToken? {
+	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		guard info.functionName == DIKeywords.injection.rawValue else { return nil }
 		var cycle = false
 		var name = ""

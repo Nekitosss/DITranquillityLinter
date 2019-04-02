@@ -11,7 +11,7 @@ import SourceKittenFramework
 /// Trying to create AliasToken
 final class AliasTokenBuilder: TokenBuilder {
 	
-	func build(using info: TokenBuilderInfo) -> DIToken? {
+	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		guard info.functionName == DIKeywords.as.rawValue else { return nil }
 		var typeName = ""
 		var tag = ""

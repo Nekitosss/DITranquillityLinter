@@ -12,7 +12,7 @@ final class ParserTests: XCTestCase {
 	func testDefaultMakingRegistration() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestDefaultMakingRegistration")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
-		let containsDefault = registration.tokenList.contains(where: { $0 is IsDefaultToken })
+		let containsDefault = registration.tokenList.contains(where: { $0.underlyingValue is IsDefaultToken })
 		XCTAssertTrue(containsDefault, "Could not parse '.default()' token")
 	}
 	

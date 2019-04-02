@@ -49,7 +49,7 @@ public enum EnvVariable: String {
 				?? "/Applications/Xcode.app/Contents/Developer"
 			return commandLineToolsPath + "/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
 		case .testableProjectFolder:
-			return "/Users/nikita/development/fooddly/Fooddly/"
+			return "/Users/nikitapatskov/Develop/fooddly/Fooddly/"
 		case .testableProjectName:
 			return "Fooddly.xcodeproj"
 		}

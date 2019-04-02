@@ -9,7 +9,7 @@
 import Foundation
 
 /// Injection information for registration
-struct InjectionToken: DIToken {
+struct InjectionToken: Codable {
 	
 	var isIntermediate: Bool {
 		return true
@@ -66,5 +66,46 @@ struct InjectionToken: DIToken {
 			}
 		}
 		return ""
+	}
+}
+
+extension InjectionToken {
+	
+	private enum CodingKeys: String, CodingKey {
+		case name
+		case typeName
+		case plainTypeName
+		case cycle
+		case optionalInjection
+		case methodInjection
+		case modificators
+		case location
+	}
+	
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(name, forKey: .name)
+		try container.encode(typeName, forKey: .typeName)
+		try container.encode(plainTypeName, forKey: .plainTypeName)
+		try container.encode(cycle, forKey: .cycle)
+		try container.encode(optionalInjection, forKey: .optionalInjection)
+		try container.encode(methodInjection, forKey: .methodInjection)
+		try container.encode(modificators, forKey: .modificators)
+		try container.encode(location, forKey: .location)
+	}
+	
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		name = try container.decode(String.self, forKey: .name)
+		typeName = try container.decode(String.self, forKey: .typeName)
+		plainTypeName = try container.decode(String.self, forKey: .plainTypeName)
+		cycle = try container.decode(Bool.self, forKey: .cycle)
+		optionalInjection = try container.decode(Bool.self, forKey: .optionalInjection)
+		methodInjection = try container.decode(Bool.self, forKey: .methodInjection)
+		modificators = try container.decode([InjectionModificator].self, forKey: .modificators)
+		location = try container.decode(Location.self, forKey: .location)
+		
+		// We need injection substructore only for processing and should not store in after full process
+		injectionSubstructureList = []
 	}
 }

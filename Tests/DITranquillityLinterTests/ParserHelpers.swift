@@ -5,7 +5,7 @@ import XCTest
 // Helpers
 func extractAliasInfo(registrationToken: RegistrationToken, maximumAliasCount: Int = 1) throws -> AliasToken {
 	// Aliases +1 by default cause of implicitly alias to self-registration class name. So we filter that
-	let aliases = registrationToken.tokenList.compactMap({ $0 as? AliasToken }).filter({ $0.typeName != registrationToken.typeName || !$0.tag.isEmpty })
+	let aliases = registrationToken.tokenList.compactMap({ $0.underlyingValue as? AliasToken }).filter({ $0.typeName != registrationToken.typeName || !$0.tag.isEmpty })
 	XCTAssertEqual(aliases.count, maximumAliasCount)
 	guard let alias = aliases.first else {
 		throw TestError.aliasTokenNotFound
@@ -14,7 +14,7 @@ func extractAliasInfo(registrationToken: RegistrationToken, maximumAliasCount: I
 }
 
 func extractInjectionInfo(registrationToken: RegistrationToken, maximumInjectionCount: Int = 1) throws -> InjectionToken {
-	let injections = registrationToken.tokenList.compactMap({ $0 as? InjectionToken })
+	let injections = registrationToken.tokenList.compactMap({ $0.underlyingValue as? InjectionToken })
 	XCTAssertLessThanOrEqual(injections.count, maximumInjectionCount)
 	guard let firstInjection = injections.first else {
 		throw TestError.injectionTokenNotFound

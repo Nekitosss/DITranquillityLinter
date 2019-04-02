@@ -31,7 +31,7 @@ final class GraphValidator {
 			return nil
 		}
 		let defaultCount = registrations.filter({ registration in
-			registration.tokenList.contains(where: { $0 is IsDefaultToken })
+			registration.tokenList.contains(where: { $0.underlyingValue is IsDefaultToken })
 		}).count
 		
 		if defaultCount == 0 {
@@ -54,7 +54,7 @@ final class GraphValidator {
 		}
 		
 		for token in registration.tokenList {
-			switch token {
+			switch token.underlyingValue {
 			case let alias as AliasToken:
 				errors += self.findErrors(inAlias: alias, collectedInfo: collectedInfo, typeInfo: typeInfo, registration: registration)
 				
@@ -99,7 +99,7 @@ final class GraphValidator {
 			errors.append(GraphError(infoString: info, location: token.location))
 		} else if let registrations = containerPart.tokenInfo[accessor] {
 			let defaultCount = registrations.filter({ registration in
-				registration.tokenList.contains(where: { $0 is IsDefaultToken })
+				registration.tokenList.contains(where: { $0.underlyingValue is IsDefaultToken })
 			}).count
 			if registrations.count > 1 && !token.isMany && defaultCount != 1 {
 				// More than one registration for requested type+tag

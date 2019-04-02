@@ -6,7 +6,7 @@
 //  Copyright © 2018 Nikita. All rights reserved.
 //
 
-enum InjectionModificator {
+enum InjectionModificator: Codable {
 	case tagged(String)
 	case typed(String)
 	case many

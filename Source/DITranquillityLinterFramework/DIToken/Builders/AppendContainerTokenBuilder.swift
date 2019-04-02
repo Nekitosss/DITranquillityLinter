@@ -11,7 +11,7 @@ import SourceKittenFramework
 /// Trying to create AppendContainerToken
 final class AppendContainerTokenBuilder: TokenBuilder {
 	
-	func build(using info: TokenBuilderInfo) -> DIToken? {
+	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		guard
 			info.functionName == DIKeywords.append.rawValue,
 			let appendInfo = info.argumentStack.first,

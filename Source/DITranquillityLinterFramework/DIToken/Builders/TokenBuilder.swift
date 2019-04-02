@@ -9,7 +9,7 @@ import Foundation
 struct TokenBuilderInfo {
 	let functionName: String
 	let invocationBody: String
-	let tokenList: [DIToken]
+	let tokenList: [DITokenConvertible]
 	let substructureList: [SourceKitStructure]
 	let bodyOffset: Int64
 	let currentPartName: String?
@@ -23,6 +23,6 @@ struct TokenBuilderInfo {
 
 protocol TokenBuilder: class {
 	
-	func build(using info: TokenBuilderInfo) -> DIToken?
+	func build(using info: TokenBuilderInfo) -> DITokenConvertible?
 	
 }

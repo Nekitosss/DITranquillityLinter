@@ -11,7 +11,7 @@ import SourceKittenFramework
 /// Trying to create IsDefaultToken
 final class IsDefaultTokenBuilder: TokenBuilder {
 	
-	func build(using info: TokenBuilderInfo) -> DIToken? {
+	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		guard info.functionName == DIKeywords.default.rawValue else { return nil }
 		return IsDefaultToken()
 	}

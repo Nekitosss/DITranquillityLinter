@@ -8,7 +8,7 @@
 
 
 /// For information about default component. c.register(...).default()
-struct IsDefaultToken: DIToken, Codable {
+struct IsDefaultToken: Codable {
 	
 	var isIntermediate: Bool {
 		return true

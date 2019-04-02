@@ -10,7 +10,7 @@ import Foundation
 
 
 /// Contains information about aliasing c.register(...).as(MyProtocol.self)
-struct AliasToken: DIToken, Codable {
+struct AliasToken: Codable {
 	
 	var isIntermediate: Bool {
 		return true
