@@ -1,24 +1,19 @@
 //
-//  Printer.swift
+//  ContainerInfoEmitter.swift
 //  DITranquillityLinterFramework
 //
-//  Created by Nikita on 19/08/2018.
-//  Copyright © 2018 Nikita. All rights reserved.
+//  Created by Nikita on 03/04/2019.
 //
 
 import Foundation
-import SourceKittenFramework
-import PathKit
 
-public let linterVersion = "0.0.2"
-
-public class Tokenizer {
+public final class ContainerInfoEmitter {
 	
 	let container: FileContainer
 	
 	private let isTestEnvironment: Bool
-	private let validator = GraphValidator()
 	private let moduleParser: ModuleParser
+	private let tokenCacher = DependencyTokenCacher()
 	
 	public init(isTestEnvironment: Bool) {
 		self.isTestEnvironment = isTestEnvironment
@@ -26,8 +21,7 @@ public class Tokenizer {
 		self.moduleParser = ModuleParser(container: container, isTestEnvironment: isTestEnvironment)
 	}
 	
-	
-	public func process(files: [String]) throws -> Bool {
+	public func process(files: [String], outputFilePath: URL) throws -> Bool {
 		let filteredFiles = files.filter(moduleParser.shouldBeParsed)
 		let collectedInfo = try moduleParser.collectInfo(files: filteredFiles)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
@@ -38,19 +32,13 @@ public class Tokenizer {
 			Log.warning("Could not find DIContainer creation")
 			return false
 		}
+		
 		guard parsingContext.errors.isEmpty else {
 			GraphError.display(errorList: parsingContext.errors)
 			return false
 		}
-		let errorList = initContainerStructureList
-			.flatMap { self.validator.validate(containerPart: $0, collectedInfo: collectedInfo) }
 		
-		GraphError.display(errorList: errorList)
-		return errorList.isEmpty
-	}
-	
-	// TODO: Needs only for test proxy. Remove later
-	func collectInfo(files: [String]) throws -> [String: Type] {
-		return try moduleParser.collectInfo(files: files)
+		try tokenCacher.cache(partList: initContainerStructureList, outputFilePath: outputFilePath)
+		return true
 	}
 }

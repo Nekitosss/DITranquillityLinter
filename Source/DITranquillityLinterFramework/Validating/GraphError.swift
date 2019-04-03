@@ -15,4 +15,11 @@ struct GraphError: Error, Equatable {
 			infoString
 			].joined()
 	}
+	
+	/// Prints all founded errors to XCode
+	static func display(errorList: [GraphError]) {
+		errorList.forEach {
+			print($0.xcodeMessage)
+		}
+	}
 }
