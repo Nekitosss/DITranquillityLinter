@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {
           "branch": null,
-          "revision": "cd6dfb86f496fcd96ce0bc6da962cd936bf41903",
-          "version": "7.3.1"
+          "revision": "e9d769113660769a4d9dd3afb855562c0b7ae7b0",
+          "version": "7.3.4"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/Quick/Quick.git",
         "state": {
           "branch": null,
-          "revision": "5fbf13871d185526993130c3a1fad0b70bfe37ce",
-          "version": "1.3.2"
+          "revision": "f2b5a06440ea87eba1a167cab37bf6496646c52e",
+          "version": "1.3.4"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/drmohundro/SWXMLHash.git",
         "state": {
           "branch": null,
-          "revision": "9ba116841126f6c63435beef21a4cd247c32d2e7",
-          "version": "4.7.6"
+          "revision": "f43166a8e18fdd0857f29e303b1bb79a5428bca0",
+          "version": "4.9.0"
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/tuist/xcodeproj.git",
         "state": {
           "branch": null,
-          "revision": "8e15cc74149ee946b7ae125685177915b4ff7317",
-          "version": "6.4.0"
+          "revision": "065f348754b6155b8037dc43876a8f2ee354b95d",
+          "version": "6.7.0"
         }
       },
       {
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
           "branch": null,
-          "revision": "26ab35f50ea891e8edefcc9d975db2f6b67e1d68",
-          "version": "1.0.1"
+          "revision": "b08dba4bcea978bf1ad37703a384097d3efce5af",
+          "version": "1.0.2"
         }
       }
     ]

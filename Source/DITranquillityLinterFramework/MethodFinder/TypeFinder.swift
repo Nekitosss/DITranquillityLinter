@@ -150,7 +150,7 @@ final class TypeFinder {
 		
 		var plainTypeName = parameter.unwrappedTypeName
 		var typeName = TypeName.onlyDroppedOptional(name: parameter.typeName.name)
-		if let genericTypeIndex = swiftType.genericTypeParameters.index(where: { $0.typeName.unwrappedTypeName == parameter.unwrappedTypeName }),
+		if let genericTypeIndex = swiftType.genericTypeParameters.firstIndex(where: { $0.typeName.unwrappedTypeName == parameter.unwrappedTypeName }),
 			let resolvedGenericType = genericType {
 			if swiftType.genericTypeParameters.count == resolvedGenericType.typeParameters.count {
 				let actualType = resolvedGenericType.typeParameters[genericTypeIndex]

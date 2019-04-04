@@ -15,7 +15,7 @@ final class ProjectFileExtractor {
 			print("Get source files from target")
 		} else {
 			print("Get all source files")
-			sourceFileReferences = project.pbxproj.sourcesBuildPhases.flatMap({ $0.files.compactMap({ $0.file }) })
+			sourceFileReferences = project.pbxproj.sourcesBuildPhases.flatMap({ ($0.files ?? []).compactMap({ $0.file }) })
 		}
 		return sourceFileReferences.compactMap({
 			// Warning: URL with spaces not allowed, file will be excluded if we will use Foundation.URL, so we use strings

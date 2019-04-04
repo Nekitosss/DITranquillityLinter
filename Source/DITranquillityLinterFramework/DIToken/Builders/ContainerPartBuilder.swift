@@ -92,7 +92,7 @@ final class ContainerPartBuilder {
 		// Get all tokens
 		var collectedTokens = self.processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &intermediateTokenList)
 		
-		if let registrationTokenIndex = collectedTokens.index(where: { $0 is RegistrationToken }) {
+		if let registrationTokenIndex = collectedTokens.firstIndex(where: { $0 is RegistrationToken }) {
 			// get registration token. Should be 0 or 1 count. Remember that container.append(part:).register() is available
 			// swiftlint:disable force_cast
 			let registrationToken = collectedTokens.remove(at: registrationTokenIndex) as! RegistrationToken
