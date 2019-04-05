@@ -21,11 +21,13 @@ final class BinaryFrameworkParser {
 	private let cacher: ResultCacher
 	private let fileContainer: FileContainer
 	private let isTestEnvironment: Bool
+	private let timeRecorder: TimeRecorder
 	
-	init(fileContainer: FileContainer, isTestEnvironment: Bool) {
-		self.cacher = ResultCacher()
+	init(timeRecorder: TimeRecorder, cacher: ResultCacher, fileContainer: FileContainer, isTestEnvironment: Bool) {
+		self.cacher = cacher
 		self.fileContainer = fileContainer
 		self.isTestEnvironment = isTestEnvironment
+		self.timeRecorder = timeRecorder
  	}
 	
 	

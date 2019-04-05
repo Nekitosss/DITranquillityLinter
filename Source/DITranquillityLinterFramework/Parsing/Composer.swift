@@ -8,8 +8,6 @@ import Foundation
 /// Responsible for composing results of `FileParser`.
 struct Composer {
 
-    init() {}
-
     /// Performs final processing of discovered types:
     /// - extends types with their corresponding extensions;
     /// - replaces typealiases with actual types

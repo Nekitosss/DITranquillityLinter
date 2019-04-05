@@ -19,7 +19,13 @@ struct EmitInfoCommand: CommandProtocol {
 	
 	let function = "Creates container info for further linting"
 	
-	private let fileCollector = FileCollector()
+	private let fileCollector: FileCollector
+	private let infoEmitter: ContainerInfoEmitter
+	
+	init(fileCollector: FileCollector, infoEmitter: ContainerInfoEmitter) {
+		self.fileCollector = fileCollector
+		self.infoEmitter = infoEmitter
+	}
 	
 	func run(_ options: OptionalLintOptions) -> Result<(), CommandantError<()>> {
 		LintOptions.shared = options.extractOptionsFromYMLIfProvided()
@@ -28,7 +34,6 @@ struct EmitInfoCommand: CommandProtocol {
 		}
 		
 		do {
-			let infoEmitter = ContainerInfoEmitter(isTestEnvironment: true)
 			let files = try fileCollector.collectSourceFiles()
 			
 			let normalizedOutput = Path(outputPath).normalize().url

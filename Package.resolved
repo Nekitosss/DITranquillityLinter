@@ -20,6 +20,15 @@
         }
       },
       {
+        "package": "DITranquillity",
+        "repositoryURL": "https://github.com/ivlevAstef/DITranquillity.git",
+        "state": {
+          "branch": null,
+          "revision": "955ab1fc58c9d78af6e47e99b03ea61f99b1c4f0",
+          "version": "3.6.3"
+        }
+      },
+      {
         "package": "Nimble",
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {
@@ -71,6 +80,15 @@
           "branch": null,
           "revision": "f14ff47f45642aa5703900980b014c2e9394b6e5",
           "version": "0.9.0"
+        }
+      },
+      {
+        "package": "SwiftLazy",
+        "repositoryURL": "https://github.com/ivlevAstef/SwiftLazy.git",
+        "state": {
+          "branch": null,
+          "revision": "8559377d164b50324ce013556287bb3900ce2326",
+          "version": "1.1.3"
         }
       },
       {

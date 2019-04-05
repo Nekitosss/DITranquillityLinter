@@ -9,8 +9,13 @@ import Foundation
 
 final class DependencyTokenCacher {
 	
-	private let encoder = JSONEncoder()
-	private let decoder = JSONDecoder()
+	private let encoder: JSONEncoder
+	private let decoder: JSONDecoder
+	
+	init(encoder: JSONEncoder, decoder: JSONDecoder) {
+		self.encoder = encoder
+		self.decoder = decoder
+	}
 	
 	func cache(partList: [ContainerPart], outputFilePath: URL) throws {
 		let encodedData = try encoder.encode(partList)

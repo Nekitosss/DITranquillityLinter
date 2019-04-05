@@ -30,7 +30,7 @@ final class ParserTests: XCTestCase {
 	
 	// invalidInjectionMethod(c: container)
 	func testInvalidMethodCallingRegistration() throws {
-		let tokenizer = Tokenizer(isTestEnvironment: true)
+		let tokenizer: Tokenizer = container.resolve()
 		let fileURL = pathToSourceFile(with: "TestInvalidMethodCallingRegistration")
 		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
@@ -42,7 +42,7 @@ final class ParserTests: XCTestCase {
 	
 	// invalidInjectionMethod(c: container) in static let container: DIContainer = { ... }
 	func testInitialDefinitionInvalidMethodCallingRegistration() throws {
-		let tokenizer = Tokenizer(isTestEnvironment: true)
+		let tokenizer: Tokenizer = container.resolve()
 		let fileURL = pathToSourceFile(with: "TestInitialDefinitionInvalidMethodCallingRegistration")
 		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
@@ -61,7 +61,7 @@ final class ParserTests: XCTestCase {
 	
 	// Two containers in single file
 	func testSeveralContainerCreation() throws {
-		let tokenizer = Tokenizer(isTestEnvironment: true)
+		let tokenizer: Tokenizer = container.resolve()
 		let fileURL = pathToSourceFile(with: "TestSeveralContainerCreation")
 		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
@@ -72,7 +72,7 @@ final class ParserTests: XCTestCase {
 	
 	// Two containers in two files
 	func testSeveralContainerCreationSeveralFiles() throws {
-		let tokenizer = Tokenizer(isTestEnvironment: true)
+		let tokenizer: Tokenizer = container.resolve()
 		// Remember to check part and class unique in two provided swift files.
 		// If you stuck and think WTF is happening, check two provided files proper compilation
 		let fileURL1 = pathToSourceFile(with: "TestInitialDefinitionInvalidMethodCallingRegistration")

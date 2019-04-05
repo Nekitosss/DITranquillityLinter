@@ -13,12 +13,13 @@ public final class ContainerInfoEmitter {
 	
 	private let isTestEnvironment: Bool
 	private let moduleParser: ModuleParser
-	private let tokenCacher = DependencyTokenCacher()
+	private let tokenCacher: DependencyTokenCacher
 	
-	public init(isTestEnvironment: Bool) {
+	init(isTestEnvironment: Bool, fileContainer: FileContainer, moduleParser: ModuleParser, tokenCacher: DependencyTokenCacher) {
 		self.isTestEnvironment = isTestEnvironment
-		self.container = FileContainer()
-		self.moduleParser = ModuleParser(container: container, isTestEnvironment: isTestEnvironment)
+		self.moduleParser = moduleParser
+		self.container = fileContainer
+		self.tokenCacher = tokenCacher
 	}
 	
 	public func process(files: [String], outputFilePath: URL) throws -> Bool {

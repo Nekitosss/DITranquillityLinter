@@ -14,12 +14,17 @@ struct LintCommand: CommandProtocol {
 	
 	let function = "Lint objects dependency graph in project"
 	
-	private let fileCollector = FileCollector()
+	private let fileCollector: FileCollector
+	private let tokenizer: Tokenizer
+	
+	init(fileCollector: FileCollector, tokenizer: Tokenizer) {
+		self.fileCollector = fileCollector
+		self.tokenizer = tokenizer
+	}
 	
 	func run(_ options: OptionalLintOptions) -> Result<(), CommandantError<()>> {
 		LintOptions.shared = options.extractOptionsFromYMLIfProvided()
 		do {
-			let tokenizer = Tokenizer(isTestEnvironment: false)
 			let files = try fileCollector.collectSourceFiles()
 			
 			let successed = try tokenizer.process(files: files)

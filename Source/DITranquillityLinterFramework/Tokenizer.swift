@@ -16,14 +16,13 @@ public class Tokenizer {
 	
 	let container: FileContainer
 	
-	private let isTestEnvironment: Bool
-	private let validator = GraphValidator()
+	private let validator: GraphValidator
 	private let moduleParser: ModuleParser
 	
-	public init(isTestEnvironment: Bool) {
-		self.isTestEnvironment = isTestEnvironment
-		self.container = FileContainer()
-		self.moduleParser = ModuleParser(container: container, isTestEnvironment: isTestEnvironment)
+	init(container: FileContainer, validator: GraphValidator, moduleParser: ModuleParser) {
+		self.container = container
+		self.validator = validator
+		self.moduleParser = moduleParser
 	}
 	
 	

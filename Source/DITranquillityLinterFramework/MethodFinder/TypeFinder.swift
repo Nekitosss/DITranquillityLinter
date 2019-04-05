@@ -11,7 +11,6 @@ import Foundation
 
 final class TypeFinder {
 	
-	
 	static func parseTypeName(name: String) -> (plainTypeName: String, typeName: String, genericType: GenericType?) {
 		var name = name
 		if let bracketIndex = name.firstIndex(of: "(") {

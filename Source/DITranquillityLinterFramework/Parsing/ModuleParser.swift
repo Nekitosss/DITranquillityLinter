@@ -11,15 +11,16 @@ import PathKit
 
 final class ModuleParser {
 	
-	private let composer = Composer()
+	private let composer: Composer
 	private let binaryFrameworkParser: BinaryFrameworkParser
 	private let implicitDependencyTypeResolver: ImplicitFrameworkDependencyTypesResolver
 	private let container: FileContainer
 	
-	public init(container: FileContainer, isTestEnvironment: Bool) {
+	public init(composer: Composer, container: FileContainer, binaryFrameworkParser: BinaryFrameworkParser, implicitDependencyTypeResolver: ImplicitFrameworkDependencyTypesResolver) {
+		self.composer = composer
 		self.container = container
-		self.binaryFrameworkParser = BinaryFrameworkParser(fileContainer: container, isTestEnvironment: isTestEnvironment)
-		self.implicitDependencyTypeResolver = ImplicitFrameworkDependencyTypesResolver(binaryFrameworkParser: self.binaryFrameworkParser)
+		self.binaryFrameworkParser = binaryFrameworkParser
+		self.implicitDependencyTypeResolver = implicitDependencyTypeResolver
 	}
 	
 	/// Include of exclude file from analyzed file list.

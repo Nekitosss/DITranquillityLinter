@@ -5,7 +5,11 @@ import xcodeproj
 
 final class FileCollector {
 	
-	private let projectFileExtractor = ProjectFileExtractor()
+	private let projectFileExtractor: ProjectFileExtractor
+	
+	init(projectFileExtractor: ProjectFileExtractor) {
+		self.projectFileExtractor = projectFileExtractor
+	}
 	
 	func collectSourceFiles() throws -> [String] {
 		

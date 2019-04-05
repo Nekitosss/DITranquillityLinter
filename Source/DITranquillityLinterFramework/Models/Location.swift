@@ -28,9 +28,9 @@ public struct Location: CustomStringConvertible, Equatable, Codable {
 		self.character = character
 	}
 	
-	public init(file: File, byteOffset offset: Int64) {
+	public init(file: File, byteOffset offset: Int64?) {
 		self.file = file.path
-		if let lineAndCharacter = file.contents.bridge().lineAndCharacter(forByteOffset: Int(offset)) {
+		if let offset = offset, let lineAndCharacter = file.contents.bridge().lineAndCharacter(forByteOffset: Int(offset)) {
 			line = lineAndCharacter.line
 			character = lineAndCharacter.character
 		} else {
