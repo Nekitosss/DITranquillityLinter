@@ -56,6 +56,10 @@ class Type: Annotated, Codable, Equatable {
     /// Type access level, i.e. `internal`, `private`, `fileprivate`, `public`, `open`
     var accessLevel: String
 	
+	var isPubliclyAvailable: Bool {
+		return accessLevel == "public" || accessLevel == "open"
+	}
+	
 	let filePath: String
 
     /// Type name in global scope. For inner types includes the name of its containing type, i.e. `Type.Inner`

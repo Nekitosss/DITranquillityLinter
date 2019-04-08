@@ -34,7 +34,7 @@ final class ParserTests: XCTestCase {
 		let fileURL = pathToSourceFile(with: "TestInvalidMethodCallingRegistration")
 		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
-		let containerPart = containerBuilder.findContainerStructure()
+		let containerPart = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 		
 		XCTAssertNotNil(containerPart, TestError.containerInfoNotFound.rawValue)
 		XCTAssertFalse(context.errors.isEmpty, "Should not allow container passing between methods")
@@ -46,7 +46,7 @@ final class ParserTests: XCTestCase {
 		let fileURL = pathToSourceFile(with: "TestInitialDefinitionInvalidMethodCallingRegistration")
 		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
-		let containerPart = containerBuilder.findContainerStructure()
+		let containerPart = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 		
 		XCTAssertNotNil(containerPart, TestError.containerInfoNotFound.rawValue)
 		XCTAssertFalse(context.errors.isEmpty, "Should not allow container passing between methods")
@@ -65,7 +65,7 @@ final class ParserTests: XCTestCase {
 		let fileURL = pathToSourceFile(with: "TestSeveralContainerCreation")
 		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
-		let containerInfo = containerBuilder.findContainerStructure()
+		let containerInfo = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 		
 		XCTAssertEqual(containerInfo.count, 2, "Could not find several containers in single file")
 	}
@@ -79,7 +79,7 @@ final class ParserTests: XCTestCase {
 		let fileURL2 = pathToSourceFile(with: "TestInvalidMethodCallingRegistration")
 		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL1, fileURL2]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
-		let containerInfo = containerBuilder.findContainerStructure()
+		let containerInfo = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 		
 		XCTAssertEqual(containerInfo.count, 2, "Could not find several containers in several files")
 	}

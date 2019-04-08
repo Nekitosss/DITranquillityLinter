@@ -28,7 +28,7 @@ public final class ContainerInfoEmitter {
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
-		let initContainerStructureList = containerBuilder.findContainerStructure()
+		let initContainerStructureList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
 		if initContainerStructureList.isEmpty {
 			Log.warning("Could not find DIContainer creation")
 			return false

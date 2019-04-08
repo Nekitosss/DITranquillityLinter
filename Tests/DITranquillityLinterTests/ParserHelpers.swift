@@ -41,7 +41,7 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 	let collectedInfo = try tokenizer.collectInfo(files: [fileURL])
 	let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
-	let containerInfoList = containerBuilder.findContainerStructure()
+	let containerInfoList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 	if containerInfoList.isEmpty {
 		throw TestError.containerInfoNotFound
 	}
@@ -61,7 +61,7 @@ func findContainerStructure(fullPathToFile fileURL: String) throws -> ContainerP
 	let tokenizer: Tokenizer = container.resolve()
 	let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
-	guard let containerInfo = containerBuilder.findContainerStructure().first else {
+	guard let containerInfo = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false).first else {
 		throw TestError.containerInfoNotFound
 	}
 	return containerInfo

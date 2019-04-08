@@ -40,7 +40,7 @@ final class GraphValidator {
 			return nil
 		} else if defaultCount > 1 {
 			let info = buildHaseMoreThanOneDefaultRegistratioinsForType(registrationName: validatingRegistration.typeName)
-			return GraphError(infoString: info, location: validatingRegistration.location)
+			return GraphError(infoString: info, location: validatingRegistration.location, kind: .validation)
 		} else {
 			return nil
 		}
@@ -74,7 +74,7 @@ final class GraphValidator {
 		var errors: [GraphError] = []
 		if !token.tag.isEmpty && collectedInfo[token.tag] == nil {
 			let info = buildTagTypeNotFoundMessage(tagName: token.tag)
-			errors.append(GraphError(infoString: info, location: token.location))
+			errors.append(GraphError(infoString: info, location: token.location, kind: .validation))
 		}
 		guard token.typeName != registration.typeName && !autoimplementedTypes.contains(token.typeName) else {
 			return errors
@@ -84,7 +84,7 @@ final class GraphValidator {
 			let aliasTypeName = nsObjectProtocolConvert(aliasType)
 			guard inheritanceAndImplementations[aliasTypeName] == nil && !typeInfo.inheritedTypes.contains(aliasTypeName) else { continue }
 			let info = buildNotFoundAliasMessage(alias: token)
-			errors.append(GraphError(infoString: info, location: token.location))
+			errors.append(GraphError(infoString: info, location: token.location, kind: .validation))
 		}
 		return errors
 	}
@@ -96,7 +96,7 @@ final class GraphValidator {
 		if !accessor.tag.isEmpty && collectedInfo[accessor.tag] == nil {
 			// Could not resolve tag
 			let info = buildTagTypeNotFoundMessage(tagName: accessor.tag)
-			errors.append(GraphError(infoString: info, location: token.location))
+			errors.append(GraphError(infoString: info, location: token.location, kind: .validation))
 		} else if let registrations = containerPart.tokenInfo[accessor] {
 			let defaultCount = registrations.filter({ registration in
 				registration.tokenList.contains(where: { $0.underlyingValue is IsDefaultToken })
@@ -104,12 +104,12 @@ final class GraphValidator {
 			if registrations.count > 1 && !token.isMany && defaultCount != 1 {
 				// More than one registration for requested type+tag
 				let info = buildTooManyRegistrationsForType(injection: token, accessor: accessor)
-				errors.append(GraphError(infoString: info, location: token.location))
+				errors.append(GraphError(infoString: info, location: token.location, kind: .validation))
 			}
 		} else if !token.optionalInjection {
 			// Not found at lease one registration for requested type+tag
 			let info = buildNotFoundRegistrationMessage(injection: token, accessor: accessor)
-			errors.append(GraphError(infoString: info, location: token.location))
+			errors.append(GraphError(infoString: info, location: token.location, kind: .validation))
 		}
 		return errors
 	}

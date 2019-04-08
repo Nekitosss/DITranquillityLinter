@@ -186,7 +186,7 @@ final class ContainerPartBuilder {
 			}
 		} else if info.argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
 			let message = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
-			let invalidCallError = GraphError(infoString: message, location: info.location)
+			let invalidCallError = GraphError(infoString: message, location: info.location, kind: .parsing)
 			parsingContext.errors.append(invalidCallError)
 		}
 		

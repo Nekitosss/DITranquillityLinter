@@ -32,7 +32,7 @@ public class Tokenizer {
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
-		let initContainerStructureList = containerBuilder.findContainerStructure()
+		let initContainerStructureList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 		if initContainerStructureList.isEmpty {
 			Log.warning("Could not find DIContainer creation")
 			return false

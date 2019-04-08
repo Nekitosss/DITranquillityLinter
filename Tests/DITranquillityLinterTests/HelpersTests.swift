@@ -94,6 +94,8 @@ class HelpersTests: XCTestCase {
 				let data = try encoder.encode(containerInfo)
 				_ = try decoder.decode(ContainerPart.self, from: data)
 				
+			} catch TestError.containerInfoNotFound {
+				continue
 			} catch {
 				XCTFail(error.localizedDescription + "\nTest file: " + sourceFile)
 			}

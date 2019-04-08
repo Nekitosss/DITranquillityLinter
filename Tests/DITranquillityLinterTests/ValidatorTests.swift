@@ -81,7 +81,7 @@ class ValidatorTests: XCTestCase {
 	
 	func testGraphErrorPrinting() throws {
 		let location = Location(file: "filename", line: 2, character: 2)
-		let graphError = GraphError(infoString: "Error", location: location)
+		let graphError = GraphError(infoString: "Error", location: location, kind: .validation)
 		let resultMessage = "filename:2:2: error: Error"
 		
 		XCTAssertEqual(graphError.xcodeMessage, resultMessage)
@@ -89,7 +89,7 @@ class ValidatorTests: XCTestCase {
 	
 	func testEmptyFileGraphErrorPrinting() throws {
 		let location = Location(file: nil, line: nil, character: nil)
-		let graphError = GraphError(infoString: "Error", location: location)
+		let graphError = GraphError(infoString: "Error", location: location, kind: .validation)
 		let resultMessage = "<nopath>:1: error: Error"
 		
 		XCTAssertEqual(graphError.xcodeMessage, resultMessage)
