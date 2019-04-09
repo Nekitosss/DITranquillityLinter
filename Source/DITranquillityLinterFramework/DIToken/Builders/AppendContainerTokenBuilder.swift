@@ -1,9 +1,3 @@
-//
-//  AppendContainerTokenBuilder.swift
-//  DITranquillityLinterFramework
-//
-//  Created by Nikita Patskov on 28/09/2018.
-//
 
 import Foundation
 import SourceKittenFramework
@@ -22,17 +16,25 @@ final class AppendContainerTokenBuilder: TokenBuilder {
 		guard
 			let swiftType = info.parsingContext.collectedInfo[typeName],
 			self.isDIPart(appendInfo, swiftType: swiftType),
-			typeName != info.currentPartName, // Circular append block. TODO: Throw XCode error
 			let loadContainerStructure = swiftType.substructure.first(where: { $0.nameIs(DIKeywords.loadContainer) }),
 			let newContainerPartFile = info.parsingContext.fileContainer.getOrCreateFile(by: swiftType.filePath)
 			else { return nil }
+		
+		if info.diPartNameStack.contains(typeName) {
+			// Handle circular DIPart append
+			let appendDIChain = (info.diPartNameStack + [typeName]).joined(separator: " -> ")
+			let error = GraphError(infoString: "Circular dependency: \(appendDIChain)", location: info.location, kind: .circularPartAppending)
+			info.parsingContext.errors.append(error)
+			return nil
+		}
 		
 		let oldContainerName = info.parsingContext.currentContainerName
 		info.parsingContext.currentContainerName = DIKeywords.container.rawValue
 		let containerPart = ContainerPart(substructureList: loadContainerStructure.substructures,
 										  file: newContainerPartFile,
 										  parsingContext: info.parsingContext,
-										  currentPartName: typeName)
+										  currentPartName: typeName,
+										  diPartNameStack: info.diPartNameStack)
 		info.parsingContext.currentContainerName = oldContainerName
 		
 		return AppendContainerToken(location: info.location, typeName: typeName, containerPart: containerPart)

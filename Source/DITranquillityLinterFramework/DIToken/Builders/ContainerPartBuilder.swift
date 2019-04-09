@@ -28,15 +28,17 @@ final class ContainerPartBuilder {
 	private let file: File
 	private let parsingContext: ParsingContext
 	private let currentPartName: String?
+	private let diPartNameStack: [String]
 	private let content: NSString
 	private let allTokenBuilders: [TokenBuilder]
 	private let registrationTokenBuilder: RegistrationTokenBuilder
 	
 	
-	init(file: File, parsingContext: ParsingContext, currentPartName: String?) {
+	init(file: File, parsingContext: ParsingContext, currentPartName: String?, diPartNameStack: [String]) {
 		self.file = file
 		self.parsingContext = parsingContext
 		self.currentPartName = currentPartName
+		self.diPartNameStack = diPartNameStack
 		self.content = file.contents.bridge()
 		self.registrationTokenBuilder = RegistrationTokenBuilder()
 		self.allTokenBuilders = [AliasTokenBuilder(),
@@ -223,7 +225,8 @@ final class ContainerPartBuilder {
 								location: location,
 								parsingContext: parsingContext,
 								content: content,
-								file: file)
+								file: file,
+								diPartNameStack: self.diPartNameStack)
 	}
 	
 	

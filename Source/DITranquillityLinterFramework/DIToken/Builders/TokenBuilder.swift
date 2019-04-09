@@ -18,6 +18,7 @@ struct TokenBuilderInfo {
 	let parsingContext: ParsingContext
 	let content: NSString
 	let file: File
+	let diPartNameStack: [String]
 }
 
 

@@ -17,11 +17,14 @@ class InfoEmitterTests: XCTestCase {
 		XCTAssertTrue(initContainerStructureList.first?.tokenInfo.isEmpty == false, "Information not extracted from public DIPart")
 	}
 	
+	
 	func testPrivatePartNotParsing() throws {
 		let initContainerStructureList = try getContainerInfo(fileName: "TestPrivatePartNotParsing")
 		XCTAssertTrue(initContainerStructureList.isEmpty, "Non public parts handled for info emitter. It shouldnt.")
 	}
 	
+	
+	// One -> Two -> Three -> One
 	func testCircularDIPartsErrorEmitting() throws {
 		let fileURL = pathToSourceFile(with: "TestCircularDIPartsErrorEmitting")
 		
@@ -30,11 +33,27 @@ class InfoEmitterTests: XCTestCase {
 		let context = try ParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
-//		_ = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
+		_ = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
 		
 		let hasCircularDependencyError = context.errors.contains(where: { $0.kind == .circularPartAppending })
 		XCTAssertTrue(hasCircularDependencyError, "Circular dependency not detected")
 	}
+	
+	// One -> One
+	func testSelfAppendDIPartsErrorEmitting() throws {
+		let fileURL = pathToSourceFile(with: "TestSelfAppendDIPartsErrorEmitting")
+		
+		let moduleParser: ModuleParser = container.resolve()
+		let fileContainer: FileContainer = container.resolve()
+		let context = try ParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
+		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
+		
+		_ = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
+		
+		let hasCircularDependencyError = context.errors.contains(where: { $0.kind == .circularPartAppending })
+		XCTAssertTrue(hasCircularDependencyError, "Self-dependency not detected")
+	}
+	
 	
 	private func getContainerInfo(fileName: String) throws -> [ContainerPart] {
 		let fileURL = pathToSourceFile(with: fileName)

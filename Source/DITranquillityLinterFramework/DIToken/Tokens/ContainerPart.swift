@@ -17,8 +17,12 @@ struct ContainerPart: Codable {
 	let name: String?
 	let tokenInfo: [RegistrationAccessor: [RegistrationToken]]
 	
-	init(substructureList: [SourceKitStructure], file: File, parsingContext: ParsingContext, currentPartName: String?) {
-		let builer = ContainerPartBuilder(file: file, parsingContext: parsingContext, currentPartName: currentPartName)
+	init(substructureList: [SourceKitStructure], file: File, parsingContext: ParsingContext, currentPartName: String?, diPartNameStack: [String]) {
+		var diPartNameStack = diPartNameStack
+		if let name = currentPartName {
+			diPartNameStack.append(name)
+		}
+		let builer = ContainerPartBuilder(file: file, parsingContext: parsingContext, currentPartName: currentPartName, diPartNameStack: diPartNameStack)
 		self.name = currentPartName
 		self.tokenInfo = builer.build(substructureList: substructureList)
 	}

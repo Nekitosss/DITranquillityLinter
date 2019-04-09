@@ -72,7 +72,7 @@ final class ContainerInitializatorFinder {
 		} else if containerInitIndex > 0 {
 			// .init call should be after variable name declaration. So index should be greater than 0
 			parsingContext.currentContainerName = list[containerInitIndex - 1].get(.name) ?? DIKeywords.container.rawValue
-			return ContainerPart(substructureList: list, file: file, parsingContext: parsingContext, currentPartName: nil)
+			return ContainerPart(substructureList: list, file: file, parsingContext: parsingContext, currentPartName: nil, diPartNameStack: [])
 		} else {
 			return nil
 		}
@@ -91,6 +91,6 @@ final class ContainerInitializatorFinder {
 			.filter { $0.get(.name) == "load(container:)" }
 			.flatMap { $0.substructures }
 		
-		return [ContainerPart(substructureList: loadContainerSubstructure, file: file, parsingContext: parsingContext, currentPartName: type.name)]
+		return [ContainerPart(substructureList: loadContainerSubstructure, file: file, parsingContext: parsingContext, currentPartName: type.name, diPartNameStack: [])]
 	}
 }
