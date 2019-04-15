@@ -5,7 +5,6 @@
 //  Created by Nikita on 03/04/2019.
 //
 
-import Result
 import Commandant
 import Dispatch
 import Foundation

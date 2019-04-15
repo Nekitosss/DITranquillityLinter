@@ -1,4 +1,3 @@
-import Result
 import Commandant
 import Dispatch
 import Foundation

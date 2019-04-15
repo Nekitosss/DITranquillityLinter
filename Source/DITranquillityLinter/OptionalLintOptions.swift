@@ -1,6 +1,5 @@
 
 import Foundation
-import Result
 import Commandant
 import DITranquillityLinterFramework
 import Yams
