@@ -20,10 +20,12 @@ let container: DIContainer = {
 DispatchQueue.global().async {
 	let registry = CommandRegistry<CommandantError<()>>()
 	let lintCommand: LintCommand = container.resolve()
+	let emitInfoCommand: EmitInfoCommand = container.resolve()
 	registry.register(lintCommand)
+	registry.register(emitInfoCommand)
 	registry.register(HelpCommand(registry: registry))
 	
-	registry.main(defaultVerb: lintCommand.verb) { error in
+	registry.main(defaultVerb: emitInfoCommand.verb) { error in
 		Log.error(String(describing: error))
 	}
 }

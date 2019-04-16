@@ -22,13 +22,14 @@ final class DependencyTokenCacher {
 		try encodedData.write(to: outputFilePath)
 	}
 	
-	func getCachedPartList(from fileURL: URL) throws -> [ContainerPart] {
+	func getCachedPartList(from fileURL: URL) -> [ContainerPart] {
 		do {
 			let data = try Data(contentsOf: fileURL, options: [])
 			let decodedContainerInfo = try decoder.decode([ContainerPart].self, from: data)
 			return decodedContainerInfo
 		} catch let error as DecodingError {
-			throw error
+			Log.error(error)
+			return []
 		} catch {
 			return []
 		}

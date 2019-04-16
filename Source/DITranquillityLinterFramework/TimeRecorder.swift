@@ -15,6 +15,7 @@ public final class TimeRecorder {
 		case collectDependencies
 		case parseSourceAndDependencies
 		case parseBinary
+		case parseCachedContainers
 		case compose
 		case createTokens
 		case validate

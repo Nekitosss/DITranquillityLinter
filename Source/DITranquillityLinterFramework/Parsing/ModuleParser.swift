@@ -63,6 +63,10 @@ final class ModuleParser {
 		}
 	}
 	
+	func getCachedContainers() throws -> [String: ContainerPart] {
+		return try self.binaryFrameworkParser.parseCachedInfoInExplicitBinaryModules()
+	}
+	
 	private func mergeResult(list: [FileParserResult]) -> FileParserResult {
 		return list.reduce(into: FileParserResult(path: nil, module: nil, types: [], linterVersion: linterVersion)) {
 			$0.typealiases += $1.typealiases

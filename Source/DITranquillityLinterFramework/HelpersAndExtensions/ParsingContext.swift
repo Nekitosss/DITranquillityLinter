@@ -12,6 +12,7 @@ final class ParsingContext {
 	
 	let fileContainer: FileContainer
 	let collectedInfo: [String: Type]
+	var cachedContainers: [String: ContainerPart] = [:]
 	var errors: [GraphError] = []
 	var currentContainerName = DIKeywords.container.rawValue
 	

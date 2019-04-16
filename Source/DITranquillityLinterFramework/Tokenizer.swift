@@ -30,6 +30,7 @@ public class Tokenizer {
 		let filteredFiles = files.filter(moduleParser.shouldBeParsed)
 		let collectedInfo = try moduleParser.collectInfo(files: filteredFiles)
 		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
+		parsingContext.cachedContainers = try moduleParser.getCachedContainers()
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
 		let initContainerStructureList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)

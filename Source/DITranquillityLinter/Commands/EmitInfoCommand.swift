@@ -28,14 +28,19 @@ struct EmitInfoCommand: CommandProtocol {
 	
 	func run(_ options: OptionalLintOptions) -> Result<(), CommandantError<()>> {
 		LintOptions.shared = options.extractOptionsFromYMLIfProvided()
-		guard let outputPath = options.outputPath else {
+		guard let outputPath = options.outputPath, !outputPath.isEmpty else {
 			return .failure(.usageError(description: "Output path for not provided. Please specify it using '-o' option."))
 		}
 		
 		do {
 			let files = try fileCollector.collectSourceFiles()
 			
-			let normalizedOutput = Path(outputPath).normalize().url
+			var normalizedOutput = Path(outputPath).normalize().url
+			let infoExtension = "lintcache"
+			if normalizedOutput.pathExtension != infoExtension {
+				normalizedOutput.appendPathExtension(infoExtension)
+			}
+			
 			let successed = try infoEmitter.process(files: files, outputFilePath: normalizedOutput)
 			TimeRecorder.end(event: .total)
 			if successed {

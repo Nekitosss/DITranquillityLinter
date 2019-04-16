@@ -26,7 +26,7 @@ struct OptionalLintOptions: Codable {
 				options.shouldRecordTime = (options.shouldRecordTime ?? false) || (decodedOptions.shouldRecordTime ?? false)
 			}
 		} catch {
-			Log.error(error)
+			Log.info(error)
 		}
 		return LintOptions(logLevel: options.logLevel, commonCachePath: options.commonCachePath, localCachePath: options.localCachePath, shouldRecordTime: options.shouldRecordTime ?? false, outputPath: options.outputPath)
 	}
