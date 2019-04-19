@@ -9,7 +9,7 @@
 
 import DITranquillity
 
-private protocol MyProtocol {}
+public protocol MyProtocol {}
 private typealias MyTypealias = MyProtocol
 private class MyClass: MyTypealias {
 }

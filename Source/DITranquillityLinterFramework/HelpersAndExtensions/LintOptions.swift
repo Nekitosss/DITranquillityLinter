@@ -7,7 +7,7 @@
 
 public struct LintOptions {
 	
-	public static var shared = LintOptions(logLevel: Log.Level.info.rawValue, commonCachePath: "/Library/Caches/", localCachePath: "./.ditranquillitylint/", shouldRecordTime: false, outputPath: nil)
+	public static var shared = LintOptions(logLevel: Log.Level.warnings.rawValue, commonCachePath: "/Library/Caches/", localCachePath: "./.ditranquillitylint/", shouldRecordTime: false, outputPath: nil)
 	
 	let logLevel: Log.Level
 	let commonCachePath: String

@@ -10,7 +10,7 @@ import Foundation
 import SourceKittenFramework
 import PathKit
 
-public let linterVersion = "0.0.2"
+public let linterVersion = "0.0.3"
 
 public class Tokenizer {
 	

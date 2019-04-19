@@ -193,8 +193,13 @@ final class BinaryFrameworkParser {
 			"key.toolchains": toolchains,
 			"key.synthesizedextensions": 1
 		]
-		let result = try Request.customRequest(request: skObject).send()
-		return (result["key.sourcetext"] as? String) ?? ""
+		do {
+			let result = try Request.customRequest(request: skObject).send()
+			return (result["key.sourcetext"] as? String) ?? ""
+		} catch {
+			Log.warning(skObject)
+			throw error
+		}
 	}
 	
 	
