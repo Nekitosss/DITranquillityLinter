@@ -27,6 +27,10 @@ final class AppendContainerTokenBuilder: TokenBuilder {
 			?? info.parsingContext.cachedContainers[typeName]
 			else { return nil }
 		
+		guard validateAlreadyAppendedPartToThisContainer(info: info, typeName: typeName) else {
+			return nil
+		}
+		
 		return AppendContainerToken(location: info.location, typeName: typeName, containerPart: containerPart)
 	}
 	
@@ -43,6 +47,7 @@ final class AppendContainerTokenBuilder: TokenBuilder {
 		let containerPart = ContainerPart(substructureList: loadContainerStructure.substructures,
 										  file: newContainerPartFile,
 										  parsingContext: info.parsingContext,
+										  containerParsingContext: info.containerParsingContext,
 										  currentPartName: typeName,
 										  diPartNameStack: info.diPartNameStack)
 		info.parsingContext.currentContainerName = oldContainerName
@@ -52,6 +57,19 @@ final class AppendContainerTokenBuilder: TokenBuilder {
 	private func isDIPart(_ argumentInfo: ArgumentInfo, swiftType: Type) -> Bool {
 		return (argumentInfo.name == DIKeywords.part.rawValue && swiftType.inheritedTypes.contains(DIKeywords.diPart.rawValue))
 			|| (argumentInfo.name == DIKeywords.framework.rawValue && swiftType.inheritedTypes.contains(DIKeywords.diFramework.rawValue))
+	}
+	
+	private func validateAlreadyAppendedPartToThisContainer(info: TokenBuilderInfo, typeName: String) -> Bool {
+		if var previousParsedLocations = info.containerParsingContext.parsedParts[typeName] {
+			previousParsedLocations.append(info.location)
+			info.containerParsingContext.parsedParts[typeName] = previousParsedLocations
+			let warning = GraphWarning(infoString: "\(typeName) was already included to container", location: info.location)
+			info.parsingContext.warnings.append(warning)
+			return false
+		} else {
+			info.containerParsingContext.parsedParts[typeName] = [info.location]
+			return true
+		}
 	}
 	
 }

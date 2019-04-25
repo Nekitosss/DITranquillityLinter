@@ -15,7 +15,8 @@ struct TokenBuilderInfo {
 	let currentPartName: String?
 	let argumentStack: [ArgumentInfo]
 	let location: Location
-	let parsingContext: ParsingContext
+	let parsingContext: GlobalParsingContext
+	let containerParsingContext: ContainerParsingContext
 	let content: NSString
 	let file: File
 	let diPartNameStack: [String]

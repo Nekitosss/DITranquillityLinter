@@ -4,7 +4,18 @@
 
 import Foundation
 
-struct GraphError: Error, Equatable {
+protocol XCodePrintable {
+	var xcodeMessage: String { get }
+}
+
+/// Prints all founded errors to XCode
+func print(xcodePrintable: [XCodePrintable]) {
+	xcodePrintable.forEach {
+		print($0.xcodeMessage)
+	}
+}
+
+struct GraphError: Error, Equatable, XCodePrintable {
 	let infoString: String
 	let location: Location
 	let kind: Kind
@@ -22,11 +33,18 @@ struct GraphError: Error, Equatable {
 			infoString
 			].joined()
 	}
+}
+
+struct GraphWarning: Equatable, XCodePrintable {
+	let infoString: String
+	let location: Location
 	
-	/// Prints all founded errors to XCode
-	static func display(errorList: [GraphError]) {
-		errorList.forEach {
-			print($0.xcodeMessage)
-		}
+	var xcodeMessage: String {
+		return [
+			"\(location): ",
+			"warning: ",
+			infoString
+			].joined()
 	}
 }
+

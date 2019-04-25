@@ -197,7 +197,7 @@ final class BinaryFrameworkParser {
 			let result = try Request.customRequest(request: skObject).send()
 			return (result["key.sourcetext"] as? String) ?? ""
 		} catch {
-			Log.warning(skObject)
+			Log.info(skObject)
 			throw error
 		}
 	}

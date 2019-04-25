@@ -25,7 +25,7 @@ public final class ContainerInfoEmitter {
 	public func process(files: [String], outputFilePath: URL) throws -> Bool {
 		let filteredFiles = files.filter(moduleParser.shouldBeParsed)
 		let collectedInfo = try moduleParser.collectInfo(files: filteredFiles)
-		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
+		let parsingContext = GlobalParsingContext(container: container, collectedInfo: collectedInfo)
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
 		let initContainerStructureList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
@@ -34,8 +34,9 @@ public final class ContainerInfoEmitter {
 			return false
 		}
 		
+		print(xcodePrintable: parsingContext.warnings)
 		guard parsingContext.errors.isEmpty else {
-			GraphError.display(errorList: parsingContext.errors)
+			print(xcodePrintable: parsingContext.errors)
 			return false
 		}
 		

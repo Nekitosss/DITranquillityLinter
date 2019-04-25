@@ -29,7 +29,7 @@ public class Tokenizer {
 	public func process(files: [String]) throws -> Bool {
 		let filteredFiles = files.filter(moduleParser.shouldBeParsed)
 		let collectedInfo = try moduleParser.collectInfo(files: filteredFiles)
-		let parsingContext = ParsingContext(container: container, collectedInfo: collectedInfo)
+		let parsingContext = GlobalParsingContext(container: container, collectedInfo: collectedInfo)
 		parsingContext.cachedContainers = try moduleParser.getCachedContainers()
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
@@ -38,14 +38,16 @@ public class Tokenizer {
 			Log.warning("Could not find DIContainer creation")
 			return false
 		}
+		
+		print(xcodePrintable: parsingContext.warnings)
 		guard parsingContext.errors.isEmpty else {
-			GraphError.display(errorList: parsingContext.errors)
+			print(xcodePrintable: parsingContext.errors)
 			return false
 		}
 		let errorList = initContainerStructureList
 			.flatMap { self.validator.validate(containerPart: $0, collectedInfo: collectedInfo) }
 		
-		GraphError.display(errorList: errorList)
+		print(xcodePrintable: errorList)
 		return errorList.isEmpty
 	}
 	

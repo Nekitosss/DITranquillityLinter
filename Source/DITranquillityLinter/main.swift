@@ -25,7 +25,7 @@ DispatchQueue.global().async {
 	registry.register(emitInfoCommand)
 	registry.register(HelpCommand(registry: registry))
 	
-	registry.main(defaultVerb: emitInfoCommand.verb) { error in
+	registry.main(defaultVerb: lintCommand.verb) { error in
 		Log.error(String(describing: error))
 	}
 }

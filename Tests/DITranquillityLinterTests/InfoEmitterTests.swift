@@ -30,7 +30,7 @@ class InfoEmitterTests: XCTestCase {
 		
 		let moduleParser: ModuleParser = container.resolve()
 		let fileContainer: FileContainer = container.resolve()
-		let context = try ParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
+		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		_ = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
@@ -45,7 +45,7 @@ class InfoEmitterTests: XCTestCase {
 		
 		let moduleParser: ModuleParser = container.resolve()
 		let fileContainer: FileContainer = container.resolve()
-		let context = try ParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
+		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		_ = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
@@ -85,7 +85,7 @@ class InfoEmitterTests: XCTestCase {
 		// Create main container
 		let tokenizer: Tokenizer = container.resolve()
 		let usingFileURL = pathToSourceFile(with: "TestPublicUsing")
-		let context = try ParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [usingFileURL]))
+		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [usingFileURL]))
 		
 		// Set side module dependency
 		context.cachedContainers = initContainerStructureList.reduce(into: [:]) {$0[$1.name ?? ""] = $1 }
@@ -107,7 +107,7 @@ class InfoEmitterTests: XCTestCase {
 		
 		let moduleParser: ModuleParser = container.resolve()
 		let fileContainer: FileContainer = container.resolve()
-		let context = try ParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
+		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		return containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)

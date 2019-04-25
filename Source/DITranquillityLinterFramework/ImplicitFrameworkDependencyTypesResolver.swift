@@ -13,7 +13,8 @@ final class ImplicitFrameworkDependencyTypesResolver {
 	}
 	
 	func resolveTypesFromImplicitDependentBinaryFrameworks(in allTypes: [Type], composedTypes: [String: Type]) throws -> [FileParserResult]? {
-		let resolvedTypes = Set(composedTypes.keys)
+		// extension types are not actually fully resolved
+		let resolvedTypes = Set(composedTypes.filter({ $1.kind != "extension" }).keys)
 		let unresolvedTypes: Set<String> = allTypes.reduce(into: []) {
 			$0.formUnion(findUnresolvedTypes(in: $1, resolvedTypes: resolvedTypes))
 		}
