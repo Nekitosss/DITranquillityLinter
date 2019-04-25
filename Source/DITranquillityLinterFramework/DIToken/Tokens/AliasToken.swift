@@ -36,6 +36,7 @@ struct AliasToken: Codable {
 	static func decompose(name: String) -> [String] {
 		if name.contains("&") {
 			return name
+				.bracketsBalancing()
 				.split(separator: "&")
 				.map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) })
 		} else {
