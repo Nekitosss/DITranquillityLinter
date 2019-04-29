@@ -292,7 +292,7 @@ extension FileParser {
 	fileprivate func genericTypeInfo(source: [String: SourceKitRepresentable]) -> GenericType? {
 		guard let substring = extract(.nameSuffix, from: source),
 			let name = extract(.name, from: source),
-			let closeBracketIndex = substring.index(of: ">")
+			let closeBracketIndex = substring.firstIndex(of: ">")
 			else { return nil }
 		let genericInfoSubstring = String(substring[...closeBracketIndex])
 		
@@ -732,7 +732,7 @@ extension FileParser {
         guard let attributeString = string.trimmingCharacters(in: .whitespaces)
             .components(separatedBy: " ", excludingDelimiterBetween: ("(", ")")).first else { return nil }
 
-        if let openIndex = attributeString.index(of: "(") {
+        if let openIndex = attributeString.firstIndex(of: "(") {
             let name = String(attributeString.prefix(upTo: openIndex))
             guard let identifier = identifier ?? Attribute.Identifier.from(string: name) else { return nil }
 

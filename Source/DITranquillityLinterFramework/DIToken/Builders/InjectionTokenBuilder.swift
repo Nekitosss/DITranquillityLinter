@@ -11,7 +11,7 @@ import SourceKittenFramework
 /// Trying to create InjectionToken (without injection type resolving)
 final class InjectionTokenBuilder: TokenBuilder {
 	
-	func build(using info: TokenBuilderInfo) -> DIToken? {
+	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		guard info.functionName == DIKeywords.injection.rawValue else { return nil }
 		var cycle = false
 		var name = ""
@@ -50,7 +50,7 @@ final class InjectionTokenBuilder: TokenBuilder {
 			// injection(\.myPath)
 			name = String(argument.value.dropFirst(2))
 			
-		} else if let dotIndex = argument.value.index(of: "."), isEmptyArgumentName && argument.value.firstMatch(RegExp.explicitKeyPath.rawValue) != nil {
+		} else if let dotIndex = argument.value.firstIndex(of: "."), isEmptyArgumentName && argument.value.firstMatch(RegExp.explicitKeyPath.rawValue) != nil {
 			// injection(\RegistrationType.myPath)
 			name = String(argument.value[argument.value.index(after: dotIndex)...])
 			

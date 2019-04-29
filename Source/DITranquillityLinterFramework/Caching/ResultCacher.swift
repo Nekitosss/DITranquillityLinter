@@ -13,8 +13,15 @@ final class ResultCacher {
 	private var commonCacheDirectory: String { return LintOptions.shared.commonCachePath }
 	private var libraryCacheFolderName: String { return LintOptions.shared.localCachePath }
 	
-	private let encoder = JSONEncoder()
-	private let decoder = JSONDecoder()
+	private let encoder: JSONEncoder
+	private let decoder: JSONDecoder
+	private let timeRecorder: TimeRecorder
+
+	init(encoder: JSONEncoder, decoder: JSONDecoder, timeRecorder: TimeRecorder) {
+		self.encoder = encoder
+		self.decoder = decoder
+		self.timeRecorder = timeRecorder
+	}
 	
 	func clearCaches(isCommonCache: Bool) throws {
 		let cachePath = self.cachePath(isCommonCache: isCommonCache)

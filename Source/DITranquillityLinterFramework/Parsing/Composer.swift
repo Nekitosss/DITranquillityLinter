@@ -8,8 +8,6 @@ import Foundation
 /// Responsible for composing results of `FileParser`.
 struct Composer {
 
-    init() {}
-
     /// Performs final processing of discovered types:
     /// - extends types with their corresponding extensions;
     /// - replaces typealiases with actual types
@@ -352,7 +350,7 @@ struct Composer {
                     let valueName = self.actualTypeName(for: TypeName(types[1]), containingType: containingType, unique: unique, typealiases: typealiases)
                     actualTypeName = "[\(keyName ?? types[0]): \(valueName ?? types[1])]"
                 }
-            } else if let genericStartIndex = unwrappedTypeName.index(of: "<"), unwrappedTypeName.last == ">" {
+            } else if let genericStartIndex = unwrappedTypeName.firstIndex(of: "<"), unwrappedTypeName.last == ">" {
                 let genericTypeNameString = String(unwrappedTypeName.prefix(upTo: genericStartIndex))
                 let genericTypeName = self.actualTypeName(for: TypeName(genericTypeNameString), containingType: containingType, unique: unique, typealiases: typealiases)
 

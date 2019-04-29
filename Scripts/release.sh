@@ -1,2 +1,2 @@
-swift build -c release -Xswiftc -static-stdlib
+swift build --static-swift-stdlib -c release
 cp -f .build/release/ditranquillity ditranquillity

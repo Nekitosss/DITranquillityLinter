@@ -21,11 +21,15 @@ final class BinaryFrameworkParser {
 	private let cacher: ResultCacher
 	private let fileContainer: FileContainer
 	private let isTestEnvironment: Bool
+	private let timeRecorder: TimeRecorder
+	private let dependencyCacher: DependencyTokenCacher
 	
-	init(fileContainer: FileContainer, isTestEnvironment: Bool) {
-		self.cacher = ResultCacher()
+	init(timeRecorder: TimeRecorder, cacher: ResultCacher, fileContainer: FileContainer, isTestEnvironment: Bool, dependencyCacher: DependencyTokenCacher) {
+		self.cacher = cacher
 		self.fileContainer = fileContainer
 		self.isTestEnvironment = isTestEnvironment
+		self.timeRecorder = timeRecorder
+		self.dependencyCacher = dependencyCacher
  	}
 	
 	
@@ -39,6 +43,14 @@ final class BinaryFrameworkParser {
 		
 		return try self.parseFrameworkInfoList(userDefinedFrameworks, target: target, sdk: sdk, isCommon: false, explicitNames: nil)
 		
+	}
+	
+	func parseCachedInfoInExplicitBinaryModules() throws -> [String: ContainerPart] {
+		timeRecorder.start(event: .parseCachedContainers)
+		defer { timeRecorder.end(event: .parseCachedContainers) }
+		
+		let userDefinedFrameworks = try self.getUserDefinedBinaryFrameworkNames()
+		return self.collectCachedContainerPartsFromBinaryModules(userDefinedFrameworks)
 	}
 	
 	/// Parse OS related bynary frameworks and
@@ -113,6 +125,21 @@ final class BinaryFrameworkParser {
 		return commonFrameworkInfoList
 	}
 	
+	private func collectCachedContainerPartsFromBinaryModules(_ frameworkInfoList: [BinaryFrameworkInfo]) -> [String: ContainerPart] {
+		var result: [String: ContainerPart] = [:]
+		for frameworkInfo in frameworkInfoList {
+			guard let url = URL(string: frameworkInfo.path)?.appendingPathExtension(".dilintemitted.lintcache") else {
+				continue
+			}
+			for part in self.dependencyCacher.getCachedPartList(from: url) {
+				guard let name = part.name else {
+					continue
+				}
+				result[name] = part
+			}
+		}
+		return result
+	}
 	
 	/// Parse concrete binary framework.
 	private func parseFrameworkInfoList(_ frameworkInfoList: [BinaryFrameworkInfo], target: String, sdk: String, isCommon: Bool, explicitNames: Set<String>?) throws -> [FileParserResult] {
@@ -166,8 +193,13 @@ final class BinaryFrameworkParser {
 			"key.toolchains": toolchains,
 			"key.synthesizedextensions": 1
 		]
-		let result = try Request.customRequest(request: skObject).send()
-		return (result["key.sourcetext"] as? String) ?? ""
+		do {
+			let result = try Request.customRequest(request: skObject).send()
+			return (result["key.sourcetext"] as? String) ?? ""
+		} catch {
+			Log.info(skObject)
+			throw error
+		}
 	}
 	
 	

@@ -6,10 +6,19 @@
 //
 
 import XCTest
+import DITranquillity
 @testable import DITranquillityLinterFramework
 
 class HelpersTests: XCTestCase {
 
+	func testContainerValidation() {
+		let container = DIContainer()
+		DISetting.Log.level = .warning
+		container.append(part: LinterDIPart.self)
+		
+		XCTAssertTrue(container.validate(checkGraphCycles: true))
+	}
+	
 	func testParallelArrayErrorThrowing() throws {
 		let throwable = NSError(domain: "", code: 0, userInfo: nil)
 		do {
@@ -24,11 +33,10 @@ class HelpersTests: XCTestCase {
 	
 	
 	func testBinaryFrameworkParsingNoCache() throws {
-		let container = FileContainer()
-		let cacher = ResultCacher()
+		let cacher: ResultCacher = container.resolve()
 		try cacher.clearCaches(isCommonCache: true)
 		
-		let parser = BinaryFrameworkParser(fileContainer: container, isTestEnvironment: true)
+		let parser: BinaryFrameworkParser = container.resolve()
 		let result = try parser.parseBinaryModules(names: ["NSAutoreleasePool"])
 		
 		XCTAssertNotNil(result)
@@ -37,8 +45,7 @@ class HelpersTests: XCTestCase {
 	
 	
 	func testProperBinaryParsingErrorHandling() throws {
-		let container = FileContainer()
-		let parser = BinaryFrameworkParser(fileContainer: container, isTestEnvironment: true)
+		let parser: BinaryFrameworkParser = container.resolve()
 		let result = try parser.parseBinaryModules(names: ["NSIndexPath+UIKitAdditions"]) // That will not be parsed, but error will not be thrown
 		
 		XCTAssertNotNil(result)
@@ -47,8 +54,7 @@ class HelpersTests: XCTestCase {
 
 	
 	func testSkippingEmptyBinaryParsing() throws {
-		let container = FileContainer()
-		let parser = BinaryFrameworkParser(fileContainer: container, isTestEnvironment: true)
+		let parser: BinaryFrameworkParser = container.resolve()
 		let result = try parser.parseBinaryModules(names: [])
 		
 		XCTAssertNil(result)
@@ -73,8 +79,26 @@ class HelpersTests: XCTestCase {
 	func testProperFileProcessingSequence() throws {
 		let filePath = pathToSourceFile(with: "TestComposedTypealiasFailure")
 		
-		let tokenizer = Tokenizer(isTestEnvironment: true)
+		let tokenizer: Tokenizer = container.resolve()
 		let result = try tokenizer.process(files: [filePath])
 		XCTAssertFalse(result)
+	}
+	
+	// Takes all test source files and encode -> decode them. Change later to constant decoding checking?
+	func testAllFilesEncodingDecoding() {
+		let encoder = JSONEncoder()
+		let decoder = JSONDecoder()
+		for sourceFile in pathsToSourceFiles() {
+			do {
+				let containerInfo = try findContainerStructure(fullPathToFile: sourceFile)
+				let data = try encoder.encode(containerInfo)
+				_ = try decoder.decode(ContainerPart.self, from: data)
+				
+			} catch TestError.containerInfoNotFound {
+				continue
+			} catch {
+				XCTFail(error.localizedDescription + "\nTest file: " + sourceFile)
+			}
+		}
 	}
 }

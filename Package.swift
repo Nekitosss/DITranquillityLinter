@@ -1,4 +1,4 @@
-// swift-tools-version:4.2
+// swift-tools-version:5.0
 import PackageDescription
 
 let package = Package(
@@ -12,6 +12,7 @@ let package = Package(
 		.package(url: "https://github.com/kylef/PathKit.git", .upToNextMajor(from: "0.9.2")),
 		.package(url: "https://github.com/Carthage/Commandant.git", from: "0.15.0"),
 		.package(url: "https://github.com/jpsim/Yams.git", from: "1.0.1"),
+		.package(url: "https://github.com/ivlevAstef/DITranquillity.git", from: "3.6.3"),
 		],
     targets: [
 		.target(
@@ -20,6 +21,7 @@ let package = Package(
 				"DITranquillityLinterFramework",
 				"Commandant",
 				"Yams",
+				"DITranquillity"
 			]),
 		.target(
 			name: "DITranquillityLinterFramework",
@@ -27,6 +29,7 @@ let package = Package(
 				"SourceKittenFramework",
 				"xcodeproj",
 				"PathKit",
+				"DITranquillity"
 			]),
 		.testTarget(
 			name: "DITranquillityLinterTests",

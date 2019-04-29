@@ -222,7 +222,7 @@ final class TypeName: NSObject, LosslessStringConvertible, Codable {
 				|| unwrappedTypeName.isValidDictionaryName()
 			
 			if isGeneric {
-				unwrappedTypeName = String(unwrappedTypeName.prefix(upTo: unwrappedTypeName.index(of: "<") ?? unwrappedTypeName.endIndex))
+				unwrappedTypeName = String(unwrappedTypeName.prefix(upTo: unwrappedTypeName.firstIndex(of: "<") ?? unwrappedTypeName.endIndex))
 			}
 		}
 		return (unwrappedTypeName, isImplicitlyUnwrappedOptional, isOptional, isGeneric)

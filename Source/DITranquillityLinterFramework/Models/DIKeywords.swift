@@ -26,4 +26,6 @@ enum DIKeywords: String {
 	case appDelegate = "AppDelegate"
 	case container = "container"
 	case xcTestCase = "XCTestCase"
+	case part = "part"
+	case framework = "framework"
 }

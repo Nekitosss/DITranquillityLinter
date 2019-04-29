@@ -9,7 +9,7 @@
 import Foundation
 import SourceKittenFramework
 
-public struct Location: CustomStringConvertible, Equatable {
+public struct Location: CustomStringConvertible, Equatable, Codable {
 	public let file: String?
 	public let line: Int?
 	public let character: Int?
@@ -28,9 +28,9 @@ public struct Location: CustomStringConvertible, Equatable {
 		self.character = character
 	}
 	
-	public init(file: File, byteOffset offset: Int64) {
+	public init(file: File, byteOffset offset: Int64?) {
 		self.file = file.path
-		if let lineAndCharacter = file.contents.bridge().lineAndCharacter(forByteOffset: Int(offset)) {
+		if let offset = offset, let lineAndCharacter = file.contents.bridge().lineAndCharacter(forByteOffset: Int(offset)) {
 			line = lineAndCharacter.line
 			character = lineAndCharacter.character
 		} else {

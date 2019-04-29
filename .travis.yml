@@ -1,5 +1,5 @@
 language: swift
-osx_image: xcode10.1
+osx_image: xcode10.2
 
 git:
   submodules: false
@@ -13,7 +13,8 @@ env:
 before_install:
   - curl -L -O https://github.com/realm/SwiftLint/releases/download/0.28.2/SwiftLint.pkg
   - sudo installer -pkg SwiftLint.pkg -target /
-  - sudo bundle install
+  - bundle install
+  - swift package --version
   - swift package resolve
   - Scripts/generate-xcodeproj.sh
 script:

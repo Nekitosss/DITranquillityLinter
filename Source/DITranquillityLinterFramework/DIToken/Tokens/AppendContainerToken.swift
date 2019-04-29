@@ -11,7 +11,7 @@ import Foundation
 
 /// For information abound appending another DIPart or DIFramework to container
 /// container.append(part: MyPart.self) or .append(framework: MyFramework.self)
-struct AppendContainerToken: DIToken {
+struct AppendContainerToken: Codable {
 	
 	var isIntermediate: Bool {
 		return false

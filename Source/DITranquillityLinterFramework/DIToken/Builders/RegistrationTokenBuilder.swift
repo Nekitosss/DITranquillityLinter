@@ -11,11 +11,11 @@ import SourceKittenFramework
 /// Trying to create RegsitrationToken. Resolves containing InjectionToken types.
 final class RegistrationTokenBuilder: TokenBuilder {
 	
-	typealias RegistrationInfo = (typeName: String, plainTypeName: String, tokenList: [DIToken])
+	typealias RegistrationInfo = (typeName: String, plainTypeName: String, tokenList: [DITokenConvertible])
 	
 	private let typeFinder = TypeFinder()
 	
-	func build(using info: TokenBuilderInfo) -> DIToken? {
+	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		guard info.functionName == DIKeywords.register.rawValue || info.functionName == DIKeywords.register1.rawValue else {
 			return nil
 		}
@@ -44,7 +44,10 @@ final class RegistrationTokenBuilder: TokenBuilder {
 		registrationInfo.tokenList.append(aliasToken)
 		
 		registrationInfo.tokenList = self.fillTokenListWithInfo(input: registrationInfo.tokenList, registrationTypeName: registrationInfo.typeName, parsingContext: info.parsingContext, content: info.content, file: info.file)
-		return RegistrationToken(typeName: registrationInfo.typeName, plainTypeName: registrationInfo.plainTypeName, location: location, tokenList: registrationInfo.tokenList)
+		return RegistrationToken(typeName: registrationInfo.typeName,
+								 plainTypeName: registrationInfo.plainTypeName,
+								 location: location,
+								 tokenList: registrationInfo.tokenList.map({ $0.diTokenValue }))
 	}
 	
 	
@@ -88,7 +91,7 @@ final class RegistrationTokenBuilder: TokenBuilder {
 	
 	
 	// TODO: Currently only .init extracts. Should handle all other static methods
-	private func extractStaticMethodRegistration(expressionCallInitSubstructure: SourceKitStructure, name: String, parsingContext: ParsingContext, content: NSString, file: File, bodyOffset: Int64) -> RegistrationInfo {
+	private func extractStaticMethodRegistration(expressionCallInitSubstructure: SourceKitStructure, name: String, parsingContext: GlobalParsingContext, content: NSString, file: File, bodyOffset: Int64) -> RegistrationInfo {
 		let (typeName, fullTypeName, genericType) = TypeFinder.parseTypeName(name: name)
 		
 		// Handle MyClass.NestedClass()
@@ -103,7 +106,7 @@ final class RegistrationTokenBuilder: TokenBuilder {
 	}
 	
 	
-	private func extractStaticVariableRegistration(body: String, parsingContext: ParsingContext) -> RegistrationInfo? {
+	private func extractStaticVariableRegistration(body: String, parsingContext: GlobalParsingContext) -> RegistrationInfo? {
 		guard let lastDotIndex = body.lastIndex(of: ".") else {
 			return nil
 		}
@@ -116,7 +119,7 @@ final class RegistrationTokenBuilder: TokenBuilder {
 	}
 	
 	
-	func fillTokenListWithInfo(input: [DIToken], registrationTypeName: String, parsingContext: ParsingContext, content: NSString, file: File) -> [DIToken] {
+	func fillTokenListWithInfo(input: [DITokenConvertible], registrationTypeName: String, parsingContext: GlobalParsingContext, content: NSString, file: File) -> [DITokenConvertible] {
 		// Recursively walk through all classes and find injection type
 		return input.reduce(into: []) { result, token in
 			// injectionToken.typeName.isEmpty always really empty here (in alpha at least)
