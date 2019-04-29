@@ -1,0 +1,301 @@
+syntax="proto3";
+package protobuf;
+
+enum AccessLevel {
+    internal = 0;
+    private = 1;
+    fileprivate = 2;
+    public = 3;
+    open = 4;
+}
+
+message TypedCodableValue {
+    oneof Value {
+        float floatValue = 1;
+        bool boolValue = 2;
+        string stringValue = 3;
+        int64 int64Value = 4;
+        ListValue arrayValue = 5;
+        MapValue dictionaryValue = 6;
+    }
+}
+
+// `ListValue` is a wrapper around a repeated field of values.
+message ListValue {
+    // Repeated field of dynamically typed values.
+    repeated TypedCodableValue values = 1;
+}
+
+message MapValue {
+    map<string,TypedCodableValue> mapValue = 1;
+}
+
+message BytesRange {
+    int64 offset = 1;
+    int64 length = 2;
+}
+
+message Structure {
+    MapValue dictionary = 1;
+}
+
+message GenericTypeWrapper {
+    oneof Value {
+        GenericType some = 2;
+        Null none = 3;
+    }
+}
+
+message TypeNameWrapper {
+    oneof Value {
+        TypeName some = 2;
+        Null none = 3;
+    }
+}
+
+message TypeWrapper {
+    oneof Value {
+        Type some = 2;
+        Null none = 3;
+    }
+}
+
+
+message TupleTypeWrapper {
+    oneof Value {
+        TupleType some = 2;
+        Null none = 3;
+    }
+}
+
+message ArrayTypeWrapper {
+    oneof Value {
+        ArrayType some = 2;
+        Null none = 3;
+    }
+}
+
+message DictionaryTypeWrapper {
+    oneof Value {
+        DictionaryType some = 2;
+        Null none = 3;
+    }
+}
+
+message ClosureTypeWrapper {
+    oneof Value {
+        ClosureType some = 2;
+        Null none = 3;
+    }
+}
+
+message StringWrapper {
+    oneof Value {
+        string some = 2;
+        Null none = 3;
+    }
+}
+
+message StructureWrapper {
+    oneof Value {
+        Structure some = 2;
+        Null none = 3;
+    }
+}
+
+
+message Type {
+
+    string module = 1;
+	map<string,Typealias> typealiases = 2;
+    bool isExtension = 3;
+	string accessLevel = 4;
+    string filePath = 5;
+	bool isGeneric = 6;
+    repeated GenericTypeParameter genericTypeParameters = 7;
+	string localName = 8;
+    repeated Variable variables = 9;
+	repeated Method methods = 10;
+	repeated Subscript subscripts = 11;
+    BytesRange bodyBytesRange = 12;
+    map<string, TypedCodableValue> annotations = 13;
+    repeated string inheritedTypes = 14;
+	map<string,string> based = 15;
+    TypeMap inherits = 16;
+    TypeMap implements = 17;
+    TypeList containedTypes = 18;
+    TypeMap containedType = 19;
+    string parentName = 20;
+    TypeWrapper parent = 21;
+    TypeWrapper supertype = 22;
+	map<string,Attribute> attributes = 23;
+    StructureWrapper parserData = 24;
+	string __path = 25;
+}
+
+message Typealias {
+    string aliasName = 1;
+    TypeName typeName = 2;
+    TypeWrapper type = 3;
+	string filePath = 4;
+    TypeWrapper parent = 5;
+    string parentName = 6;
+
+}
+
+
+message TypeName {
+    string name = 1;
+	GenericTypeWrapper generic = 2;
+    bool isGeneric = 3;
+    TypeNameWrapper actualTypeName = 4;
+    map<string, Attribute> attributes = 5;
+    bool isOptional = 6;
+	bool isImplicitlyUnwrappedOptional = 7;
+    string unwrappedTypeName = 8;
+    TupleTypeWrapper tuple = 9;
+    ArrayTypeWrapper array = 10;
+    DictionaryTypeWrapper dictionary = 11;
+    ClosureTypeWrapper closure = 12;
+}
+
+message TupleType {
+    string name = 1;
+    repeated TupleElement elements = 2;
+}
+
+message TupleElement {
+    string name = 1;
+    TypeName typeName = 2;
+    TypeWrapper type = 3;
+}
+
+message ArrayType {
+    string name = 1;
+    TypeName elementTypeName = 2;
+    TypeWrapper elementType = 3;
+}
+
+message DictionaryType {
+    string name = 1;
+    TypeName valueTypeName = 2;
+    TypeWrapper valueType = 3;
+    TypeName keyTypeName = 4;
+    TypeWrapper keyType = 5;
+}
+
+message ClosureType {
+    string name = 1;
+    repeated MethodParameter parameters = 2;
+    TypeName returnTypeName = 3;
+    TypeWrapper returnType = 4;
+    bool throws = 5;
+}
+
+message MethodParameter {
+    StringWrapper argumentLabel = 1;
+    string name = 2;
+    TypeName typeName = 3;
+    bool inout = 4;
+    TypeWrapper type = 5;
+    StringWrapper defaultValue = 6;
+    map<string,TypedCodableValue> annotations = 7;
+    StructureWrapper parserData = 8;
+}
+
+message GenericType {
+    string name = 1;
+    repeated GenericTypeParameter typeParameters = 2;
+}
+
+message GenericTypeParameter {
+    TypeName typeName = 1;
+    TypeWrapper type = 2;
+}
+
+message Variable {
+    string name = 1;
+    TypeName typeName = 2;
+    TypeWrapper type = 3;
+    bool isComputed = 4;
+    bool isStatic = 5;
+    string readAccess = 6;
+    string writeAccess = 7;
+    StringWrapper defaultValue = 8;
+    map<string,TypedCodableValue> annotations = 9;
+    map<string,Attribute> attributes = 10;
+    TypeNameWrapper definedInTypeName = 11;
+    TypeWrapper definedInType = 12;
+    StructureWrapper parserData = 13;
+}
+
+message Method {
+    string name = 1;
+	string selectorName = 2;
+    repeated MethodParameter parameters = 3;
+	TypeName returnTypeName = 4;
+    TypeWrapper returnType = 5;
+	bool throws = 6;
+	bool rethrows = 7;
+	string accessLevel = 8;
+    bool isStatic = 9;
+	bool isClass = 10;
+    bool isFailableInitializer = 11;
+    map<string,TypedCodableValue> annotations = 12;
+    TypeNameWrapper definedInTypeName = 13;
+    TypeWrapper definedInType = 14;
+    map<string,Attribute> attributes = 15;
+    StructureWrapper parserData = 16;
+}
+
+message Subscript {
+
+    repeated MethodParameter parameters = 1;
+    TypeName returnTypeName = 2;
+    TypeWrapper returnType = 3;
+    string readAccess = 4;
+    string writeAccess = 5;
+    map<string,TypedCodableValue> annotations = 6;
+    TypeNameWrapper definedInTypeName = 7;
+    TypeWrapper definedInType = 8;
+    map<string,Attribute> attributes = 9;
+    StructureWrapper parserData = 10;
+
+}
+
+message TypeList {
+    repeated Type value = 1;
+}
+
+message TypeMap {
+    map<string, Type> value = 1;
+}
+
+message Null {
+
+}
+
+message Attribute {
+    string name = 1;
+    map<string,TypedCodableValue> arguments = 2;
+    string description = 3;
+    StructureWrapper parserData = 4;
+}
+
+message Range {
+
+}
+
+message FileParserResult {
+    StringWrapper path = 1;
+    StringWrapper module = 2;
+    repeated Type types = 3;
+    repeated Typealias typealiases = 4;
+    map<string,BytesRange> inlineRanges = 5;
+    StringWrapper contentSha = 6;
+    string linterVersion = 7;
+}
+
+message FileParserResultList {
+    repeated FileParserResult value = 1;
+}

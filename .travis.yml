@@ -1,0 +1,25 @@
+language: swift
+osx_image: xcode10.2
+
+git:
+  submodules: false
+
+env:
+  global:
+    - LC_CTYPE=en_US.UTF-8
+    - LANG=en_US.UTF-8
+    - DI_LINTER_PROJECT_FOLDER=$TRAVIS_BUILD_DIR
+    - DI_LINTER_DEFAULT_TARGET='x86_64-apple-macosx10.10'
+before_install:
+  - curl -L -O https://github.com/realm/SwiftLint/releases/download/0.28.2/SwiftLint.pkg
+  - sudo installer -pkg SwiftLint.pkg -target /
+  - bundle install
+  - swift package --version
+  - swift package resolve
+  - Scripts/generate-xcodeproj.sh
+script:
+  - swiftlint
+  - swift test
+notifications:
+  email:
+    on_success: never
