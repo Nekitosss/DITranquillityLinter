@@ -7,6 +7,7 @@
 
 import Foundation
 
+@discardableResult
 func shell(command: String) -> String? {
 	let task = Process()
 	task.launchPath = "/bin/bash"

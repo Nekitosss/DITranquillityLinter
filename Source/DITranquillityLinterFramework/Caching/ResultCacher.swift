@@ -44,10 +44,21 @@ final class ResultCacher {
 		}
 		return false
 	}
+  
+  func cacheFiles<T: Encodable>(data: T, fileName: String, isCommonCache: Bool) throws -> URL {
+    let encodedData = try encoder.encode(data)
+    
+    let cacheDirectory = URL(fileURLWithPath: cachePath(isCommonCache: isCommonCache))
+    let cachePath = cacheDirectory.appendingPathComponent(fileName)
+    
+    try FileManager.default.createDirectory(atPath: cacheDirectory.path, withIntermediateDirectories: true, attributes: nil)
+    try encodedData.write(to: cachePath)
+    return cachePath
+  }
 	
 	func cacheBinaryFiles(list: [FileParserResult], name: String, isCommonCache: Bool) throws {
-		TimeRecorder.start(event: .encodeBinary)
-		defer { TimeRecorder.end(event: .encodeBinary) }
+		TimeRecorder.start(event: .saveCache)
+		defer { TimeRecorder.end(event: .saveCache) }
 		
 		let encodedData = try encoder.encode(list)
 		let (cacheDirectory, cacheFileName) = self.getCacheURL(name: name, isCommonCache: isCommonCache)
@@ -75,7 +86,7 @@ final class ResultCacher {
 		return (cacheDirectoryURL, cacheFileURL)
 	}
 	
-	private func cachePath(isCommonCache: Bool) -> String {
+	func cachePath(isCommonCache: Bool) -> String {
 		if isCommonCache {
 			return commonCacheDirectory + libraryCacheFolderName
 		} else if let srcRoot = XcodeEnvVariable.srcRoot.value() {

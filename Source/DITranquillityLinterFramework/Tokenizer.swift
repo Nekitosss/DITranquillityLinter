@@ -18,16 +18,19 @@ public class Tokenizer {
 	
 	private let validator: GraphValidator
 	private let moduleParser: ModuleParser
+  private let astEmitter: ASTEmitter
 	
-	init(container: FileContainer, validator: GraphValidator, moduleParser: ModuleParser) {
+	init(container: FileContainer, validator: GraphValidator, moduleParser: ModuleParser, astEmitter: ASTEmitter) {
 		self.container = container
 		self.validator = validator
 		self.moduleParser = moduleParser
+    self.astEmitter = astEmitter
 	}
 	
 	
 	public func process(files: [String]) throws -> Bool {
 		let filteredFiles = files.filter(moduleParser.shouldBeParsed)
+    try astEmitter.emitAST(from: files)
 		let collectedInfo = try moduleParser.collectInfo(files: filteredFiles)
 		let parsingContext = GlobalParsingContext(container: container, collectedInfo: collectedInfo)
 		parsingContext.cachedContainers = try moduleParser.getCachedContainers()

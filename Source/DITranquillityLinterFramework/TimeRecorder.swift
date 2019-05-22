@@ -19,7 +19,7 @@ public final class TimeRecorder {
 		case compose
 		case createTokens
 		case validate
-		case encodeBinary
+		case saveCache
 		case decodeBinary
 		case mapBinary
 		case decodeCachedSource
