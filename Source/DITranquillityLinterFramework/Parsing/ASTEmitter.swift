@@ -17,26 +17,33 @@ protocol ASTEmitterProtocol: class {
 final class ASTEmitter: ASTEmitterProtocol {
   
   private let resultCacher: ResultCacher
+  private let binaryFrameworkParser: BinaryFrameworkParser
   
-  init(resultCacher: ResultCacher) {
+  init(resultCacher: ResultCacher, binaryFrameworkParser: BinaryFrameworkParser) {
     self.resultCacher = resultCacher
+    self.binaryFrameworkParser = binaryFrameworkParser
   }
   
   func emitAST(from swiftSourceFiles: [String]) throws -> [String] {
+//		let swiftSourceFiles = swiftSourceFiles.filter({ $0.bridge().lastPathComponent == "Weak.swift" })
     let outputFileMap = swiftSourceFiles.reduce(into: [:]) { $0[$1] = OutputFileMapObject(astDump: self.createASTFileURL(filePath: $1)) }
     let outputFileMapPath = try resultCacher.cacheFiles(data: outputFileMap, fileName: "outputFileMap", isCommonCache: false)
-    launchAstDump(outputFileMapPath: outputFileMapPath.path, swiftSourceFiles: swiftSourceFiles)
+    try launchAstDump(outputFileMapPath: outputFileMapPath.path, swiftSourceFiles: swiftSourceFiles)
     return []
   }
   
-  private func launchAstDump(outputFileMapPath: String, swiftSourceFiles: [String]) {
+  private func launchAstDump(outputFileMapPath: String, swiftSourceFiles: [String]) throws {
     let sourceFilesPaths = swiftSourceFiles.joined(separator: " ")
-    shell(command: "swiftc -dump-ast -module-name Name -output-file-map \(outputFileMapPath) \(sourceFilesPaths)")
+    let frameworkPaths = try binaryFrameworkParser.getUserDefinedBinaryFrameworkNames()
+    let frameworksString = frameworkPaths.reduce("") { $0 + " -F " + $1.path }
+    let (target, sdk) = binaryFrameworkParser.createCommandLineArgumentInfoForSourceParsing()
+    let command = "swiftc -dump-ast -module-name Name -target \(target) -sdk \(sdk) -output-file-map=\(outputFileMapPath) \(frameworksString) \(sourceFilesPaths)"
+    shell(command: command)
   }
   
   private func createASTFileURL(filePath: String) -> String {
     let cacheDirectory = resultCacher.cachePath(isCommonCache: false)
     let fileName = filePath.bridge().lastPathComponent.bridge().deletingPathExtension + ".ast"
-    return cacheDirectory + "/" + fileName
+    return cacheDirectory + fileName
   }
 }

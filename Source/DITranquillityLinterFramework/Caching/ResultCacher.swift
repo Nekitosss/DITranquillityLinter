@@ -91,7 +91,7 @@ final class ResultCacher {
 			return commonCacheDirectory + libraryCacheFolderName
 		} else if let srcRoot = XcodeEnvVariable.srcRoot.value() {
 			Log.verbose("SRCROOT: " + srcRoot)
-			return srcRoot + "/"
+			return "\(srcRoot)/\(libraryCacheFolderName)"
 		} else {
 			return FileManager.default.currentDirectoryPath
 		}

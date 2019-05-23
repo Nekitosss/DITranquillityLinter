@@ -8,15 +8,14 @@
 import Foundation
 import SourceKittenFramework
 
+struct BinaryFrameworkInfo {
+  let path: String
+  let name: String
+  
+  static let banryFrameworkPathExtension = "framework"
+}
+
 final class BinaryFrameworkParser {
-	
-	private struct BinaryFrameworkInfo {
-		let path: String
-		let name: String
-		
-		static let banryFrameworkPathExtension = "framework"
-	}
-	
 	
 	private let cacher: ResultCacher
 	private let fileContainer: FileContainer
@@ -38,7 +37,7 @@ final class BinaryFrameworkParser {
 		TimeRecorder.start(event: .parseBinary)
 		defer { TimeRecorder.end(event: .parseBinary) }
 		
-		let (target, sdk) = self.createCommandLineArgumentInfoForSourceKitParsing()
+		let (target, sdk) = self.createCommandLineArgumentInfoForSourceParsing()
 		let userDefinedFrameworks = try self.getUserDefinedBinaryFrameworkNames()
 		
 		return try self.parseFrameworkInfoList(userDefinedFrameworks, target: target, sdk: sdk, isCommon: false, explicitNames: nil)
@@ -58,12 +57,12 @@ final class BinaryFrameworkParser {
 		guard !names.isEmpty else {
 			return nil
 		}
-		let (target, sdk) = self.createCommandLineArgumentInfoForSourceKitParsing()
+		let (target, sdk) = self.createCommandLineArgumentInfoForSourceParsing()
 		let commonFrameworks = self.getImplicitlyDependentBinaryFrameworks(sdk: sdk)
 		return try self.parseFrameworkInfoList(commonFrameworks, target: target, sdk: sdk, isCommon: true, explicitNames: names)
 	}
 	
-	private func createCommandLineArgumentInfoForSourceKitParsing() -> (target: String, sdk: String) {
+	func createCommandLineArgumentInfoForSourceParsing() -> (target: String, sdk: String) {
 		var target = EnvVariable.defaultTarget.value()
 		var sdk = EnvVariable.defaultSDK.value()
 		
@@ -84,7 +83,7 @@ final class BinaryFrameworkParser {
 	
 	
 	/// Parse user defined binary frameworks (Carthage + Cooapods-created)
-	private func getUserDefinedBinaryFrameworkNames() throws -> [BinaryFrameworkInfo] {
+	func getUserDefinedBinaryFrameworkNames() throws -> [BinaryFrameworkInfo] {
 		guard let frameworkPathsString = XcodeEnvVariable.frameworkSearchPaths.value() else {
 			return []
 		}

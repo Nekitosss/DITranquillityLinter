@@ -20,7 +20,7 @@ public final class LinterDIPart: DIPart {
 		container.register(GraphValidator.init)
 		container.register(JSONEncoder.init)
 		container.register(JSONDecoder.init)
-    container.register1(ASTEmitter.init)
+    container.register(ASTEmitter.init)
 		
 		// isTestEnvironment
 		container.register { false }
