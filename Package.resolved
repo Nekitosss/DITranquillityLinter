@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/ivlevAstef/DITranquillity.git",
         "state": {
           "branch": null,
-          "revision": "955ab1fc58c9d78af6e47e99b03ea61f99b1c4f0",
-          "version": "3.6.3"
+          "revision": "e22b9ba371dd8602448ddc6364b8d83e2d660981",
+          "version": "3.7.1"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {
           "branch": null,
-          "revision": "43304bf2b1579fd555f2fdd51742771c1e4f2b98",
-          "version": "8.0.1"
+          "revision": "f8657642dfdec9973efc79cc68bcef43a653a2bc",
+          "version": "8.0.2"
         }
       },
       {
@@ -71,6 +71,15 @@
           "branch": null,
           "revision": "f14ff47f45642aa5703900980b014c2e9394b6e5",
           "version": "0.9.0"
+        }
+      },
+      {
+        "package": "ASTVisitor",
+        "repositoryURL": "https://github.com/Nekitosss/swift-ast-visitor.git",
+        "state": {
+          "branch": null,
+          "revision": "97be5943cd4c349b7e7e20ad5faa467e09c376e8",
+          "version": "0.0.3"
         }
       },
       {

@@ -5,6 +5,10 @@ import XCTest
 
 class RegistrationParserTests: XCTestCase {
 	
+	override func tearDown() {
+		clearTestArtifacts()
+	}
+	
 	// register{ MyClass<Float>() }
 	func testExplicitGenericInitRegistration() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestExplicitGenericInitRegistration")

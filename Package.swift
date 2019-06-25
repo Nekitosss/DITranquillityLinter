@@ -2,26 +2,27 @@
 import PackageDescription
 
 let package = Package(
-    name: "DITranquillityLinter",
-    products: [
-        .executable(name: "ditranquillity", targets: ["DITranquillityLinter"]),
-    ],
-    dependencies: [
-        .package(url: "https://github.com/jpsim/SourceKitten.git", from: "0.21.2"),
+	name: "DITranquillityLinter",
+	products: [
+		.executable(name: "ditranquillity", targets: ["DITranquillityLinter"]),
+	],
+	dependencies: [
+		.package(url: "https://github.com/jpsim/SourceKitten.git", from: "0.21.2"),
 		.package(url: "https://github.com/tuist/xcodeproj.git", .upToNextMajor(from: "6.0.1")),
 		.package(url: "https://github.com/kylef/PathKit.git", .upToNextMajor(from: "0.9.2")),
 		.package(url: "https://github.com/Carthage/Commandant.git", from: "0.15.0"),
 		.package(url: "https://github.com/jpsim/Yams.git", from: "1.0.1"),
 		.package(url: "https://github.com/ivlevAstef/DITranquillity.git", from: "3.6.3"),
-		],
-    targets: [
+		.package(url: "https://github.com/Nekitosss/swift-ast-visitor.git", from: "0.0.1"),
+	],
+	targets: [
 		.target(
 			name: "DITranquillityLinter",
 			dependencies: [
 				"DITranquillityLinterFramework",
 				"Commandant",
 				"Yams",
-				"DITranquillity"
+				"DITranquillity",
 			]),
 		.target(
 			name: "DITranquillityLinterFramework",
@@ -29,10 +30,14 @@ let package = Package(
 				"SourceKittenFramework",
 				"xcodeproj",
 				"PathKit",
-				"DITranquillity"
+				"DITranquillity",
+				"ASTVisitor",
 			]),
 		.testTarget(
 			name: "DITranquillityLinterTests",
 			dependencies: ["DITranquillityLinterFramework"]),
-    ]
+	]
 )
+
+
+

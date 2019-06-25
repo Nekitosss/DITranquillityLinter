@@ -10,7 +10,7 @@ let container: DIContainer = {
 	container.register(LintCommand.init)
 	container.register(EmitInfoCommand.init)
 	container.register(ProjectFileExtractor.init)
-	container.register1(FileCollector.init)
+	container.register(FileCollector.init)
 	
 	assert(container.validate(checkGraphCycles: true))
 	

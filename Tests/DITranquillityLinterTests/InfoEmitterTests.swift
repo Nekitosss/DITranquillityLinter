@@ -10,6 +10,10 @@ import XCTest
 
 class InfoEmitterTests: XCTestCase {
 	
+	override func tearDown() {
+		clearTestArtifacts()
+	}
+	
 	func testPublicPartParsing() throws {
 		let initContainerStructureList = try getContainerInfo(fileName: "TestPublicPartParsing")
 		
@@ -30,7 +34,7 @@ class InfoEmitterTests: XCTestCase {
 		
 		let moduleParser: ModuleParser = container.resolve()
 		let fileContainer: FileContainer = container.resolve()
-		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
+		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]), astFilePaths: [])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		_ = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
@@ -45,7 +49,7 @@ class InfoEmitterTests: XCTestCase {
 		
 		let moduleParser: ModuleParser = container.resolve()
 		let fileContainer: FileContainer = container.resolve()
-		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
+		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]), astFilePaths: [])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		_ = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
@@ -85,7 +89,7 @@ class InfoEmitterTests: XCTestCase {
 		// Create main container
 		let tokenizer: Tokenizer = container.resolve()
 		let usingFileURL = pathToSourceFile(with: "TestPublicUsing")
-		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [usingFileURL]))
+		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [usingFileURL]), astFilePaths: [])
 		
 		// Set side module dependency
 		context.cachedContainers = initContainerStructureList.reduce(into: [:]) {$0[$1.name ?? ""] = $1 }
@@ -107,7 +111,7 @@ class InfoEmitterTests: XCTestCase {
 		
 		let moduleParser: ModuleParser = container.resolve()
 		let fileContainer: FileContainer = container.resolve()
-		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]))
+		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]), astFilePaths: [])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		return containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)

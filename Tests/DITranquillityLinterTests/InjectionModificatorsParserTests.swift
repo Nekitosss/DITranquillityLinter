@@ -5,6 +5,10 @@ import XCTest
 
 class InjectionModificatorsParserTests: XCTestCase {
 	
+	override func tearDown() {
+		clearTestArtifacts()
+	}
+	
 	// .injection(\.ss) { by(tag: MyTag.self, on: $0) }
 	func testTaggedModificatorKeyPathInjection() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestTaggedModificatorKeyPathInjection")

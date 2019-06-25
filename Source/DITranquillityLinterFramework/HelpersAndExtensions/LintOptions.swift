@@ -18,7 +18,7 @@ public struct LintOptions {
 	public init(logLevel: String?, commonCachePath: String?, localCachePath: String?, shouldRecordTime: Bool, outputPath: String?) {
 		self.logLevel = logLevel.flatMap(Log.Level.init(rawValue:)) ?? .warnings
 		self.commonCachePath = commonCachePath ?? "/Library/Caches/"
-		self.localCachePath = localCachePath ?? "./.ditranquillitylint/"
+		self.localCachePath = localCachePath ?? ResultCacher.localCacheDefaultPostfix + "/"
 		self.shouldRecordTime = shouldRecordTime
 		self.outputPath = outputPath
 	}

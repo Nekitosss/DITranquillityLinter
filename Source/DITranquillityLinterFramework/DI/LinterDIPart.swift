@@ -9,7 +9,7 @@ public final class LinterDIPart: DIPart {
 		container.register(DependencyTokenCacher.init)
 		container.register(FileContainer.init)
 		container.register(ResultCacher.init)
-		container.register1(ImplicitFrameworkDependencyTypesResolver.init)
+		container.register(ImplicitFrameworkDependencyTypesResolver.init)
 		container.register(TypeFinder.init)
 		container.register(BinaryFrameworkParser.init)
 		container.register(Composer.init)
@@ -20,7 +20,7 @@ public final class LinterDIPart: DIPart {
 		container.register(GraphValidator.init)
 		container.register(JSONEncoder.init)
 		container.register(JSONDecoder.init)
-    container.register(ASTEmitter.init)
+    	container.register(ASTEmitter.init)
 		
 		// isTestEnvironment
 		container.register { false }

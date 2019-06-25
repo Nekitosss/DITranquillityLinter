@@ -1,0 +1,11 @@
+framework module SwiftLazy {
+  umbrella header "SwiftLazy.h"
+
+  export *
+  module * { export * }
+}
+
+module SwiftLazy.Swift {
+    header "SwiftLazy-Swift.h"
+    requires objc
+}

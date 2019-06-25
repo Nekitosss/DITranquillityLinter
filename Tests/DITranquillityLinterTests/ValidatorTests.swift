@@ -8,7 +8,11 @@ class ValidatorTests: XCTestCase {
 	static var allTests = [
 		("testValidateAliasingSuccess", testValidateAliasingSuccess),
 		]
-
+	
+	override func tearDown() {
+		clearTestArtifacts()
+	}
+	
 	func testValidateAliasingSuccess() throws {
 		let errorList = try validateGraph(fileName: "TestValidateAliasingSuccess")
 		XCTAssertTrue(errorList.isEmpty)

@@ -9,6 +9,7 @@
 import Foundation
 import SourceKittenFramework
 import PathKit
+import ASTVisitor
 
 public let linterVersion = "0.0.3"
 
@@ -18,21 +19,21 @@ public class Tokenizer {
 	
 	private let validator: GraphValidator
 	private let moduleParser: ModuleParser
-  private let astEmitter: ASTEmitter
+	private let astEmitter: ASTEmitter
 	
 	init(container: FileContainer, validator: GraphValidator, moduleParser: ModuleParser, astEmitter: ASTEmitter) {
 		self.container = container
 		self.validator = validator
 		self.moduleParser = moduleParser
-    self.astEmitter = astEmitter
+		self.astEmitter = astEmitter
 	}
 	
 	
 	public func process(files: [String]) throws -> Bool {
 		let filteredFiles = files.filter(moduleParser.shouldBeParsed)
-    try astEmitter.emitAST(from: files)
+		let astFiles = try astEmitter.emitAST(from: files)
 		let collectedInfo = try moduleParser.collectInfo(files: filteredFiles)
-		let parsingContext = GlobalParsingContext(container: container, collectedInfo: collectedInfo)
+		let parsingContext = GlobalParsingContext(container: container, collectedInfo: collectedInfo, astFilePaths: astFiles)
 		parsingContext.cachedContainers = try moduleParser.getCachedContainers()
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
@@ -59,3 +60,4 @@ public class Tokenizer {
 		return try moduleParser.collectInfo(files: files)
 	}
 }
+

@@ -5,6 +5,10 @@ import XCTest
 
 class AliasingParserTests: XCTestCase {
 	
+	override func tearDown() {
+		clearTestArtifacts()
+	}
+	
 	// .as(MyProtocol.self)
 	func testPlainAliasing() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestPlainAliasing")

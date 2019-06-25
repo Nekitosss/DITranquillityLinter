@@ -7,6 +7,7 @@
 
 import Foundation
 import SourceKittenFramework
+import ASTVisitor
 
 final class ContainerInitializatorFinder {
 	
@@ -20,6 +21,17 @@ final class ContainerInitializatorFinder {
 	func findContainerStructure(separatlyIncludePublicParts: Bool) -> [ContainerPart] {
 		TimeRecorder.start(event: .createTokens)
 		defer { TimeRecorder.end(event: .createTokens) }
+		
+		for astFile in parsingContext.astFilePaths {
+			do {
+				let visitor = try Visitor(fileURL: URL(fileURLWithPath: astFile))
+				visitor.visit(predicate: self.isDiContainerCreation, visitChildNodesForFoundedPredicate: false) { node, _ in
+					print(node)
+				}
+			} catch {
+				fatalError(error.localizedDescription)
+			}
+		}
 		
 		var result: [ContainerPart] = []
 		
@@ -36,6 +48,14 @@ final class ContainerInitializatorFinder {
 		return result
 	}
 	
+	private func isDiContainerCreation(node: ASTNode) -> Bool {
+		guard node.kind == .patternBindingDecl,
+			let component = node[.patternTyped][.typeIdent][.component].getOne()?.typedNode.unwrap(Component.self),
+			component.id == DIKeywords.diContainer.rawValue,
+			component.bind == "DITranquillity.(file).DIContainer"
+			else { return false }
+		return true
+	}
 	
 	private func getProssibleContainerTypeHolders() -> [Type] {
 		var possibleContainerValues = parsingContext.collectedInfo.values.filter {

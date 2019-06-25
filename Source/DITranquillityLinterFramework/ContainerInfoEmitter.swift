@@ -25,7 +25,7 @@ public final class ContainerInfoEmitter {
 	public func process(files: [String], outputFilePath: URL) throws -> Bool {
 		let filteredFiles = files.filter(moduleParser.shouldBeParsed)
 		let collectedInfo = try moduleParser.collectInfo(files: filteredFiles)
-		let parsingContext = GlobalParsingContext(container: container, collectedInfo: collectedInfo)
+		let parsingContext = GlobalParsingContext(container: container, collectedInfo: collectedInfo, astFilePaths: [])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
 		let initContainerStructureList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)

@@ -12,14 +12,16 @@ final class GlobalParsingContext {
 	
 	let fileContainer: FileContainer
 	let collectedInfo: [String: Type]
+	let astFilePaths: [String]
 	var cachedContainers: [String: ContainerPart] = [:]
 	var errors: [GraphError] = []
 	var warnings: [GraphWarning] = []
 	var currentContainerName = DIKeywords.container.rawValue
 	
-	init(container: FileContainer, collectedInfo: [String: Type]) {
+	init(container: FileContainer, collectedInfo: [String: Type], astFilePaths: [String]) {
 		self.fileContainer = container
 		self.collectedInfo = collectedInfo
+		self.astFilePaths = astFilePaths
 	}
 }
 

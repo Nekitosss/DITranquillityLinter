@@ -5,7 +5,11 @@ import XCTest
 
 
 class InjectionParserTests: XCTestCase {
-
+	
+	override func tearDown() {
+		clearTestArtifacts()
+	}
+	
 	// .injection(\MyClass.variable)
 	func testExplicitKeyPathInjection() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestExplicitKeyPathInjection")

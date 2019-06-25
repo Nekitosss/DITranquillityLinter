@@ -10,6 +10,8 @@ import SourceKittenFramework
 
 final class ResultCacher {
 	
+	static let localCacheDefaultPostfix = "/.ditranquillitylint"
+	
 	private var commonCacheDirectory: String { return LintOptions.shared.commonCachePath }
 	private var libraryCacheFolderName: String { return LintOptions.shared.localCachePath }
 	
@@ -45,7 +47,7 @@ final class ResultCacher {
 		return false
 	}
   
-  func cacheFiles<T: Encodable>(data: T, fileName: String, isCommonCache: Bool) throws -> URL {
+  func saveFiles<T: Encodable>(data: T, fileName: String, isCommonCache: Bool) throws -> URL {
     let encodedData = try encoder.encode(data)
     
     let cacheDirectory = URL(fileURLWithPath: cachePath(isCommonCache: isCommonCache))
@@ -93,7 +95,7 @@ final class ResultCacher {
 			Log.verbose("SRCROOT: " + srcRoot)
 			return "\(srcRoot)/\(libraryCacheFolderName)"
 		} else {
-			return FileManager.default.currentDirectoryPath
+			return FileManager.default.currentDirectoryPath + ResultCacher.localCacheDefaultPostfix + "/"
 		}
 	}
 	

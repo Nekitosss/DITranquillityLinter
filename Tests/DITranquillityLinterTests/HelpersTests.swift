@@ -10,7 +10,11 @@ import DITranquillity
 @testable import DITranquillityLinterFramework
 
 class HelpersTests: XCTestCase {
-
+	
+	override func tearDown() {
+		clearTestArtifacts()
+	}
+	
 	func testContainerValidation() {
 		let container = DIContainer()
 		DISetting.Log.level = .warning

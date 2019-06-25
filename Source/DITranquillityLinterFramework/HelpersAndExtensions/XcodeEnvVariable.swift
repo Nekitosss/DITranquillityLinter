@@ -39,19 +39,22 @@ public enum EnvVariable: String {
 	case defaultSDK = "DI_LINTER_DEFAULT_SDK"
 	case testableProjectFolder = "DI_LINTER_TESTABLE_PROJECT_FOLDER"
 	case testableProjectName = "DI_LINTER_TESTABLE_PROJECT_NAME"
+	case frameworkSearchPath = "DI_LINTER_FRAMEWORK_PATH"
 	
 	public var defaultValue: String {
 		switch self {
 		case .defaultTarget:
-			return "x86_64-apple-macosx10.10"
+			return "x86_64-apple-ios8.0-simulator"
 		case .defaultSDK:
 			let commandLineToolsPath = shell(command: "xcode-select -p")?.trimmingCharacters(in: .whitespacesAndNewlines)
 				?? "/Applications/Xcode.app/Contents/Developer"
-			return commandLineToolsPath + "/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+			return commandLineToolsPath + "/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
 		case .testableProjectFolder:
 			return "/Users/nikita/development/fooddly/Fooddly/"
 		case .testableProjectName:
 			return "Fooddly.xcodeproj"
+		case .frameworkSearchPath:
+			return FileManager.default.currentDirectoryPath + "/TestFiles.bundle/"
 		}
 	}
 	

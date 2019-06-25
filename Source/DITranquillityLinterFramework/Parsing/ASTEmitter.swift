@@ -25,17 +25,16 @@ final class ASTEmitter: ASTEmitterProtocol {
   }
   
   func emitAST(from swiftSourceFiles: [String]) throws -> [String] {
-//		let swiftSourceFiles = swiftSourceFiles.filter({ $0.bridge().lastPathComponent == "Weak.swift" })
     let outputFileMap = swiftSourceFiles.reduce(into: [:]) { $0[$1] = OutputFileMapObject(astDump: self.createASTFileURL(filePath: $1)) }
-    let outputFileMapPath = try resultCacher.cacheFiles(data: outputFileMap, fileName: "outputFileMap", isCommonCache: false)
+    let outputFileMapPath = try resultCacher.saveFiles(data: outputFileMap, fileName: "outputFileMap", isCommonCache: false)
     try launchAstDump(outputFileMapPath: outputFileMapPath.path, swiftSourceFiles: swiftSourceFiles)
-    return []
+		return outputFileMap.map { $1.astDump }
   }
   
   private func launchAstDump(outputFileMapPath: String, swiftSourceFiles: [String]) throws {
     let sourceFilesPaths = swiftSourceFiles.joined(separator: " ")
     let frameworkPaths = try binaryFrameworkParser.getUserDefinedBinaryFrameworkNames()
-    let frameworksString = frameworkPaths.reduce("") { $0 + " -F " + $1.path }
+    let frameworksString = frameworkPaths.reduce("") { $0 + " -F " + $1.path } + " -F \(EnvVariable.frameworkSearchPath.value())"
     let (target, sdk) = binaryFrameworkParser.createCommandLineArgumentInfoForSourceParsing()
     let command = "swiftc -dump-ast -module-name Name -target \(target) -sdk \(sdk) -output-file-map=\(outputFileMapPath) \(frameworksString) \(sourceFilesPaths)"
     shell(command: command)

@@ -39,7 +39,7 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 	let fileURL = pathToSourceFile(with: fileName)
 	let tokenizer: Tokenizer = container.resolve()
 	let collectedInfo = try tokenizer.collectInfo(files: [fileURL])
-	let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
+	let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [])
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 	let containerInfoList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 	if containerInfoList.isEmpty {
@@ -58,8 +58,10 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 }
 
 func findContainerStructure(fullPathToFile fileURL: String) throws -> ContainerPart {
+	let astEmitter: ASTEmitter = container.resolve()
+	let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
 	let tokenizer: Tokenizer = container.resolve()
-	let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]))
+	let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [astFilePath])
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 	guard let containerInfo = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false).first else {
 		throw TestError.containerInfoNotFound
@@ -68,13 +70,21 @@ func findContainerStructure(fullPathToFile fileURL: String) throws -> ContainerP
 }
 
 func pathToSourceFile(with name: String) -> String {
-	let bundle = Bundle(path: FileManager.default.currentDirectoryPath + "/TestFiles.bundle")!
+	let bundle = Bundle(path: testBundlePath())!
 	return bundle.path(forResource: name, ofType: "swift")!
 }
 
+func testBundlePath() -> String {
+	return FileManager.default.currentDirectoryPath + "/TestFiles.bundle"
+}
+
 func pathsToSourceFiles() -> [String] {
-	let bundle = Bundle(path: FileManager.default.currentDirectoryPath + "/TestFiles.bundle")!
+	let bundle = Bundle(path: testBundlePath())!
 	return bundle.paths(forResourcesOfType: "swift", inDirectory: nil)
+}
+
+func clearTestArtifacts() {
+	try! (container.resolve() as ResultCacher).clearCaches(isCommonCache: false)
 }
 
 let container: DIContainer = {
