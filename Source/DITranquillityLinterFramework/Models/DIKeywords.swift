@@ -11,7 +11,7 @@ enum DIKeywords: String {
 	case register1 = "register1"
 	case injection = "injection"
 	case `default` = "default"
-	case `as` = "as"
+	case `as` = "extension.as"
 	case check = "check"
 	case tag = "tag"
 	case by = "by"

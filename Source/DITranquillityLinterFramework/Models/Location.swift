@@ -8,6 +8,7 @@
 
 import Foundation
 import SourceKittenFramework
+import ASTVisitor
 
 public struct Location: CustomStringConvertible, Equatable, Codable {
 	public let file: String?
@@ -26,6 +27,12 @@ public struct Location: CustomStringConvertible, Equatable, Codable {
 		self.file = file
 		self.line = line
 		self.character = character
+	}
+	
+	init(visitorLocation: ASTVisitor.Location) {
+		self.file = visitorLocation.file
+		self.line = visitorLocation.line
+		self.character = visitorLocation.char
 	}
 	
 	public init(file: File, byteOffset offset: Int64?) {

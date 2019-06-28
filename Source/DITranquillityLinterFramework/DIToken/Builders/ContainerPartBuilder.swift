@@ -8,6 +8,7 @@
 
 import SourceKittenFramework
 import Foundation
+import ASTVisitor
 
 final class ContainerPartBuilder {
 	
@@ -25,23 +26,19 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private let file: File
 	private let parsingContext: GlobalParsingContext
 	private let containerParsingContext: ContainerParsingContext
 	private let currentPartName: String?
 	private let diPartNameStack: [String]
-	private let content: NSString
 	private let allTokenBuilders: [TokenBuilder]
 	private let registrationTokenBuilder: RegistrationTokenBuilder
 	
 	
-	init(file: File, parsingContext: GlobalParsingContext, containerParsingContext: ContainerParsingContext, currentPartName: String?, diPartNameStack: [String]) {
-		self.file = file
+	init(parsingContext: GlobalParsingContext, containerParsingContext: ContainerParsingContext, currentPartName: String?, diPartNameStack: [String]) {
 		self.parsingContext = parsingContext
 		self.containerParsingContext = containerParsingContext
 		self.currentPartName = currentPartName
 		self.diPartNameStack = diPartNameStack
-		self.content = file.contents.bridge()
 		self.registrationTokenBuilder = RegistrationTokenBuilder()
 		self.allTokenBuilders = [AliasTokenBuilder(),
 								 InjectionTokenBuilder(),
@@ -52,7 +49,7 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	func build(substructureList: [SourceKitStructure]) -> [RegistrationAccessor: [RegistrationToken]] {
+	func build(substructureList: [ASTNode]) -> [RegistrationAccessor: [RegistrationToken]] {
 		var intermediateTokenList: [DITokenConvertible] = []
 		var assignedRegistrations: [String: RegistrationToken] = [:]
 		var otherRegistrations: [DITokenConvertible] = []
@@ -72,27 +69,27 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private func processRegistrationChain(substructure: SourceKitStructure, intermediateTokenList: inout [DITokenConvertible], nextAssignee: inout String?, otherRegistrations: inout [DITokenConvertible], assignedRegistrations: inout [String: RegistrationToken]) {
+	private func processRegistrationChain(substructure: ASTNode, intermediateTokenList: inout [DITokenConvertible], nextAssignee: inout String?, otherRegistrations: inout [DITokenConvertible], assignedRegistrations: inout [String: RegistrationToken]) {
 		intermediateTokenList.removeAll()
 		let assignee = nextAssignee
 		nextAssignee = nil
-		guard let kind: String = substructure.get(.kind) else {
-			return
-		}
+//		guard let kind: String = substructure.get(.kind) else {
+//			return
+//		}
 		
-		switch kind {
-		case SwiftExpressionKind.call.rawValue:
+		switch substructure.kind {
+		case .callExpr:
 			processExpressionKindCall(use: substructure, assignee: assignee, intermediateTokenList: &intermediateTokenList, otherRegistrations: &otherRegistrations, assignedRegistrations: &assignedRegistrations)
-		case SwiftDeclarationKind.varLocal.rawValue:
-			nextAssignee = processVarLocalDeclarationKind(use: substructure, otherRegistrations: &otherRegistrations, assignedRegistrations: assignedRegistrations)
-				?? nextAssignee
+//		case SwiftDeclarationKind.varLocal.rawValue:
+//			nextAssignee = processVarLocalDeclarationKind(use: substructure, otherRegistrations: &otherRegistrations, assignedRegistrations: assignedRegistrations)
+//				?? nextAssignee
 		default:
 			break
 		}
 	}
 	
 	
-	private func processExpressionKindCall(use substructure: SourceKitStructure, assignee: String?, intermediateTokenList: inout [DITokenConvertible], otherRegistrations: inout [DITokenConvertible], assignedRegistrations: inout [String: RegistrationToken]) {
+	private func processExpressionKindCall(use substructure: ASTNode, assignee: String?, intermediateTokenList: inout [DITokenConvertible], otherRegistrations: inout [DITokenConvertible], assignedRegistrations: inout [String: RegistrationToken]) {
 		// Get all tokens
 		var collectedTokens = self.processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &intermediateTokenList)
 		
@@ -109,26 +106,26 @@ final class ContainerPartBuilder {
 			}
 			otherRegistrations.append(contentsOf: collectedTokens)
 			
-		} else if let name: String = substructure.get(.name),
-			let firstDotIndex = name.firstIndex(of: "."),
-			let registrationToken = assignedRegistrations[String(name[..<firstDotIndex])] {
-			// something like:
-			// let r = container.register(_:)  (processed earlier)
-			// r.inject(_:)  (processed in that if block)
-			let inputTokenList =
-				registrationToken.tokenList.map { $0.underlyingValue }
-				+ collectedTokens
-				+ intermediateTokenList
-			let tokenList = self.registrationTokenBuilder.fillTokenListWithInfo(input: inputTokenList,
-																				registrationTypeName: registrationToken.plainTypeName,
-																				parsingContext: parsingContext,
-																				content: content,
-																				file: file)
-			let newToken = RegistrationToken(typeName: registrationToken.typeName,
-											 plainTypeName: registrationToken.plainTypeName,
-											 location: registrationToken.location,
-											 tokenList: tokenList.map { $0.diTokenValue })
-			assignedRegistrations[String(name[..<firstDotIndex])] = newToken
+//		} else if let name: String = substructure.get(.name),
+//			let firstDotIndex = name.firstIndex(of: "."),
+//			let registrationToken = assignedRegistrations[String(name[..<firstDotIndex])] {
+//			// something like:
+//			// let r = container.register(_:)  (processed earlier)
+//			// r.inject(_:)  (processed in that if block)
+//			let inputTokenList =
+//				registrationToken.tokenList.map { $0.underlyingValue }
+//				+ collectedTokens
+//				+ intermediateTokenList
+//			let tokenList = self.registrationTokenBuilder.fillTokenListWithInfo(input: inputTokenList,
+//																				registrationTypeName: registrationToken.plainTypeName,
+//																				parsingContext: parsingContext,
+//																				content: content,
+//																				file: file)
+//			let newToken = RegistrationToken(typeName: registrationToken.typeName,
+//											 plainTypeName: registrationToken.plainTypeName,
+//											 location: registrationToken.location,
+//											 tokenList: tokenList.map { $0.diTokenValue })
+//			assignedRegistrations[String(name[..<firstDotIndex])] = newToken
 		} else {
 			// container.append(part:) for example
 			otherRegistrations.append(contentsOf: collectedTokens)
@@ -175,7 +172,7 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	private func processLoadContainerBodyPart(loadContainerBodyPart: SourceKitStructure, tokenList: inout [DITokenConvertible]) -> [DITokenConvertible] {
+	private func processLoadContainerBodyPart(loadContainerBodyPart: ASTNode, tokenList: inout [DITokenConvertible]) -> [DITokenConvertible] {
 		guard let info = self.getTokenInfo(from: loadContainerBodyPart, tokenList: tokenList) else {
 			return []
 		}
@@ -188,48 +185,63 @@ final class ContainerPartBuilder {
 				tokenList.removeAll()
 				result.append(token)
 			}
-		} else if info.argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
-			let message = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
-			let invalidCallError = GraphError(infoString: message, location: info.location, kind: .parsing)
-			parsingContext.errors.append(invalidCallError)
 		}
+//		else if info.argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
+//			let message = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
+//			let invalidCallError = GraphError(infoString: message, location: info.location, kind: .parsing)
+//			parsingContext.errors.append(invalidCallError)
+//		}
 		
-		for substructure in loadContainerBodyPart.substructures {
+		for substructure in loadContainerBodyPart.children {
 			result += processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &tokenList)
 		}
 		return result
 	}
 	
 	
-	private func getTokenInfo(from loadContainerBodyPart: SourceKitStructure, tokenList: [DITokenConvertible]) -> TokenBuilderInfo? {
-		guard
-			loadContainerBodyPart.isKind(of: SwiftExpressionKind.call),
-			let name: String = loadContainerBodyPart.get(.name),
-			let bodyOffset = loadContainerBodyPart.getBodyInfo()?.offset,
-			let body = loadContainerBodyPart.body(using: content)
+	private func getTokenInfo(from loadContainerBodyPart: ASTNode, tokenList: [DITokenConvertible]) -> TokenBuilderInfo? {
+		guard loadContainerBodyPart.kind == .callExpr,
+			let declRefNode = loadContainerBodyPart[.dotSyntaxCallExpr][.declrefExpr].getOne(),
+			let declIndex = declRefNode.info.firstIndex(where: { $0.key == TokenKey.decl.rawValue }),
+			declRefNode.info[declIndex].value == "DITranquillity.(file).DIComponentBuilder",
+			let calledMethodName = declRefNode.info[safe: declIndex + 1]?.value
 			else { return nil }
-		let functionName = TypeFinder.restoreMethodName(initial: name)
-		
-		let substructureList = loadContainerBodyPart.substructures
-		var argumentStack = ContainerPartBuilder.argumentInfo(substructures: substructureList, content: content)
-		if argumentStack.isEmpty {
-			argumentStack = parseArgumentList(body: body, substructureList: substructureList)
-		}
-		let location = Location(file: file, byteOffset: bodyOffset)
-		
-		return TokenBuilderInfo(functionName: functionName,
-								invocationBody: body,
+		return TokenBuilderInfo(functionName: calledMethodName,
 								tokenList: tokenList,
-								substructureList: substructureList,
-								bodyOffset: bodyOffset,
-								currentPartName: currentPartName,
-								argumentStack: argumentStack,
-								location: location,
-								parsingContext: parsingContext,
-								containerParsingContext: containerParsingContext,
-								content: content,
-								file: file,
+								node: loadContainerBodyPart,
+								currentPartName: self.currentPartName,
+								parsingContext: self.parsingContext,
+								containerParsingContext: self.containerParsingContext,
 								diPartNameStack: self.diPartNameStack)
+		
+//		guard
+//			loadContainerBodyPart.isKind(of: SwiftExpressionKind.call),
+//			let name: String = loadContainerBodyPart.get(.name),
+//			let bodyOffset = loadContainerBodyPart.getBodyInfo()?.offset,
+//			let body = loadContainerBodyPart.body(using: content)
+//			else { return nil }
+//		let functionName = TypeFinder.restoreMethodName(initial: name)
+//
+//		let substructureList = loadContainerBodyPart.substructures
+//		var argumentStack = ContainerPartBuilder.argumentInfo(substructures: substructureList, content: content)
+//		if argumentStack.isEmpty {
+//			argumentStack = parseArgumentList(body: body, substructureList: substructureList)
+//		}
+//		let location = Location(file: file, byteOffset: bodyOffset)
+//
+//		return TokenBuilderInfo(functionName: functionName,
+//								invocationBody: body,
+//								tokenList: tokenList,
+//								substructureList: substructureList,
+//								bodyOffset: bodyOffset,
+//								currentPartName: currentPartName,
+//								argumentStack: argumentStack,
+//								location: location,
+//								parsingContext: parsingContext,
+//								containerParsingContext: containerParsingContext,
+//								content: content,
+//								file: file,
+//								diPartNameStack: self.diPartNameStack)
 	}
 	
 	

@@ -109,9 +109,12 @@ class InfoEmitterTests: XCTestCase {
 	private func getContainerInfo(fileName: String) throws -> [ContainerPart] {
 		let fileURL = pathToSourceFile(with: fileName)
 		
+		let astEmitter: ASTEmitter = container.resolve()
+		let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
+		
 		let moduleParser: ModuleParser = container.resolve()
 		let fileContainer: FileContainer = container.resolve()
-		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]), astFilePaths: [])
+		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]), astFilePaths: [astFilePath])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		return containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)

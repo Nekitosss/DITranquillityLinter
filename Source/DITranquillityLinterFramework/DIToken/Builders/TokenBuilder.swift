@@ -4,21 +4,15 @@
 
 import SourceKittenFramework
 import Foundation
-
+import ASTVisitor
 
 struct TokenBuilderInfo {
 	let functionName: String
-	let invocationBody: String
 	let tokenList: [DITokenConvertible]
-	let substructureList: [SourceKitStructure]
-	let bodyOffset: Int64
+	let node: ASTNode
 	let currentPartName: String?
-	let argumentStack: [ArgumentInfo]
-	let location: Location
 	let parsingContext: GlobalParsingContext
 	let containerParsingContext: ContainerParsingContext
-	let content: NSString
-	let file: File
 	let diPartNameStack: [String]
 }
 
