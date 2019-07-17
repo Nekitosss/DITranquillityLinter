@@ -23,7 +23,7 @@ private class ParsablePart: DIPart {
 	}()
 	
 	static func load(container: DIContainer) {
-		container.register1 { MyClass.Nested(string: $0, int: 55) }
+		container.register { MyClass.Nested(string: $0, int: 55) }
 	}
 	
 }

@@ -49,7 +49,7 @@ final class ContainerPartBuilder {
 	}
 	
 	
-	func build(substructureList: [ASTNode]) -> [RegistrationAccessor: [RegistrationToken]] {
+	func build(substructureList: [ASTNode]) -> [DITokenConvertible] {
 		var intermediateTokenList: [DITokenConvertible] = []
 		var assignedRegistrations: [String: RegistrationToken] = [:]
 		var otherRegistrations: [DITokenConvertible] = []
@@ -64,8 +64,7 @@ final class ContainerPartBuilder {
 		}
 		
 		let assignedRegistrationValues = Array(assignedRegistrations.values)
-		let tokenList = otherRegistrations + (assignedRegistrationValues as [DITokenConvertible])
-		return compose(tokenList: tokenList)
+		return otherRegistrations + (assignedRegistrationValues as [DITokenConvertible])
 	}
 	
 	
@@ -145,30 +144,10 @@ final class ContainerPartBuilder {
 			// For handling:
 			// var r = container.register(_:)
 			// r.injectSomething...
-			// r = container.register1(_:)
+			// r = container.register(_:)
 			otherRegistrations.append(registration)
 		}
 		return name
-	}
-	
-	
-	private func compose(tokenList: [DITokenConvertible]) -> [RegistrationAccessor: [RegistrationToken]] {
-		return tokenList.reduce(into: [:]) { result, token in
-			switch token {
-			case let registration as RegistrationToken:
-				registration.tokenList
-					.compactMap { $0.underlyingValue as? AliasToken }
-					.forEach { result[$0.getRegistrationAccessor(), default: []].append(registration) }
-				
-			case let appendContainer as AppendContainerToken:
-				appendContainer.containerPart.tokenInfo
-					.forEach { result[$0, default: []] += $1 }
-				
-			default:
-				// Should not be here. All another tokens should be composed in registration and appendContainer tokens
-				break
-			}
-		}
 	}
 	
 	
@@ -201,9 +180,9 @@ final class ContainerPartBuilder {
 	
 	private func getTokenInfo(from loadContainerBodyPart: ASTNode, tokenList: [DITokenConvertible]) -> TokenBuilderInfo? {
 		guard loadContainerBodyPart.kind == .callExpr,
-			let declRefNode = loadContainerBodyPart[.dotSyntaxCallExpr][.declrefExpr].getOne(),
+			let declRefNode = loadContainerBodyPart[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first, // Todo add validation on second token
 			let declIndex = declRefNode.info.firstIndex(where: { $0.key == TokenKey.decl.rawValue }),
-			declRefNode.info[declIndex].value == "DITranquillity.(file).DIComponentBuilder",
+			declRefNode.info[declIndex].value == "DITranquillity.(file).DIComponentBuilder" || declRefNode.info[declIndex].value == "DITranquillity.(file).DIContainer",
 			let calledMethodName = declRefNode.info[safe: declIndex + 1]?.value
 			else { return nil }
 		return TokenBuilderInfo(functionName: calledMethodName,

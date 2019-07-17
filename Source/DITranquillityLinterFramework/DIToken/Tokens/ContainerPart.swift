@@ -13,9 +13,15 @@ import ASTVisitor
 // DIPart, DIFramework
 /// Trying to collect info from container part and pack it into RegistrationTokens
 struct ContainerPart: Codable {
-	
 	let name: String?
 	let tokenInfo: [RegistrationAccessor: [RegistrationToken]]
+}
+
+// Created because we could not resolve container info here. We should fully resolve container info later
+struct ContainerIntermediatePart: Codable {
+	
+	let name: String?
+	let tokenInfo: [DIToken]
 	
 	init(substructureList: [ASTNode], parsingContext: GlobalParsingContext, containerParsingContext: ContainerParsingContext, currentPartName: String?, diPartNameStack: [String]) {
 		var diPartNameStack = diPartNameStack
@@ -24,7 +30,7 @@ struct ContainerPart: Codable {
 		}
 		let builer = ContainerPartBuilder(parsingContext: parsingContext, containerParsingContext: containerParsingContext, currentPartName: currentPartName, diPartNameStack: diPartNameStack)
 		self.name = currentPartName
-		self.tokenInfo = builer.build(substructureList: substructureList)
+		self.tokenInfo = builer.build(substructureList: substructureList).map({ $0.diTokenValue })
 	}
 	
 }

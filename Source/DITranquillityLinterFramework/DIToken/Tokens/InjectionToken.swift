@@ -36,9 +36,6 @@ struct InjectionToken: Codable {
 	/// "as MyType", "by(tag:on)", "many()"
 	let modificators: [InjectionModificator]
 	
-	/// Source substructure info. For type resolving
-	let injectionSubstructureList: [SourceKitStructure]
-	
 	/// Location of registration token (For printing message in XCode)
 	let location: Location
 	
@@ -104,8 +101,5 @@ extension InjectionToken {
 		methodInjection = try container.decode(Bool.self, forKey: .methodInjection)
 		modificators = try container.decode([InjectionModificator].self, forKey: .modificators)
 		location = try container.decode(Location.self, forKey: .location)
-		
-		// We need injection substructore only for processing and should not store in after full process
-		injectionSubstructureList = []
 	}
 }

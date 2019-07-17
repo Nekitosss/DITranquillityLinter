@@ -82,15 +82,16 @@ final class TypeFinder {
 	
 	
 	func findMethodTypeInfo(typeName: String, parsingContext: GlobalParsingContext, content: NSString, file: File, token: InjectionToken) -> [DITokenConvertible] {
-		guard let substructure = token.injectionSubstructureList.last,
-			var methodName: String = substructure.get(.name),
-			let offset: Int64 = substructure.get(.offset)
-			else { return [] }
-		methodName = TypeFinder.restoreMethodName(initial: methodName, defaultMethodName: methodName)
-		let signature = restoreSignature(name: methodName, substructureList: substructure.substructures, content: content)
-		
-		let (plainTypeName, _, genericType) = TypeFinder.parseTypeName(name: typeName)
-		return findMethodInfo(methodSignature: signature, initialObjectName: plainTypeName, parsingContext: parsingContext, file: file, genericType: genericType, methodCallBodyOffset: offset, forcedAllInjection: false) ?? []
+		return []
+//		guard let substructure = token.injectionSubstructureList.last,
+//			var methodName: String = substructure.get(.name),
+//			let offset: Int64 = substructure.get(.offset)
+//			else { return [] }
+//		methodName = TypeFinder.restoreMethodName(initial: methodName, defaultMethodName: methodName)
+//		let signature = restoreSignature(name: methodName, substructureList: substructure.substructures, content: content)
+//
+//		let (plainTypeName, _, genericType) = TypeFinder.parseTypeName(name: typeName)
+//		return findMethodInfo(methodSignature: signature, initialObjectName: plainTypeName, parsingContext: parsingContext, file: file, genericType: genericType, methodCallBodyOffset: offset, forcedAllInjection: false) ?? []
 	}
 	
 	
@@ -139,7 +140,6 @@ final class TypeFinder {
 								  optionalInjection: parameter.isOptional,
 								  methodInjection: true,
 								  modificators: modificators,
-								  injectionSubstructureList: [],
 								  location: location)
 		}
 	}

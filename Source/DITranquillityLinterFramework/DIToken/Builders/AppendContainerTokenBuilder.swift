@@ -1,6 +1,6 @@
 
 import Foundation
-import SourceKittenFramework
+import ASTVisitor
 
 /// Trying to create AppendContainerToken
 final class AppendContainerTokenBuilder: TokenBuilder {
@@ -8,9 +8,17 @@ final class AppendContainerTokenBuilder: TokenBuilder {
 	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		
 		guard
-			info.functionName == DIKeywords.append.rawValue
+			info.functionName == DIKeywords.append.rawValue,
+			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getOne()?.typedNode.unwrap(DeclrefExpression.self),
+			let astLocation = declrefExpr.location,
+			let appendedType = info.node[.tupleExpr][.erasureExpr][.dotSelfExpr][.typeExpr].getOne()?[tokenKey: .typerepr]?.value
 			else { return nil }
-		return nil
+		let location = Location(visitorLocation: astLocation)
+		if let containerPart = info.parsingContext.cachedContainers[appendedType] {
+			return AppendContainerToken(location: location, typeName: appendedType, containerPart: containerPart)
+		} else {
+			return FutureAppendContainerToken(location: location, typeName: appendedType)
+		}
 		
 //		let typeName = appendInfo.value.droppedDotSelf()
 //
@@ -30,8 +38,8 @@ final class AppendContainerTokenBuilder: TokenBuilder {
 //		guard validateAlreadyAppendedPartToThisContainer(info: info, typeName: typeName) else {
 //			return nil
 //		}
-//
-//		return AppendContainerToken(location: info.location, typeName: typeName, containerPart: containerPart)
+		
+		
 	}
 	
 //	private func tryParseContainerPartInCurrentModule(info: TokenBuilderInfo, appendInfo: ArgumentInfo, typeName: String) -> ContainerPart? {

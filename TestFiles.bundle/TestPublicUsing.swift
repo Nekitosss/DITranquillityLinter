@@ -27,7 +27,7 @@ class ParsableUsagePart: DIPart {
 	}()
 	
 	func load(container: DIContainer) {
-		container.register1(MyUsingClass.init)
+		container.register(MyUsingClass.init)
 	}
 	
 }

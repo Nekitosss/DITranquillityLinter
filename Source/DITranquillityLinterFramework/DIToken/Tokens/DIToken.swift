@@ -20,6 +20,10 @@ extension AppendContainerToken: DITokenConvertible {
 	var diTokenValue: DIToken { return .append(self) }
 }
 
+extension FutureAppendContainerToken: DITokenConvertible {
+	var diTokenValue: DIToken { return .futureAppend(self) }
+}
+
 extension InjectionToken: DITokenConvertible {
 	var diTokenValue: DIToken { return .injection(self) }
 }
@@ -38,6 +42,7 @@ enum DIToken: Codable {
 	case injection(InjectionToken)
 	case isDefault(IsDefaultToken)
 	case registration(RegistrationToken)
+	case futureAppend(FutureAppendContainerToken)
 	
 	/// For example, AliasToken could be only part of RegistrationToken.
 	/// Currently, RegistrationToken and AppendContainerToken are independent, all others are intermediate.
@@ -64,6 +69,8 @@ enum DIToken: Codable {
 			return token
 		case .registration(let token):
 			return token
+		case .futureAppend(let token):
+			return token
 		}
 	}
 	
@@ -89,6 +96,9 @@ enum DIToken: Codable {
 			try container.encode(token, forKey: .isDefault)
 		case .registration(let token):
 			try container.encode(token, forKey: .registration)
+		case .futureAppend(let token):
+			let context = EncodingError.Context.init(codingPath: container.codingPath, debugDescription: "We should not encode FutureDIToken. It should be translated to plain AppendContainerToken.")
+			throw EncodingError.invalidValue(token, context)
 		}
 	}
 	

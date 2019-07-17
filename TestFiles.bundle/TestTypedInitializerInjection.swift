@@ -23,7 +23,7 @@ private class ParsablePart: DIPart {
 	}()
 	
 	static func load(container: DIContainer) {
-		container.register1 { MyClass(ss: $0 as MyAnotherClass) }
+		container.register { MyClass(ss: $0 as MyAnotherClass) }
 	}
 	
 }

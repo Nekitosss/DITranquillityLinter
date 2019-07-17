@@ -7,8 +7,7 @@
 //
 
 enum DIKeywords: String {
-	case register = "register"
-	case register1 = "register1"
+	case register = "extension.register(file:line:_:)"
 	case injection = "injection"
 	case `default` = "default"
 	case `as` = "extension.as"
@@ -20,7 +19,7 @@ enum DIKeywords: String {
 	case loadContainer = "load(container:)"
 	case diFramework = "DIFramework"
 	case diPart = "DIPart"
-	case append = "append"
+	case append = "extension.append(part:)"
 	case diContainer = "DIContainer"
 	case initDIContainer = "DIContainer.init"
 	case appDelegate = "AppDelegate"

@@ -17,7 +17,7 @@ final class GlobalParsingContext {
 	var errors: [GraphError] = []
 	var warnings: [GraphWarning] = []
 	var currentContainerName = DIKeywords.container.rawValue
-	var parsedDIParts: [String: ContainerPart] = [:]
+	var parsedDIParts: [String: ContainerIntermediatePart] = [:]
 	
 	init(container: FileContainer, collectedInfo: [String: Type], astFilePaths: [String]) {
 		self.fileContainer = container

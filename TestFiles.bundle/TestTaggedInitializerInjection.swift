@@ -22,7 +22,7 @@ private class ParsablePart: DIPart {
 	}()
 	
 	static func load(container: DIContainer) {
-		container.register1 { MyClass<String>.init(ss: by(tag: MyTag.self,
+		container.register { MyClass<String>.init(ss: by(tag: MyTag.self,
 														  on: $0)) }
 	}
 	

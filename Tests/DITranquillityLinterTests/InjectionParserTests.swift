@@ -64,7 +64,7 @@ class InjectionParserTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "String")
 	}
 	
-	// .register1 { MyChild(ss: $0) } where .init(ss:) contains in MyParent
+	// .register { MyChild(ss: $0) } where .init(ss:) contains in MyParent
 	func testInheritedInitializerInjection() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestInheritedInitializerInjection")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)

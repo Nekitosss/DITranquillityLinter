@@ -64,7 +64,7 @@ class RegistrationParserTests: XCTestCase {
 		XCTAssertEqual(registration.plainTypeName, "MyClass.Nested")
 	}
 	
-	// .register1 { MyClass.Nested(string: $0, int: 55) }
+	// .register { MyClass.Nested(string: $0, int: 55) }
 	func testNotAllVariablesInjectionInMethod() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestNotAllVariablesInjectionInMethod")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
@@ -118,7 +118,7 @@ class RegistrationParserTests: XCTestCase {
 		XCTAssertTrue(testRegistrationName(secondTypeName))
 	}
 	
-	// .register1{ MyClass<String>.init(ss: $0) }
+	// .register{ MyClass<String>.init(ss: $0) }
 	func testExplicitClosureGenericInitializerInjection() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestExplicitClosureGenericInitializerInjection")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
@@ -128,7 +128,7 @@ class RegistrationParserTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "String")
 	}
 	
-	// .register1{ MyClass<String>(ss: $0) }
+	// .register{ MyClass<String>(ss: $0) }
 	func testImplicitClosureGenericInitializerInjection() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestImplicitClosureGenericInitializerInjection")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
@@ -138,7 +138,7 @@ class RegistrationParserTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "String")
 	}
 	
-	// .register1(MyClass<String>.init)
+	// .register(MyClass<String>.init)
 	func testImplicitPlainGenericInitializerInjection() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestImplicitPlainGenericInitializerInjection")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)

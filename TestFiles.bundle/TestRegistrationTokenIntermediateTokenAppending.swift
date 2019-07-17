@@ -29,7 +29,7 @@ private class ParsablePart: DIPart {
 	static func load(container: DIContainer) {
 		container.register(MyClass.init)
 			.as(check: MyAlias.self) {$0}
-		container.register1(MyClass2.init)
+		container.register(MyClass2.init)
 	}
 	
 }

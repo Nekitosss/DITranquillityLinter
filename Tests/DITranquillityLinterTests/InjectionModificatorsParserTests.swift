@@ -38,7 +38,7 @@ class InjectionModificatorsParserTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "String")
 	}
 	
-	// .register1 { MyClass<String>.init(ss: by(tag: MyTag.self, on: $0)) }
+	// .register { MyClass<String>.init(ss: by(tag: MyTag.self, on: $0)) }
 	func testTaggedInitializerInjection() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestTaggedInitializerInjection")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
@@ -47,7 +47,7 @@ class InjectionModificatorsParserTests: XCTestCase {
 		XCTAssertEqual(injection.typeName, "String")
 	}
 	
-	// .register1 { MyClass(ss: $0 as MyAnotherClass) }
+	// .register { MyClass(ss: $0 as MyAnotherClass) }
 	func testTypedInitializerInjection() throws {
 		let containerInfo = try findContainerStructure(fileName: "TestTypedInitializerInjection")
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)

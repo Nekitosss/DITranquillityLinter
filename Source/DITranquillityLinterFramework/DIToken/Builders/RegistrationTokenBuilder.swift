@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SourceKittenFramework
+import ASTVisitor
 
 /// Trying to create RegsitrationToken. Resolves containing InjectionToken types.
 final class RegistrationTokenBuilder: TokenBuilder {
@@ -16,12 +16,38 @@ final class RegistrationTokenBuilder: TokenBuilder {
 	private let typeFinder = TypeFinder()
 	
 	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
-		guard info.functionName == DIKeywords.register.rawValue || info.functionName == DIKeywords.register1.rawValue else {
-			return nil
-		}
-		return nil
+		guard info.functionName == DIKeywords.register.rawValue,
+			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first?.typedNode.unwrap(DeclrefExpression.self),
+			let astLocation = declrefExpr.location
+			else { return nil }
+		let location = Location(visitorLocation: astLocation)
 		
-//		var registrationInfo: RegistrationInfo = ("", "", info.tokenList)
+		var registrationInfo: RegistrationInfo = ("", "", info.tokenList)
+		
+		for substitution in declrefExpr.substitution {
+			if substitution.key == "Impl" {
+				registrationInfo.typeName = substitution.value
+			} else {
+				let injection = InjectionToken(name: "",
+											   typeName: substitution.value,
+											   plainTypeName: "",
+											   cycle: false,
+											   optionalInjection: false,
+											   methodInjection: true,
+											   modificators: [],
+											   location: location)
+				registrationInfo.tokenList.append(injection)
+			}
+		}
+		
+		let aliasToken = AliasToken(typeName: registrationInfo.typeName, tag: "", location: location)
+		registrationInfo.tokenList.append(aliasToken)
+		
+		return RegistrationToken(typeName: registrationInfo.typeName,
+								 plainTypeName: registrationInfo.plainTypeName,
+								 location: location,
+								 tokenList: registrationInfo.tokenList.map({ $0.diTokenValue }))
+		
 //
 //		// TODO: process generics here
 //		if let typedRegistration = info.invocationBody.firstMatch(RegExp.trailingTypeInfo) {
@@ -41,14 +67,9 @@ final class RegistrationTokenBuilder: TokenBuilder {
 //
 //		// Class registration by default available by its own type without tag.
 //		let location = Location(file: info.file, byteOffset: info.bodyOffset)
-//		let aliasToken = AliasToken(typeName: registrationInfo.typeName, tag: "", location: location)
-//		registrationInfo.tokenList.append(aliasToken)
+		
 //
 //		registrationInfo.tokenList = self.fillTokenListWithInfo(input: registrationInfo.tokenList, registrationTypeName: registrationInfo.typeName, parsingContext: info.parsingContext, content: info.content, file: info.file)
-//		return RegistrationToken(typeName: registrationInfo.typeName,
-//								 plainTypeName: registrationInfo.plainTypeName,
-//								 location: location,
-//								 tokenList: registrationInfo.tokenList.map({ $0.diTokenValue }))
 	}
 	
 	

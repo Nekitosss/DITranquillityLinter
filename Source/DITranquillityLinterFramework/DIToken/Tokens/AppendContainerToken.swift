@@ -26,3 +26,18 @@ struct AppendContainerToken: Codable {
 	/// All registrations, contained in part
 	let containerPart: ContainerPart
 }
+
+/// For future append container resolving when we could not extract container part immidiately
+struct FutureAppendContainerToken: Codable {
+	
+	var isIntermediate: Bool {
+		return false
+	}
+	
+	/// Location of registration token (For printing message in XCode)
+	let location: Location
+	
+	/// DIPart or DIFramework class name
+	let typeName: String
+	
+}

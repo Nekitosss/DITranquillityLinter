@@ -22,16 +22,16 @@ final class ContainerInitializatorFinder {
 		TimeRecorder.start(event: .createTokens)
 		defer { TimeRecorder.end(event: .createTokens) }
 		
-		var result: [ContainerPart] = []
+		var intermediateResult: [ContainerIntermediatePart] = []
 		for astFile in parsingContext.astFilePaths {
 			do {
 				let visitor = try Visitor(fileURL: URL(fileURLWithPath: astFile))
 				visitor.visit(predicate: self.shouldHandle, visitChildNodesForFoundedPredicate: false) { node, _ in
 					if let containerPart = self.extractDIContainerCreation(node: node) {
-						result.append(containerPart)
+						intermediateResult.append(containerPart)
 					}
 					if let diPartDeclaration = self.extractDIPartDeclaration(node: node) {
-						self.parsingContext.cachedContainers[diPartDeclaration.name] = diPartDeclaration.part
+						self.parsingContext.parsedDIParts[diPartDeclaration.name] = diPartDeclaration.part
 					}
 				}
 			} catch {
@@ -39,8 +39,39 @@ final class ContainerInitializatorFinder {
 			}
 		}
 		
+		let result = intermediateResult.map {
+			ContainerPart(name: $0.name, tokenInfo: compose(tokenList: $0.tokenInfo))
+		}
+		
 		return result
 	}
+	
+	
+	
+	private func compose(tokenList: [DIToken]) -> [RegistrationAccessor: [RegistrationToken]] {
+		return tokenList.reduce(into: [:]) { result, token in
+			switch token {
+			case .registration(let registration):
+				registration.tokenList
+					.compactMap { $0.underlyingValue as? AliasToken }
+					.forEach { result[$0.getRegistrationAccessor(), default: []].append(registration) }
+				
+			case .append(let appendContainer):
+				appendContainer.containerPart.tokenInfo
+					.forEach { result[$0, default: []] += $1 }
+				
+			case .futureAppend(let futureContainer):
+				guard let containerPart = self.parsingContext.parsedDIParts[futureContainer.typeName] else { return }
+				compose(tokenList: containerPart.tokenInfo)
+					.forEach { result[$0, default: []] += $1 }
+				
+			default:
+				// Should not be here. All another tokens should be composed in registration and appendContainer tokens
+				break
+			}
+		}
+	}
+	
 	
 	private func shouldHandle(node: ASTNode) -> Bool {
 		return self.isDiContainerCreation(node: node) || self.isDIPartMethod(node: node)
@@ -65,7 +96,7 @@ final class ContainerInitializatorFinder {
 		return true
 	}
 	
-	private func extractDIContainerCreation(node: ASTNode) -> ContainerPart? {
+	private func extractDIContainerCreation(node: ASTNode) -> ContainerIntermediatePart? {
 		guard
 			node.kind == .patternBindingDecl,
 			let containerCreationNode = node[.callExpr][.closureExpr][.braceStmt].getOne(),
@@ -74,7 +105,7 @@ final class ContainerInitializatorFinder {
 		return containerPart
 	}
 	
-	private func extractDIPartDeclaration(node: ASTNode) -> (name: String, part: ContainerPart)? {
+	private func extractDIPartDeclaration(node: ASTNode) -> (name: String, part: ContainerIntermediatePart)? {
 		guard node.kind == .funcDecl,
 			let containerPartName = node[.parameter].getOne()?[tokenKey: .type]?.value.droppedDotType(),
 			let containerPartCreationNode = node[.braceStmt].getOne(),
@@ -104,7 +135,7 @@ final class ContainerInitializatorFinder {
 //			+ list.flatMap { self.recursivelyFindContainerAndBuildGraph(list: $0.substructures, file: file) }
 //	}
 	
-	private func buildContainerPart(list: [ASTNode]) -> ContainerPart? {
+	private func buildContainerPart(list: [ASTNode]) -> ContainerIntermediatePart? {
 //		if containerInitIndex == 0 {
 //			// something like "var container: DIContainer!"
 //			// We cannot handle it yet
@@ -118,7 +149,7 @@ final class ContainerInitializatorFinder {
 //		} else if containerInitIndex > 0 {
 			// .init call should be after variable name declaration. So index should be greater than 0
 //			parsingContext.currentContainerName = list[containerInitIndex - 1].get(.name) ?? DIKeywords.container.rawValue
-			return ContainerPart(substructureList: list, parsingContext: parsingContext, containerParsingContext: ContainerParsingContext(), currentPartName: nil, diPartNameStack: [])
+			return ContainerIntermediatePart(substructureList: list, parsingContext: parsingContext, containerParsingContext: ContainerParsingContext(), currentPartName: nil, diPartNameStack: [])
 //		} else {
 //			return nil
 //		}
