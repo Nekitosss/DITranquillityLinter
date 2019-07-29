@@ -21,11 +21,11 @@
       },
       {
         "package": "DITranquillity",
-        "repositoryURL": "https://github.com/ivlevAstef/DITranquillity.git",
+        "repositoryURL": "git@github.com:Nekitosss/DITranquillity.git",
         "state": {
           "branch": null,
-          "revision": "e22b9ba371dd8602448ddc6364b8d83e2d660981",
-          "version": "3.7.1"
+          "revision": "b2f1a08b6460120f17bc2c24c1aa203ba20aaa09",
+          "version": "3.7.3"
         }
       },
       {

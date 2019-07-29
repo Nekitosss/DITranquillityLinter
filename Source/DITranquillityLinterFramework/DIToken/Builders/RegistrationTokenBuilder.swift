@@ -27,7 +27,7 @@ final class RegistrationTokenBuilder: TokenBuilder {
 		for substitution in declrefExpr.substitution {
 			if substitution.key == "Impl" {
 				registrationInfo.typeName = substitution.value
-			} else {
+			} else if !substitution.value.isEmpty {
 				let injection = InjectionToken(name: "",
 											   typeName: substitution.value,
 											   plainTypeName: "",

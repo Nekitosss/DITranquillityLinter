@@ -152,24 +152,23 @@ final class ContainerPartBuilder {
 	
 	
 	private func processLoadContainerBodyPart(loadContainerBodyPart: ASTNode, tokenList: inout [DITokenConvertible]) -> [DITokenConvertible] {
-		guard let info = self.getTokenInfo(from: loadContainerBodyPart, tokenList: tokenList) else {
-			return []
-		}
-		
 		var result: [DITokenConvertible] = []
-		if let token = tryBuildToken(use: info) {
-			if token.diTokenValue.isIntermediate {
-				tokenList.append(token)
-			} else {
-				tokenList.removeAll()
-				result.append(token)
+		
+		if let info = self.getTokenInfo(from: loadContainerBodyPart, tokenList: tokenList) {
+			if let token = tryBuildToken(use: info) {
+				if token.diTokenValue.isIntermediate {
+					tokenList.append(token)
+				} else {
+					tokenList.removeAll()
+					result.append(token)
+				}
 			}
+//			else if info.argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
+//				let message = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
+//				let invalidCallError = GraphError(infoString: message, location: info.location, kind: .parsing)
+//				parsingContext.errors.append(invalidCallError)
+//			}
 		}
-//		else if info.argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
-//			let message = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
-//			let invalidCallError = GraphError(infoString: message, location: info.location, kind: .parsing)
-//			parsingContext.errors.append(invalidCallError)
-//		}
 		
 		for substructure in loadContainerBodyPart.children {
 			result += processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &tokenList)
@@ -182,7 +181,7 @@ final class ContainerPartBuilder {
 		guard loadContainerBodyPart.kind == .callExpr,
 			let declRefNode = loadContainerBodyPart[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first, // Todo add validation on second token
 			let declIndex = declRefNode.info.firstIndex(where: { $0.key == TokenKey.decl.rawValue }),
-			declRefNode.info[declIndex].value == "DITranquillity.(file).DIComponentBuilder" || declRefNode.info[declIndex].value == "DITranquillity.(file).DIContainer",
+			isDIDeclarationValue(decl: declRefNode.info[declIndex].value),
 			let calledMethodName = declRefNode.info[safe: declIndex + 1]?.value
 			else { return nil }
 		return TokenBuilderInfo(functionName: calledMethodName,
@@ -221,6 +220,11 @@ final class ContainerPartBuilder {
 //								content: content,
 //								file: file,
 //								diPartNameStack: self.diPartNameStack)
+	}
+	
+	// Should refer to builder or container
+	private func isDIDeclarationValue(decl: String) -> Bool {
+		return decl == "DITranquillity.(file).DIComponentBuilder" || decl == "DITranquillity.(file).DIContainer"
 	}
 	
 	

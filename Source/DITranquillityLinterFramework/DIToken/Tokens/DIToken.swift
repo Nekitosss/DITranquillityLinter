@@ -45,12 +45,12 @@ enum DIToken: Codable {
 	case futureAppend(FutureAppendContainerToken)
 	
 	/// For example, AliasToken could be only part of RegistrationToken.
-	/// Currently, RegistrationToken and AppendContainerToken are independent, all others are intermediate.
+	/// Currently, RegistrationToken, AppendContainerToken and FutureAppendContainerToken are independent, all others are intermediate.
 	/// Intermediate tokens could not exists without independent tokens.
 	/// AliasToken could not exests without referenced RegistrationToken
 	var isIntermediate: Bool {
 		switch self {
-		case .registration, .append:
+		case .registration, .append, .futureAppend:
 			return false
 		default:
 			return true

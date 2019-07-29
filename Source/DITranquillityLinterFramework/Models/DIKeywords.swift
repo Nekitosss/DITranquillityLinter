@@ -9,7 +9,7 @@
 enum DIKeywords: String {
 	case register = "extension.register(file:line:_:)"
 	case injection = "injection"
-	case `default` = "default"
+	case `default` = "extension.default()"
 	case `as` = "extension.as"
 	case check = "check"
 	case tag = "tag"
