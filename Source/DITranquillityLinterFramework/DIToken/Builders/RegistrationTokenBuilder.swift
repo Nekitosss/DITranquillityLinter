@@ -16,7 +16,7 @@ final class RegistrationTokenBuilder: TokenBuilder {
 	private let typeFinder = TypeFinder()
 	
 	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
-		guard info.functionName == DIKeywords.register.rawValue,
+		guard info.functionName == DIKeywords.initializerRegister.rawValue || info.functionName == DIKeywords.typeRegister.rawValue,
 			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first?.typedNode.unwrap(DeclrefExpression.self),
 			let astLocation = declrefExpr.location
 			else { return nil }

@@ -7,7 +7,8 @@
 //
 
 enum DIKeywords: String {
-	case register = "extension.register(file:line:_:)"
+	case initializerRegister = "extension.register(file:line:_:)"
+	case typeRegister = "extension.register(_:file:line:)"
 	case injection = "injection"
 	case `default` = "extension.default()"
 	case `as` = "extension.as"
