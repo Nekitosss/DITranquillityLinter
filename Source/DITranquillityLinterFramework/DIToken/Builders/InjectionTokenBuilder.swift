@@ -6,18 +6,40 @@
 //
 
 import Foundation
-import SourceKittenFramework
+import ASTVisitor
 
 /// Trying to create InjectionToken (without injection type resolving)
 final class InjectionTokenBuilder: TokenBuilder {
 	
 	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
-		guard info.functionName == DIKeywords.injection.rawValue else { return nil }
-		return nil
-//
-//		var cycle = false
-//		var name = ""
-//		var modificators: [InjectionModificator] = []
+		guard
+			info.functionName == DIKeywords.injection.rawValue,
+			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first?.typedNode.unwrap(DeclrefExpression.self),
+			let astLocation = declrefExpr.location
+			else { return nil }
+		
+		let location = Location(visitorLocation: astLocation)
+		var cycle = false
+		var name = ""
+		var modificators: [InjectionModificator] = []
+		var typeName = ""
+
+		for substitution in declrefExpr.substitution {
+			if substitution.key == "Property" {
+				typeName = substitution.value
+			}
+		}
+		let unwrappedName = TypeName.unwrapTypeName(name: typeName)
+		
+		return InjectionToken(name: "",
+							  typeName: TypeName.onlyDroppedOptional(name: typeName),
+							  plainTypeName: unwrappedName.unwrappedTypeName,
+							  cycle: cycle,
+							  optionalInjection: unwrappedName.isOptional,
+							  methodInjection: false,
+							  modificators: [],
+							  location: location)
+
 //
 //		for argument in info.argumentStack {
 //			cycle = self.extractCycleInfo(from: argument) ?? cycle

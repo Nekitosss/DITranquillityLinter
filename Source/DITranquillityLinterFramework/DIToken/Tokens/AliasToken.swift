@@ -17,13 +17,13 @@ struct AliasToken: Codable {
 	}
 	
 	/// Unique type name of injection. With resolved generic constraints and typealiases
-	let typeName: String
+	var typeName: String
 	
 	/// Type name for accessing [String: Type] dicationary for getting all collected info of type
-	let plainTypeName: String
+	var plainTypeName: String
 	
 	/// Unique tag of aliasing. With resolved generic constraints and typealiases
-	let tag: String
+	var tag: String
 	
 	/// Location of registration token (For printing message in XCode)
 	let location: Location

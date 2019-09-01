@@ -16,10 +16,10 @@ struct RegistrationToken: Codable {
 	}
 	
 	/// Unique type name of registration. With resolved generic constraints and typealiases
-	let typeName: String
+	var typeName: String
 	
 	/// Type name for accessing [String: Type] dicationary for getting all collected info of type
-	let plainTypeName: String
+	var plainTypeName: String
 	
 	/// Location of registration token (For printing message in XCode)
 	let location: Location

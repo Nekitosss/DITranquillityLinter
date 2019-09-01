@@ -26,7 +26,12 @@ final class ContainerInitializatorFinder {
 		for astFile in parsingContext.astFilePaths {
 			do {
 				let visitor = try Visitor(fileURL: URL(fileURLWithPath: astFile))
-				visitor.visit(predicate: self.shouldHandle, visitChildNodesForFoundedPredicate: false) { node, _ in
+				visitor.visit(predicate: self.shouldHandle, visitChildNodesForFoundedPredicate: false) { node, parents in
+					if let typealiasInfo = self.extractTypealias(node: node, parents: parents) {
+						let name = typealiasInfo.name.droppedDotType()
+						self.parsingContext.typealiasInfo[name] = typealiasInfo
+					}
+					
 					if let containerPart = self.extractDIContainerCreation(node: node) {
 						intermediateResult.append(containerPart)
 					}
@@ -46,10 +51,17 @@ final class ContainerInitializatorFinder {
 		return result
 	}
 	
-	
+	private func extractTypealias(node: ASTNode, parents: [ASTNode]) -> TypealiasDeclaration? {
+		guard
+			node.kind == .typealiasDecl,
+			let typealiasInfo = node.typedNode.unwrap(TypealiasDeclaration.self)
+			else { return nil }
+		return typealiasInfo
+	}
 	
 	private func compose(tokenList: [DIToken]) -> [RegistrationAccessor: [RegistrationToken]] {
-		return tokenList.reduce(into: [:]) { result, token in
+		let tokenListWithResolvedTypealiases = changeTypealaisesToExactValues(tokenList: tokenList)
+		return tokenListWithResolvedTypealiases.reduce(into: [:]) { result, token in
 			switch token {
 			case .registration(let registration):
 				registration.tokenList
@@ -72,9 +84,44 @@ final class ContainerInitializatorFinder {
 		}
 	}
 	
+	private func changeTypealaisesToExactValues(tokenList: [DIToken]) -> [DIToken] {
+		return tokenList.map {
+			switch $0 {
+			case .registration(var token):
+				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				token.plainTypeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				return token.diTokenValue
+			case .injection(var token):
+				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				token.plainTypeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				return token.diTokenValue
+			case .alias(var token):
+				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				token.plainTypeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				token.tag = changeToExactValue(typealiasName: token.tag, location: token.location)
+				return token.diTokenValue
+			case .futureAppend(var token):
+				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				return token.diTokenValue
+			case .append(var token):
+				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				return token.diTokenValue
+			case .isDefault:
+				return $0
+			}
+		}
+	}
+	
+	private func changeToExactValue(typealiasName: String, location: Location) -> String {
+		guard let typealiasValue = self.parsingContext.typealiasInfo[typealiasName] else { return typealiasName }
+		return typealiasValue.sourceTypeName
+	}
+	
 	
 	private func shouldHandle(node: ASTNode) -> Bool {
-		return self.isDiContainerCreation(node: node) || self.isDIPartMethod(node: node)
+		return self.isDiContainerCreation(node: node)
+			|| self.isDIPartMethod(node: node)
+			|| self.isTypealiasDeclaration(node: node)
 	}
 	
 	private func isDiContainerCreation(node: ASTNode) -> Bool {
@@ -91,9 +138,13 @@ final class ContainerInitializatorFinder {
 			let rangeIndex = node.info.firstIndex(where: { $0.key == TokenKey.range.rawValue }), // Method name should be right after range info in AST
 			let name = node.info[safe: rangeIndex + 1]?.value,
 			name == DIKeywords.loadContainer.rawValue,
-			node[.parameterList][.parameter].getOne()?[tokenKey: .type]?.value == DIKeywords.diContainer.rawValue
+			node[.parameterList][.parameter].getOne()?[tokenKey: .type].getOne()?.value == DIKeywords.diContainer.rawValue
 			else { return false }
 		return true
+	}
+	
+	private func isTypealiasDeclaration(node: ASTNode) -> Bool {
+		return node.kind == .typealiasDecl
 	}
 	
 	private func extractDIContainerCreation(node: ASTNode) -> ContainerIntermediatePart? {
@@ -107,7 +158,7 @@ final class ContainerInitializatorFinder {
 	
 	private func extractDIPartDeclaration(node: ASTNode) -> (name: String, part: ContainerIntermediatePart)? {
 		guard node.kind == .funcDecl,
-			let containerPartName = node[.parameter].getOne()?[tokenKey: .type]?.value.droppedDotType(),
+			let containerPartName = node[.parameter].getOne()?[tokenKey: .type].getOne()?.value.droppedDotType(),
 			let containerPartCreationNode = node[.braceStmt].getOne(),
 			let containerPart = self.buildContainerPart(list: containerPartCreationNode.children)
 			else { return nil }

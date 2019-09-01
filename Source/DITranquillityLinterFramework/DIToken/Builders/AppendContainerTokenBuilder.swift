@@ -11,7 +11,7 @@ final class AppendContainerTokenBuilder: TokenBuilder {
 			info.functionName == DIKeywords.append.rawValue,
 			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getOne()?.typedNode.unwrap(DeclrefExpression.self),
 			let astLocation = declrefExpr.location,
-			let appendedType = info.node[.tupleExpr][.erasureExpr][.dotSelfExpr][.typeExpr].getOne()?[tokenKey: .typerepr]?.value
+			let appendedType = info.node[.tupleExpr][.erasureExpr][.dotSelfExpr][.typeExpr].getOne()?[tokenKey: .typerepr].getOne()?.value
 			else { return nil }
 		let location = Location(visitorLocation: astLocation)
 		if let containerPart = info.parsingContext.cachedContainers[appendedType] {

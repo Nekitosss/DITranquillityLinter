@@ -21,7 +21,7 @@ struct AppendContainerToken: Codable {
 	let location: Location
 	
 	/// DIPart or DIFramework class name
-	let typeName: String
+	var typeName: String
 	
 	/// All registrations, contained in part
 	let containerPart: ContainerPart
@@ -38,6 +38,6 @@ struct FutureAppendContainerToken: Codable {
 	let location: Location
 	
 	/// DIPart or DIFramework class name
-	let typeName: String
+	var typeName: String
 	
 }
