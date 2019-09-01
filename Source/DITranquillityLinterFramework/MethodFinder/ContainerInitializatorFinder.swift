@@ -28,7 +28,7 @@ final class ContainerInitializatorFinder {
 				let visitor = try Visitor(fileURL: URL(fileURLWithPath: astFile))
 				visitor.visit(predicate: self.shouldHandle, visitChildNodesForFoundedPredicate: false) { node, parents in
 					if let typealiasInfo = self.extractTypealias(node: node, parents: parents) {
-						let name = typealiasInfo.name.droppedDotType()
+						let name = typealiasInfo.name.droppedDotType().droppedDotProtocol()
 						self.parsingContext.typealiasInfo[name] = typealiasInfo
 					}
 					
@@ -89,15 +89,16 @@ final class ContainerInitializatorFinder {
 			switch $0 {
 			case .registration(var token):
 				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
-				token.plainTypeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				token.plainTypeName = changeToExactValue(typealiasName: token.plainTypeName, location: token.location)
+				token.tokenList = changeTypealaisesToExactValues(tokenList: token.tokenList)
 				return token.diTokenValue
 			case .injection(var token):
 				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
-				token.plainTypeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				token.plainTypeName = changeToExactValue(typealiasName: token.plainTypeName, location: token.location)
 				return token.diTokenValue
 			case .alias(var token):
 				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
-				token.plainTypeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				token.plainTypeName = changeToExactValue(typealiasName: token.plainTypeName, location: token.location)
 				token.tag = changeToExactValue(typealiasName: token.tag, location: token.location)
 				return token.diTokenValue
 			case .futureAppend(var token):
@@ -114,7 +115,7 @@ final class ContainerInitializatorFinder {
 	
 	private func changeToExactValue(typealiasName: String, location: Location) -> String {
 		guard let typealiasValue = self.parsingContext.typealiasInfo[typealiasName] else { return typealiasName }
-		return typealiasValue.sourceTypeName
+		return TypeName.onlyUnwrappedName(name: typealiasValue.sourceTypeName)
 	}
 	
 	

@@ -61,6 +61,10 @@ extension String {
 		return droppedSuffix(".Type")
 	}
 	
+	func droppedDotProtocol() -> String {
+		return droppedSuffix(".Protocol")
+	}
+	
 	func droppedSuffix(_ suffix: String) -> String {
 		return self.hasSuffix(suffix) ? String(self.dropLast(suffix.count)) : self
 	}

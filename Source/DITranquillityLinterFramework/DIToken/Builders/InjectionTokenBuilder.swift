@@ -19,7 +19,6 @@ final class InjectionTokenBuilder: TokenBuilder {
 			else { return nil }
 		
 		let location = Location(visitorLocation: astLocation)
-		var cycle = false
 		var name = ""
 		var modificators: [InjectionModificator] = []
 		var typeName = ""
@@ -30,6 +29,12 @@ final class InjectionTokenBuilder: TokenBuilder {
 			}
 		}
 		let unwrappedName = TypeName.unwrapTypeName(name: typeName)
+		
+		var cycle = false
+		if let cycleCall = info.node[.tupleShuffleExpr][.tupleExpr][.callExpr][.tupleExpr][.booleanLiteralExpr].getOne(),
+			let value = cycleCall[tokenKey: .value].getOne()?.value {
+			cycle = value == "true"
+		}
 		
 		return InjectionToken(name: "",
 							  typeName: TypeName.onlyDroppedOptional(name: typeName),

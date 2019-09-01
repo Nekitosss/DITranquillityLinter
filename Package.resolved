@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/Nekitosss/swift-ast-visitor.git",
         "state": {
           "branch": null,
-          "revision": "d1e103a0d183c35ce12cfb17ddbb498bfac56dc6",
-          "version": "0.0.9"
+          "revision": "919dad7ac9e0c1ea675710740f52a9c5ab721a2e",
+          "version": "0.0.11"
         }
       },
       {

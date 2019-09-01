@@ -25,5 +25,5 @@ struct RegistrationToken: Codable {
 	let location: Location
 	
 	/// Collected tokens of registration. Injection info, isDefault component info
-	let tokenList: [DIToken]
+	var tokenList: [DIToken]
 }
