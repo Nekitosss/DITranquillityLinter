@@ -12,7 +12,7 @@ let package = Package(
 		.package(url: "https://github.com/kylef/PathKit.git", .upToNextMajor(from: "0.9.2")),
 		.package(url: "https://github.com/Carthage/Commandant.git", from: "0.15.0"),
 		.package(url: "https://github.com/jpsim/Yams.git", from: "1.0.1"),
-		.package(url: "git@github.com:Nekitosss/DITranquillity.git", from: "3.6.3"),
+		.package(url: "https://github.com/ivlevAstef/DITranquillity", from: "3.6.3"),
 		.package(url: "https://github.com/Nekitosss/swift-ast-visitor.git", from: "0.0.1"),
 	],
 	targets: [

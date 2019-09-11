@@ -12,7 +12,7 @@ import ASTVisitor
 final class AliasTokenBuilder: TokenBuilder {
 	
 	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
-		guard info.functionName == DIKeywords.as.rawValue,
+		guard info.functionName == DIKeywords.as.rawValue || info.functionName == DIKeywords.taggedAlias.rawValue,
 			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getOne()?.typedNode.unwrap(DeclrefExpression.self),
 			let location = declrefExpr.location,
 			!declrefExpr.substitution.isEmpty
@@ -21,9 +21,14 @@ final class AliasTokenBuilder: TokenBuilder {
 		var tag = ""
 		
 		for substitution in declrefExpr.substitution {
-			if substitution.key == "Parent" {
-				typeName = substitution.value
-			}
+            switch substitution.key {
+            case "Parent":
+                typeName = substitution.value
+            case "Tag":
+                tag = substitution.value
+            default:
+                continue
+            }
 		}
 		
 		return AliasToken(typeName: typeName, tag: tag, location: .init(visitorLocation: location))

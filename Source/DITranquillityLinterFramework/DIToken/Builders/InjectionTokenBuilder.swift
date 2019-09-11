@@ -12,38 +12,86 @@ import ASTVisitor
 final class InjectionTokenBuilder: TokenBuilder {
 	
 	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
-		guard
-			info.functionName == DIKeywords.injection.rawValue,
-			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first?.typedNode.unwrap(DeclrefExpression.self),
-			let astLocation = declrefExpr.location
-			else { return nil }
-		
-		let location = Location(visitorLocation: astLocation)
-		var name = ""
-		var modificators: [InjectionModificator] = []
-		var typeName = ""
-
-		for substitution in declrefExpr.substitution {
-			if substitution.key == "Property" {
-				typeName = substitution.value
-			}
-		}
-		let unwrappedName = TypeName.unwrapTypeName(name: typeName)
-		
-		var cycle = false
-		if let cycleCall = info.node[.tupleShuffleExpr][.tupleExpr][.callExpr][.tupleExpr][.booleanLiteralExpr].getOne(),
-			let value = cycleCall[tokenKey: .value].getOne()?.value {
-			cycle = value == "true"
-		}
-		
-		return InjectionToken(name: "",
-							  typeName: TypeName.onlyDroppedOptional(name: typeName),
-							  plainTypeName: unwrappedName.unwrappedTypeName,
-							  cycle: cycle,
-							  optionalInjection: unwrappedName.isOptional,
-							  methodInjection: false,
-							  modificators: [],
-							  location: location)
+        if info.functionName == DIKeywords.injection.rawValue {
+            guard
+                let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first?.typedNode.unwrap(DeclrefExpression.self),
+                let astLocation = declrefExpr.location
+                else { return nil }
+            
+            let location = Location(visitorLocation: astLocation)
+            var name = ""
+            var typeName = ""
+            
+            for substitution in declrefExpr.substitution {
+                if substitution.key == "Property" {
+                    typeName = substitution.value
+                }
+            }
+            let unwrappedName = TypeName.unwrapTypeName(name: typeName)
+            
+            var cycle = false
+            if let cycleCall = info.node[.tupleShuffleExpr][.tupleExpr][.callExpr][.tupleExpr][.booleanLiteralExpr].getOne(),
+                let value = cycleCall[tokenKey: .value].getOne()?.value {
+                cycle = value == "true"
+            }
+            
+            return InjectionToken(name: "",
+                                  typeName: TypeName.onlyDroppedOptional(name: typeName),
+                                  plainTypeName: unwrappedName.unwrappedTypeName,
+                                  cycle: cycle,
+                                  optionalInjection: unwrappedName.isOptional,
+                                  methodInjection: false,
+                                  modificators: [],
+                                  location: location)
+            
+        } else if info.functionName == DIKeywords.modifiedInjection.rawValue {
+            guard
+                let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first?.typedNode.unwrap(DeclrefExpression.self),
+                let astLocation = declrefExpr.location
+                else { return nil }
+            
+            let location = Location(visitorLocation: astLocation)
+            var name = ""
+            var modificators: [InjectionModificator] = []
+            var typeName = ""
+            
+            for substitution in declrefExpr.substitution {
+                if substitution.key == "P" {
+                    typeName = substitution.value
+                }
+            }
+            let unwrappedName = TypeName.unwrapTypeName(name: typeName)
+            
+            var cycle = false
+            if let cycleCall = info.node[.tupleShuffleExpr][.tupleExpr][.callExpr][.tupleExpr][.booleanLiteralExpr].getOne(),
+                let value = cycleCall[tokenKey: .value].getOne()?.value {
+                cycle = value == "true"
+            }
+            
+            if let tag = info.node[.tupleShuffleExpr][.tupleExpr][.closureExpr][.callExpr][.declrefExpr].getOne()?.typedNode.unwrap(DeclrefExpression.self) {
+                
+                for substitution in tag.substitution {
+                    if substitution.key == "Tag" {
+                        modificators.append(.tagged(substitution.value))
+                    }
+                }
+            }
+            
+            if info.node[.tupleShuffleExpr][.tupleExpr][.functionConversionExpr][.closureExpr][.callExpr][.declrefExpr].getOne()?[tokenKey: .decl].getOne()?.value == DIKeywords.many.rawValue {
+                modificators.append(.many)
+            }
+            
+            return InjectionToken(name: "",
+                                  typeName: TypeName.onlyDroppedOptional(name: typeName),
+                                  plainTypeName: unwrappedName.unwrappedTypeName,
+                                  cycle: cycle,
+                                  optionalInjection: unwrappedName.isOptional,
+                                  methodInjection: false,
+                                  modificators: modificators,
+                                  location: location)
+        }
+        
+        return nil
 
 //
 //		for argument in info.argumentStack {
