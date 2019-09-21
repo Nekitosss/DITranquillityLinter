@@ -28,13 +28,14 @@ final class RegistrationTokenBuilder: TokenBuilder {
 			if substitution.key == "Impl" {
 				registrationInfo.typeName = substitution.value
 			} else if !substitution.value.isEmpty {
+				let (typeName, plainTypeName, isOptional, modificators) = InjectionTokenBuilder.unwrapSubstitution(declrefSubstitution: [substitution.key: substitution.value])
 				let injection = InjectionToken(name: "",
-											   typeName: substitution.value,
-											   plainTypeName: "",
+											   typeName: typeName,
+											   plainTypeName: plainTypeName,
 											   cycle: false,
-											   optionalInjection: false,
+											   optionalInjection: isOptional,
 											   methodInjection: true,
-											   modificators: [],
+											   modificators: modificators,
 											   location: location)
 				registrationInfo.tokenList.append(injection)
 			}

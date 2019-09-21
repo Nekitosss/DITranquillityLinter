@@ -56,9 +56,9 @@ final class TypeFinder {
 			if let forcedType = body.firstMatch(RegExp.forcedType)?.trimmingCharacters(in: .whitespacesAndNewlines) {
 				injectionModificators[argumentNumber, default: []].append(.typed(forcedType))
 			}
-			if let taggedInjection = InjectionTokenBuilder.parseTaggedAndManyInjection(structure: substucture, content: content) {
-				injectionModificators[argumentNumber, default: []].append(contentsOf: taggedInjection)
-			}
+//			if let taggedInjection = InjectionTokenBuilder.parseTaggedAndManyInjection(structure: substucture, content: content) {
+//				injectionModificators[argumentNumber, default: []].append(contentsOf: taggedInjection)
+//			}
 			
 			signatureName += name + ":"
 			argumentNumber += 1

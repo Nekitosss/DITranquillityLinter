@@ -30,4 +30,6 @@ enum DIKeywords: String {
 	case xcTestCase = "XCTestCase"
 	case part = "part"
 	case framework = "framework"
+	case diByTag = "DIByTag"
+	case diMany = "DIMany"
 }
