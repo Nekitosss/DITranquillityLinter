@@ -159,9 +159,11 @@ final class ContainerInitializatorFinder {
 	
 	private func extractDIPartDeclaration(node: ASTNode) -> (name: String, part: ContainerIntermediatePart)? {
 		guard node.kind == .funcDecl,
-			let containerPartName = node[.parameter].getOne()?[tokenKey: .type].getOne()?.value.droppedDotType(),
-			let containerPartCreationNode = node[.braceStmt].getOne(),
-			let containerPart = self.buildContainerPart(list: containerPartCreationNode.children)
+			let containerPartName = node[.parameter].getOne()?[tokenKey: .type].getOne()?.value.droppedDotType()
+			else { return nil }
+		
+		let containerPartCreationNode = node[.braceStmt].getOne() ?? node
+		guard let containerPart = self.buildContainerPart(list: containerPartCreationNode.children)
 			else { return nil }
 		return (containerPartName, containerPart)
 	}

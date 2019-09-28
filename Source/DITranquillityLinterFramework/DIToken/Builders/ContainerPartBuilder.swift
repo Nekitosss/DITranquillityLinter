@@ -72,16 +72,24 @@ final class ContainerPartBuilder {
 		intermediateTokenList.removeAll()
 		let assignee = nextAssignee
 		nextAssignee = nil
-//		guard let kind: String = substructure.get(.kind) else {
-//			return
-//		}
 		
 		switch substructure.kind {
 		case .callExpr:
 			processExpressionKindCall(use: substructure, assignee: assignee, intermediateTokenList: &intermediateTokenList, otherRegistrations: &otherRegistrations, assignedRegistrations: &assignedRegistrations)
-//		case SwiftDeclarationKind.varLocal.rawValue:
-//			nextAssignee = processVarLocalDeclarationKind(use: substructure, otherRegistrations: &otherRegistrations, assignedRegistrations: assignedRegistrations)
-//				?? nextAssignee
+			
+		case .patternBindingDecl:
+			// For handling:
+			// var r = container.register(_:)
+			// r.injectSomething...
+			// r = container.register(_:)
+			guard let name = substructure[.patternNamed].getOne()?.info.last?.value,
+				let callExpr = substructure[.callExpr].getOne()
+				else { return }
+			if let registration = assignedRegistrations[name] {
+				otherRegistrations.append(registration)
+			}
+			processExpressionKindCall(use: callExpr, assignee: name, intermediateTokenList: &intermediateTokenList, otherRegistrations: &otherRegistrations, assignedRegistrations: &assignedRegistrations)
+			
 		default:
 			break
 		}
@@ -89,8 +97,16 @@ final class ContainerPartBuilder {
 	
 	
 	private func processExpressionKindCall(use substructure: ASTNode, assignee: String?, intermediateTokenList: inout [DITokenConvertible], otherRegistrations: inout [DITokenConvertible], assignedRegistrations: inout [String: RegistrationToken]) {
+		
+		// Assume that: let r = container.register(...)
+		// "r" - stored in assignee. Cause we assign registration to "r" variable
+		// "container" - stored in callee. Cause we call "register" on "container"
+		// Created for resolving: let r = c.register(...); r.alias(...);
+		// TODO: Test r = r.alias(...)
+		
+		var callee: String?
 		// Get all tokens
-		var collectedTokens = self.processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &intermediateTokenList)
+		var collectedTokens = self.processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &intermediateTokenList, callee: &callee)
 		
 		if let registrationTokenIndex = collectedTokens.firstIndex(where: { $0 is RegistrationToken }) {
 			// get registration token. Should be 0 or 1 count. Remember that container.append(part:).register() is available
@@ -105,53 +121,19 @@ final class ContainerPartBuilder {
 			}
 			otherRegistrations.append(contentsOf: collectedTokens)
 			
-//		} else if let name: String = substructure.get(.name),
-//			let firstDotIndex = name.firstIndex(of: "."),
-//			let registrationToken = assignedRegistrations[String(name[..<firstDotIndex])] {
-//			// something like:
-//			// let r = container.register(_:)  (processed earlier)
-//			// r.inject(_:)  (processed in that if block)
-//			let inputTokenList =
-//				registrationToken.tokenList.map { $0.underlyingValue }
-//				+ collectedTokens
-//				+ intermediateTokenList
-//			let tokenList = self.registrationTokenBuilder.fillTokenListWithInfo(input: inputTokenList,
-//																				registrationTypeName: registrationToken.plainTypeName,
-//																				parsingContext: parsingContext,
-//																				content: content,
-//																				file: file)
-//			let newToken = RegistrationToken(typeName: registrationToken.typeName,
-//											 plainTypeName: registrationToken.plainTypeName,
-//											 location: registrationToken.location,
-//											 tokenList: tokenList.map { $0.diTokenValue })
-//			assignedRegistrations[String(name[..<firstDotIndex])] = newToken
 		} else {
-			// container.append(part:) for example
-			otherRegistrations.append(contentsOf: collectedTokens)
+			if let callee = callee, assignedRegistrations[callee] != nil {
+				assignedRegistrations[callee]?.tokenList +=
+					(collectedTokens + intermediateTokenList).map({ $0.diTokenValue })
+			} else {
+				// container.append(part:) for example
+				otherRegistrations.append(contentsOf: collectedTokens)
+			}
 		}
 	}
 	
-	/// For swift complex source code resolving
-	///
-	/// ```let r = container.register(_:)```
-	///
-	/// "r" is assignee name
-	private func processVarLocalDeclarationKind(use substructure: SourceKitStructure, otherRegistrations: inout [DITokenConvertible], assignedRegistrations: [String: RegistrationToken]) -> String? {
-		guard let name: String = substructure.get(.name) else {
-			return nil
-		}
-		if let registration = assignedRegistrations[name] {
-			// For handling:
-			// var r = container.register(_:)
-			// r.injectSomething...
-			// r = container.register(_:)
-			otherRegistrations.append(registration)
-		}
-		return name
-	}
 	
-	
-	private func processLoadContainerBodyPart(loadContainerBodyPart: ASTNode, tokenList: inout [DITokenConvertible]) -> [DITokenConvertible] {
+	private func processLoadContainerBodyPart(loadContainerBodyPart: ASTNode, tokenList: inout [DITokenConvertible], callee: inout String?) -> [DITokenConvertible] {
 		var result: [DITokenConvertible] = []
 		
 		if let info = self.getTokenInfo(from: loadContainerBodyPart, tokenList: tokenList) {
@@ -163,6 +145,17 @@ final class ContainerPartBuilder {
 					result.append(token)
 				}
 			}
+			if
+				let possibleCallee = loadContainerBodyPart[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.last,
+				let declIndex = possibleCallee.info.firstIndex(where: { $0.key == TokenKey.decl.rawValue }),
+				!isDIDeclarationValue(decl: possibleCallee.info[declIndex].value), // NOT!
+				let calleeRange = possibleCallee.info[declIndex].value.range(of: "Name.\\(file\\).[a-zA-Z\\d_-]+.load\\(container:\\).[a-zA-Z\\d_-]+@", options: .regularExpression)
+				{
+					let fullCallee = possibleCallee.info[declIndex].value[calleeRange]
+					let rawCallee = fullCallee.split(separator: ".").last?.dropLast()
+					callee = rawCallee.map { String($0) }
+			}
+			
 //			else if info.argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
 //				let message = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
 //				let invalidCallError = GraphError(infoString: message, location: info.location, kind: .parsing)
@@ -171,7 +164,7 @@ final class ContainerPartBuilder {
 		}
 		
 		for substructure in loadContainerBodyPart.children {
-			result += processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &tokenList)
+			result += processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &tokenList, callee: &callee)
 		}
 		return result
 	}
@@ -191,75 +184,11 @@ final class ContainerPartBuilder {
 								parsingContext: self.parsingContext,
 								containerParsingContext: self.containerParsingContext,
 								diPartNameStack: self.diPartNameStack)
-		
-//		guard
-//			loadContainerBodyPart.isKind(of: SwiftExpressionKind.call),
-//			let name: String = loadContainerBodyPart.get(.name),
-//			let bodyOffset = loadContainerBodyPart.getBodyInfo()?.offset,
-//			let body = loadContainerBodyPart.body(using: content)
-//			else { return nil }
-//		let functionName = TypeFinder.restoreMethodName(initial: name)
-//
-//		let substructureList = loadContainerBodyPart.substructures
-//		var argumentStack = ContainerPartBuilder.argumentInfo(substructures: substructureList, content: content)
-//		if argumentStack.isEmpty {
-//			argumentStack = parseArgumentList(body: body, substructureList: substructureList)
-//		}
-//		let location = Location(file: file, byteOffset: bodyOffset)
-//
-//		return TokenBuilderInfo(functionName: functionName,
-//								invocationBody: body,
-//								tokenList: tokenList,
-//								substructureList: substructureList,
-//								bodyOffset: bodyOffset,
-//								currentPartName: currentPartName,
-//								argumentStack: argumentStack,
-//								location: location,
-//								parsingContext: parsingContext,
-//								containerParsingContext: containerParsingContext,
-//								content: content,
-//								file: file,
-//								diPartNameStack: self.diPartNameStack)
 	}
 	
 	// Should refer to builder or container
 	private func isDIDeclarationValue(decl: String) -> Bool {
 		return decl == "DITranquillity.(file).DIComponentBuilder" || decl == "DITranquillity.(file).DIContainer"
-	}
-	
-	
-	private func parseArgumentList(body: String, substructureList: [SourceKitStructure]) -> [ArgumentInfo] {
-		// Variable injection could also be passed here "$0.a = $1".
-		// It parses ok but we may got something with comma on right side of the assignment. Tagged injection, for example.
-		// Last used because of first substructure can be further contiguous registration "c.register(...).injection(We are here)"
-		guard !body.contains("=") else {
-			return [ArgumentInfo(name: "_", value: body, structure: substructureList.last ?? [:])]
-		}
-		return body.split(separator: ",").compactMap(self.parseArgument)
-	}
-	
-	
-	private func parseArgument(argument: String.SubSequence) -> ArgumentInfo? {
-		let parts = argument.split(separator: ":")
-		var result: (outerName: String, innerName: String, value: String) = ("", "", "")
-		if parts.count == 0 {
-			return nil
-		} else if parts.count == 1 {
-			result.value = String(parts[0])
-			result.outerName = "_"
-		} else {
-			result.value = String(parts[1])
-			
-			let nameParts = parts[0].split(separator: " ", omittingEmptySubsequences: true)
-			if nameParts.count == 1 {
-				result.innerName = String(nameParts[0])
-				result.outerName = String(nameParts[0])
-			} else if nameParts.count == 2 {
-				result.innerName = String(nameParts[1])
-				result.outerName = String(nameParts[0])
-			}
-		}
-		return ArgumentInfo(name: result.outerName, value: result.value, structure: [:])
 	}
 	
 	

@@ -8,7 +8,7 @@ final class AppendContainerTokenBuilder: TokenBuilder {
 	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		
 		guard
-			info.functionName == DIKeywords.append.rawValue,
+			info.functionName == DIKeywords.appendPart.rawValue || info.functionName == DIKeywords.appendFramework.rawValue,
 			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getOne()?.typedNode.unwrap(DeclrefExpression.self),
 			let astLocation = declrefExpr.location,
 			let appendedType = info.node[.tupleExpr][.erasureExpr][.dotSelfExpr][.typeExpr].getOne()?[tokenKey: .typerepr].getOne()?.value

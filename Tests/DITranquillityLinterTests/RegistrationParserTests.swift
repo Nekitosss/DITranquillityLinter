@@ -175,11 +175,4 @@ class RegistrationParserTests: XCTestCase {
 		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
 		XCTAssertEqual(registration.typeName, "MyClass")
 	}
-	
-	// Check intermediate token (alias, injection) adding to registration
-	func testRegistrationTokenIntermediateTokenAppending() throws {
-		let errorList = try validateGraph(fileName: "TestRegistrationTokenIntermediateTokenAppending")
-		XCTAssertTrue(errorList.isEmpty, "Lost alias for registration")
-	}
-
 }

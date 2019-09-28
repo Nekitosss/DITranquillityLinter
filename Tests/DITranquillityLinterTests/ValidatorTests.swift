@@ -13,6 +13,12 @@ class ValidatorTests: XCTestCase {
 		clearTestArtifacts()
 	}
 	
+	// Check intermediate token (alias, injection) adding to registration
+	func testRegistrationTokenIntermediateTokenAppending() throws {
+		let errorList = try validateGraph(fileName: "TestRegistrationTokenIntermediateTokenAppending")
+		XCTAssertTrue(errorList.isEmpty, "Lost alias for registration")
+	}
+	
 	func testValidateAliasingSuccess() throws {
 		let errorList = try validateGraph(fileName: "TestValidateAliasingSuccess")
 		XCTAssertTrue(errorList.isEmpty)

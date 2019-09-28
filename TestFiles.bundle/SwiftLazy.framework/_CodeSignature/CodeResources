@@ -6,23 +6,31 @@
 	<dict>
 		<key>Headers/SwiftLazy-Swift.h</key>
 		<data>
-		7gBXY6SGWeKX4nbaIK/lLWhzIkk=
+		I0lCkEJlP6UTvjCi8gBtETHZKjQ=
 		</data>
 		<key>Headers/SwiftLazy.h</key>
 		<data>
-		knLUHBO2xjMI2SlSC7oCsQimQxw=
+		QQnddP2SxEO09JdSTrUQyuBm+jA=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		Tbj13mWofQm1JATXfzrdcTZwGok=
+		YG1s5JBKjSAwdMBBvSomgA4jU+A=
+		</data>
+		<key>Modules/SwiftLazy.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
+		<data>
+		nN6s09w8Rn9OkeXX0e8kX84BJbc=
+		</data>
+		<key>Modules/SwiftLazy.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
+		<data>
+		HRoSa6XOCBLBXFlzSzeRV6NWSAk=
 		</data>
 		<key>Modules/SwiftLazy.swiftmodule/x86_64.swiftdoc</key>
 		<data>
-		R6r7LLgoGDbuAjMcBroP+4iNsXA=
+		nN6s09w8Rn9OkeXX0e8kX84BJbc=
 		</data>
 		<key>Modules/SwiftLazy.swiftmodule/x86_64.swiftmodule</key>
 		<data>
-		b4yZ/2BsK/ObLu/Yeebc0ILp+ZU=
+		HRoSa6XOCBLBXFlzSzeRV6NWSAk=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -35,44 +43,66 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			7gBXY6SGWeKX4nbaIK/lLWhzIkk=
+			I0lCkEJlP6UTvjCi8gBtETHZKjQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			RxUdg+V9q1S7uwg2AavChY/hnAqxP1vQUDbR2AAclVw=
+			hv03aTBgTKPqBAssOZDwkizAH1GvtJBGAd55SqhM8U8=
 			</data>
 		</dict>
 		<key>Headers/SwiftLazy.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			knLUHBO2xjMI2SlSC7oCsQimQxw=
+			QQnddP2SxEO09JdSTrUQyuBm+jA=
 			</data>
 			<key>hash2</key>
 			<data>
-			cm2RJQV33eGGO7wGanLcnXbLqh/Nl/VtSecOUwixybQ=
+			MQWzT6nDwp1lrLR96++Gcl2aRI3DFcoe75QByedG07g=
+			</data>
+		</dict>
+		<key>Modules/SwiftLazy.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			nN6s09w8Rn9OkeXX0e8kX84BJbc=
+			</data>
+			<key>hash2</key>
+			<data>
+			dwBnvTLbOAJDi1QIabGQwxrIMYBeDwgu5+WkwTaJpFA=
+			</data>
+		</dict>
+		<key>Modules/SwiftLazy.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			HRoSa6XOCBLBXFlzSzeRV6NWSAk=
+			</data>
+			<key>hash2</key>
+			<data>
+			nOn5QR7ysUq0ORoLzIu8XnQ1faLpTDSfNLxQbe7Gasc=
 			</data>
 		</dict>
 		<key>Modules/SwiftLazy.swiftmodule/x86_64.swiftdoc</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			R6r7LLgoGDbuAjMcBroP+4iNsXA=
+			nN6s09w8Rn9OkeXX0e8kX84BJbc=
 			</data>
 			<key>hash2</key>
 			<data>
-			0jlp85fzMWO+ppk+A8ezeVanz4QRgmhMmlJz3ZkKXXU=
+			dwBnvTLbOAJDi1QIabGQwxrIMYBeDwgu5+WkwTaJpFA=
 			</data>
 		</dict>
 		<key>Modules/SwiftLazy.swiftmodule/x86_64.swiftmodule</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			b4yZ/2BsK/ObLu/Yeebc0ILp+ZU=
+			HRoSa6XOCBLBXFlzSzeRV6NWSAk=
 			</data>
 			<key>hash2</key>
 			<data>
-			I4E7Ogwx372nTDVpUi1nWRNOvND9ZCoYGeS+6IXKTQo=
+			nOn5QR7ysUq0ORoLzIu8XnQ1faLpTDSfNLxQbe7Gasc=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/ivlevAstef/DITranquillity",
         "state": {
           "branch": null,
-          "revision": "af61f4c02408afd96f5de17a78870d4ffa32dcad",
-          "version": "3.8.2"
+          "revision": "5ab7f1d1b49f9224d2d5c8cb7fc6b5f7497843c1",
+          "version": "3.8.4"
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/Nekitosss/swift-ast-visitor.git",
         "state": {
           "branch": null,
-          "revision": "c50798f1a9489536a4079cac1ce6d6a06411ea38",
-          "version": "0.0.13"
+          "revision": "e7ba05ef7ad347c1941f393a558d0c14ff1b875a",
+          "version": "0.0.14"
         }
       },
       {

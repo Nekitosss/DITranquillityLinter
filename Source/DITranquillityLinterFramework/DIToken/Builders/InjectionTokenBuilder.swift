@@ -30,9 +30,8 @@ final class InjectionTokenBuilder: TokenBuilder {
 		}
 		
 		var cycle = false
-		if let cycleCall = info.node[.tupleShuffleExpr][.tupleExpr][.callExpr][.tupleExpr][.booleanLiteralExpr].getOne(),
-			let value = cycleCall[tokenKey: .value].getOne()?.value {
-			cycle = value == "true"
+		if let possibleCycleValue = info.node[.tupleShuffleExpr][.tupleExpr][.booleanLiteralExpr].getOne()?[tokenKey: .value].getOne()?.value {
+			cycle = possibleCycleValue == "true"
 		}
 		
 		return InjectionToken(name: "",

@@ -14,7 +14,7 @@
 		</data>
 		<key>Headers/DITranquillity-Swift.h</key>
 		<data>
-		Zp9DW5YaxQt967LhFIDNO/dss7g=
+		5/QI64RA7joKCM09nn0dk62bT1w=
 		</data>
 		<key>Headers/DITranquillity.h</key>
 		<data>
@@ -22,15 +22,23 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		enOeDbu1ir4AJ18h9HBzNNnh4os=
+		sTv5YoYcpFbUucnzYVHc+zyf8m4=
+		</data>
+		<key>Modules/DITranquillity.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
+		<data>
+		BkTrg86rhx3m5oOUq2uU7iX3Auc=
+		</data>
+		<key>Modules/DITranquillity.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
+		<data>
+		W3E0Dj7K+q/AinPmz9uEJ//nEPg=
 		</data>
 		<key>Modules/DITranquillity.swiftmodule/x86_64.swiftdoc</key>
 		<data>
-		EXi3wPNmLyl5NFBer5+eUSEXPwk=
+		BkTrg86rhx3m5oOUq2uU7iX3Auc=
 		</data>
 		<key>Modules/DITranquillity.swiftmodule/x86_64.swiftmodule</key>
 		<data>
-		MM9FVJ5jFkeN4BH2eX4QNkb5JSg=
+		W3E0Dj7K+q/AinPmz9uEJ//nEPg=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -85,11 +93,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Zp9DW5YaxQt967LhFIDNO/dss7g=
+			5/QI64RA7joKCM09nn0dk62bT1w=
 			</data>
 			<key>hash2</key>
 			<data>
-			V677gwo4//4LsfhzY/eg7gSi69ZzPeIqsXoB1JVbDnA=
+			+WMisRIlrczJZCeQtMl9A1+Zvp0ZN0qzEQHLvAOnE0U=
 			</data>
 		</dict>
 		<key>Headers/DITranquillity.h</key>
@@ -103,26 +111,48 @@
 			r/KIdnez5I7C8oLCpRfIlOsPUTIafbX0irHVUeDkwYk=
 			</data>
 		</dict>
+		<key>Modules/DITranquillity.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			BkTrg86rhx3m5oOUq2uU7iX3Auc=
+			</data>
+			<key>hash2</key>
+			<data>
+			c6jG/2jlSn3F21SqP7B7FU1YqUQSe35CxYU2v2DB1cw=
+			</data>
+		</dict>
+		<key>Modules/DITranquillity.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			W3E0Dj7K+q/AinPmz9uEJ//nEPg=
+			</data>
+			<key>hash2</key>
+			<data>
+			QPUgMUhLQzAjEAsYna/RA6yqP5hl52S39q5IrpkNsek=
+			</data>
+		</dict>
 		<key>Modules/DITranquillity.swiftmodule/x86_64.swiftdoc</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			EXi3wPNmLyl5NFBer5+eUSEXPwk=
+			BkTrg86rhx3m5oOUq2uU7iX3Auc=
 			</data>
 			<key>hash2</key>
 			<data>
-			izaUPgcSh36B4y0cNi8L3XBY8G3RmltRVtdV5A6OcxI=
+			c6jG/2jlSn3F21SqP7B7FU1YqUQSe35CxYU2v2DB1cw=
 			</data>
 		</dict>
 		<key>Modules/DITranquillity.swiftmodule/x86_64.swiftmodule</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			MM9FVJ5jFkeN4BH2eX4QNkb5JSg=
+			W3E0Dj7K+q/AinPmz9uEJ//nEPg=
 			</data>
 			<key>hash2</key>
 			<data>
-			EPOX1RFD4BYzdoR973WTYY9QDMoGvphurhehZ7iv1Mc=
+			QPUgMUhLQzAjEAsYna/RA6yqP5hl52S39q5IrpkNsek=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
