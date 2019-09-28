@@ -65,9 +65,11 @@ final class ParserTests: XCTestCase {
 	
 	// Two containers in single file
 	func testSeveralContainerCreation() throws {
+		let astEmitter: ASTEmitter = container.resolve()
 		let tokenizer: Tokenizer = container.resolve()
 		let fileURL = pathToSourceFile(with: "TestSeveralContainerCreation")
-		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [])
+		let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
+		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [astFilePath])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		let containerInfo = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 		
@@ -76,12 +78,14 @@ final class ParserTests: XCTestCase {
 	
 	// Two containers in two files
 	func testSeveralContainerCreationSeveralFiles() throws {
+		let astEmitter: ASTEmitter = container.resolve()
 		let tokenizer: Tokenizer = container.resolve()
 		// Remember to check part and class unique in two provided swift files.
 		// If you stuck and think WTF is happening, check two provided files proper compilation
 		let fileURL1 = pathToSourceFile(with: "TestInitialDefinitionInvalidMethodCallingRegistration")
 		let fileURL2 = pathToSourceFile(with: "TestInvalidMethodCallingRegistration")
-		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL1, fileURL2]), astFilePaths: [])
+		let astFilePath = try astEmitter.emitAST(from: [fileURL1, fileURL2])
+		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL1, fileURL2]), astFilePaths: astFilePath)
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		let containerInfo = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 		

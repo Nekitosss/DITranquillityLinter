@@ -37,9 +37,11 @@ func extractRegistrationInfo(containerInfo: ContainerPart, maximumRegistrationCo
 
 func validateGraph(fileName: String) throws -> [GraphError] {
 	let fileURL = pathToSourceFile(with: fileName)
+	let astEmitter: ASTEmitter = container.resolve()
+	let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
 	let tokenizer: Tokenizer = container.resolve()
 	let collectedInfo = try tokenizer.collectInfo(files: [fileURL])
-	let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [])
+	let context = GlobalParsingContext(container: tokenizer.container, collectedInfo: collectedInfo, astFilePaths: [astFilePath])
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 	let containerInfoList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 	if containerInfoList.isEmpty {

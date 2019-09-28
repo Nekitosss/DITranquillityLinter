@@ -1,6 +1,6 @@
 import DITranquillity
 
-private class MyClass: MyProtocol {
+private class MyClass {
 }
 
 private class ParsablePart: DIPart {
