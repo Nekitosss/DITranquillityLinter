@@ -8,6 +8,7 @@
 
 import DITranquillity
 
+private protocol MyProtocol: class {}
 private class MyClass: MyProtocol {
 }
 

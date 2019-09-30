@@ -32,9 +32,9 @@ class InfoEmitterTests: XCTestCase {
 	func testCircularDIPartsErrorEmitting() throws {
 		let fileURL = pathToSourceFile(with: "TestCircularDIPartsErrorEmitting")
 		
-		let moduleParser: ModuleParser = container.resolve()
-		let fileContainer: FileContainer = container.resolve()
-		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]), astFilePaths: [])
+    let astEmitter: ASTEmitter = container.resolve()
+    let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
+		let context = GlobalParsingContext(astFilePaths: [astFilePath])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		_ = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
@@ -47,9 +47,9 @@ class InfoEmitterTests: XCTestCase {
 	func testSelfAppendDIPartsErrorEmitting() throws {
 		let fileURL = pathToSourceFile(with: "TestSelfAppendDIPartsErrorEmitting")
 		
-		let moduleParser: ModuleParser = container.resolve()
-		let fileContainer: FileContainer = container.resolve()
-		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]), astFilePaths: [])
+    let astEmitter: ASTEmitter = container.resolve()
+    let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
+		let context = GlobalParsingContext(astFilePaths: [astFilePath])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		_ = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)
@@ -87,9 +87,10 @@ class InfoEmitterTests: XCTestCase {
 		let initContainerStructureList = try getContainerInfo(fileName: "TestPublicPartParsing")
 		
 		// Create main container
-		let tokenizer: Tokenizer = container.resolve()
 		let usingFileURL = pathToSourceFile(with: "TestPublicUsing")
-		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [usingFileURL]), astFilePaths: [])
+    let astEmitter: ASTEmitter = container.resolve()
+    let astFilePath = try astEmitter.emitAST(from: [usingFileURL]).first!
+		let context = GlobalParsingContext(astFilePaths: [astFilePath])
 		
 		// Set side module dependency
 		context.cachedContainers = initContainerStructureList.reduce(into: [:]) {$0[$1.name ?? ""] = $1 }
@@ -102,7 +103,7 @@ class InfoEmitterTests: XCTestCase {
 		// Validate multimodule graph
 		let validator: GraphValidator = container.resolve()
 		// Collected info using only for tag checking. We may pass [:] here cause no tags testing
-		let errors = validator.validate(containerPart: containerInfo, collectedInfo: [:])
+		let errors = validator.validate(containerPart: containerInfo)
 		XCTAssertTrue(errors.isEmpty)
 	}
 	
@@ -111,10 +112,7 @@ class InfoEmitterTests: XCTestCase {
 		
 		let astEmitter: ASTEmitter = container.resolve()
 		let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
-		
-		let moduleParser: ModuleParser = container.resolve()
-		let fileContainer: FileContainer = container.resolve()
-		let context = try GlobalParsingContext(container: fileContainer, collectedInfo: moduleParser.collectInfo(files: [fileURL]), astFilePaths: [astFilePath])
+		let context = GlobalParsingContext(astFilePaths: [astFilePath])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		
 		return containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)

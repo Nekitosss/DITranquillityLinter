@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import SourceKittenFramework
 import ASTVisitor
 
 // DIPart, DIFramework

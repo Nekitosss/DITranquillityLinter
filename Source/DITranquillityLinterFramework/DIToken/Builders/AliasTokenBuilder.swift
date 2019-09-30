@@ -12,7 +12,7 @@ import ASTVisitor
 final class AliasTokenBuilder: TokenBuilder {
 	
 	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
-		guard info.functionName == DIKeywords.as.rawValue || info.functionName == DIKeywords.taggedAlias.rawValue,
+    guard info.functionName == DIKeywords.as.rawValue || info.functionName == DIKeywords.taggedAlias.rawValue || info.functionName == DIKeywords.checkedAlias.rawValue,
 			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getOne()?.typedNode.unwrap(DeclrefExpression.self),
 			let location = declrefExpr.location,
 			!declrefExpr.substitution.isEmpty

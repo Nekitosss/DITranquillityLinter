@@ -16,7 +16,7 @@ private class MyClass: MyTypealias {
 
 class ParsablePart: DIPart {
 	
-	func load(container: DIContainer) {
+	static func load(container: DIContainer) {
 		container.register(MyClass.self)
 			.as(MyTypealias.self)
 	}

@@ -21,12 +21,11 @@ class ParsableUsagePart: DIPart {
 	
 	let container: DIContainer = {
 		let container = DIContainer()
-		container.append(part: ParsablePart.self)
 		container.append(part: ParsableUsagePart.self)
 		return container
 	}()
 	
-	func load(container: DIContainer) {
+	static func load(container: DIContainer) {
 		container.register(MyUsingClass.init)
 	}
 	

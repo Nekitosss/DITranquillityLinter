@@ -7,7 +7,6 @@ let package = Package(
 		.executable(name: "ditranquillity", targets: ["DITranquillityLinter"]),
 	],
 	dependencies: [
-		.package(url: "https://github.com/jpsim/SourceKitten.git", from: "0.21.2"),
 		.package(url: "https://github.com/tuist/xcodeproj.git", .upToNextMajor(from: "6.0.1")),
 		.package(url: "https://github.com/kylef/PathKit.git", .upToNextMajor(from: "0.9.2")),
 		.package(url: "https://github.com/Carthage/Commandant.git", from: "0.15.0"),
@@ -27,7 +26,6 @@ let package = Package(
 		.target(
 			name: "DITranquillityLinterFramework",
 			dependencies: [
-				"SourceKittenFramework",
 				"xcodeproj",
 				"PathKit",
 				"DITranquillity",

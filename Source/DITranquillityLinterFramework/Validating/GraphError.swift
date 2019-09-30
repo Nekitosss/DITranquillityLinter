@@ -47,4 +47,3 @@ struct GraphWarning: Equatable, XCodePrintable {
 			].joined()
 	}
 }
-

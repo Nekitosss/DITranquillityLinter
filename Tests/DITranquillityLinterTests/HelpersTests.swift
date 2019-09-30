@@ -35,51 +35,6 @@ class HelpersTests: XCTestCase {
 		}
 	}
 	
-	
-	func testBinaryFrameworkParsingNoCache() throws {
-		let cacher: ResultCacher = container.resolve()
-		try cacher.clearCaches(isCommonCache: true)
-		
-		let parser: BinaryFrameworkParser = container.resolve()
-		let result = try parser.parseBinaryModules(names: ["NSAutoreleasePool"])
-		
-		XCTAssertNotNil(result)
-		XCTAssertFalse((result?.isEmpty ?? true))
-	}
-	
-	
-	func testProperBinaryParsingErrorHandling() throws {
-		let parser: BinaryFrameworkParser = container.resolve()
-		let result = try parser.parseBinaryModules(names: ["NSIndexPath+UIKitAdditions"]) // That will not be parsed, but error will not be thrown
-		
-		XCTAssertNotNil(result)
-		XCTAssertTrue((result?.isEmpty ?? true))
-	}
-
-	
-	func testSkippingEmptyBinaryParsing() throws {
-		let parser: BinaryFrameworkParser = container.resolve()
-		let result = try parser.parseBinaryModules(names: [])
-		
-		XCTAssertNil(result)
-	}
-	
-	
-	func testFileContainerSuccessRecreation() throws {
-		let container = FileContainer()
-		let filePath = pathToSourceFile(with: "TestComposedTypealiasError")
-		let file = container.getOrCreateFile(by: filePath)
-		
-		XCTAssertNotNil(file)
-	}
-	
-	func testFileContaienrFailureRecreation() throws {
-		let container = FileContainer()
-		let file = container.getOrCreateFile(by: "NotExistingFile")
-		
-		XCTAssertNil(file)
-	}
-	
 	func testProperFileProcessingSequence() throws {
 		let filePath = pathToSourceFile(with: "TestComposedTypealiasFailure")
 		
@@ -100,6 +55,8 @@ class HelpersTests: XCTestCase {
 				
 			} catch TestError.containerInfoNotFound {
 				continue
+      } catch let error as GraphError where error.kind == .parsing {
+          continue
 			} catch {
 				XCTFail(error.localizedDescription + "\nTest file: " + sourceFile)
 			}

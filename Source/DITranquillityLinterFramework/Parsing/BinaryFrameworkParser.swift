@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SourceKittenFramework
 
 struct BinaryFrameworkInfo {
   let path: String
@@ -18,31 +17,16 @@ struct BinaryFrameworkInfo {
 final class BinaryFrameworkParser {
 	
 	private let cacher: ResultCacher
-	private let fileContainer: FileContainer
 	private let isTestEnvironment: Bool
 	private let timeRecorder: TimeRecorder
 	private let dependencyCacher: DependencyTokenCacher
 	
-	init(timeRecorder: TimeRecorder, cacher: ResultCacher, fileContainer: FileContainer, isTestEnvironment: Bool, dependencyCacher: DependencyTokenCacher) {
+	init(timeRecorder: TimeRecorder, cacher: ResultCacher, isTestEnvironment: Bool, dependencyCacher: DependencyTokenCacher) {
 		self.cacher = cacher
-		self.fileContainer = fileContainer
 		self.isTestEnvironment = isTestEnvironment
 		self.timeRecorder = timeRecorder
 		self.dependencyCacher = dependencyCacher
  	}
-	
-	
-	/// Parse frameworks from "FRAMEWORK_SEARCH_PATHS" build setting.
-	func parseExplicitBinaryModules() throws -> [FileParserResult] {
-		TimeRecorder.start(event: .parseBinary)
-		defer { TimeRecorder.end(event: .parseBinary) }
-		
-		let (target, sdk) = self.createCommandLineArgumentInfoForSourceParsing()
-		let userDefinedFrameworks = try self.getUserDefinedBinaryFrameworkNames()
-		
-		return try self.parseFrameworkInfoList(userDefinedFrameworks, target: target, sdk: sdk, isCommon: false, explicitNames: nil)
-		
-	}
 	
 	func parseCachedInfoInExplicitBinaryModules() throws -> [String: ContainerPart] {
 		timeRecorder.start(event: .parseCachedContainers)
@@ -50,16 +34,6 @@ final class BinaryFrameworkParser {
 		
 		let userDefinedFrameworks = try self.getUserDefinedBinaryFrameworkNames()
 		return self.collectCachedContainerPartsFromBinaryModules(userDefinedFrameworks)
-	}
-	
-	/// Parse OS related bynary frameworks and
-	func parseBinaryModules(names: Set<String>) throws -> [FileParserResult]? {
-		guard !names.isEmpty else {
-			return nil
-		}
-		let (target, sdk) = self.createCommandLineArgumentInfoForSourceParsing()
-		let commonFrameworks = self.getImplicitlyDependentBinaryFrameworks(sdk: sdk)
-		return try self.parseFrameworkInfoList(commonFrameworks, target: target, sdk: sdk, isCommon: true, explicitNames: names)
 	}
 	
 	func createCommandLineArgumentInfoForSourceParsing() -> (target: String, sdk: String) {
@@ -139,68 +113,6 @@ final class BinaryFrameworkParser {
 		}
 		return result
 	}
-	
-	/// Parse concrete binary framework.
-	private func parseFrameworkInfoList(_ frameworkInfoList: [BinaryFrameworkInfo], target: String, sdk: String, isCommon: Bool, explicitNames: Set<String>?) throws -> [FileParserResult] {
-		let templateCompilerArguments = ["-target", target, "-sdk", sdk, "-F"]
-		
-		return try frameworkInfoList.flatMap { (frameworkInfo) -> [FileParserResult] in
-			let compilerArguments = templateCompilerArguments + [frameworkInfo.path]
-			return try self.parseModule(moduleName: frameworkInfo.name,
-										frameworksPath: frameworkInfo.path,
-										compilerArguments: compilerArguments,
-										explicitNames: explicitNames,
-										isCommon: isCommon)
-		}
-	}
-	
-	/// Parse Binary framework path. Framework may be separate into several ".h" files. Method parse passed "***.h" file.
-	private func parseModule(moduleName: String, frameworksPath: String, compilerArguments: [String], explicitNames: Set<String>?, isCommon: Bool) throws -> [FileParserResult] {
-		let frameworksURL = URL(fileURLWithPath: frameworksPath + "/\(moduleName).framework/Headers", isDirectory: true)
-		let frameworks = try self.collectFrameworkNames(frameworksURL: frameworksURL, explicitNames: explicitNames)
-		return try frameworks.flatMap { (frameworkName) -> [FileParserResult] in
-			Log.verbose("Parse framework: \(frameworkName)")
-			
-			let fullFrameworkName = self.fullFrameworkName(moduleName: moduleName, frameworkName: frameworkName)
-			let fileName = frameworksURL.path + "/" + fullFrameworkName + ".h"
-			let cacheName = frameworksPath + moduleName + frameworkName
-			
-			if let cachedResult = try? self.cacher.getCachedBinaryFiles(name: cacheName, isCommonCache: isCommon) {
-				return cachedResult
-				
-			} else if let contents = try? self.createSwiftSourcetext(for: fullFrameworkName, use: compilerArguments) {
-				// We use "try?" here cause we should "eat" errors in swift source creating from objc
-				let parser = FileParser(contents: contents, path: fileName, module: moduleName)
-				let fileParserResult = try [parser.parse()]
-				self.fileContainer.set(value: parser.file, for: fileName)
-				try self.cacher.cacheBinaryFiles(list: fileParserResult, name: cacheName, isCommonCache: isCommon)
-				return fileParserResult
-			}
-			
-			return []
-		}
-	}
-	
-	/// Get swift source text from binary framework using SourceKit
-	private func createSwiftSourcetext(for fullFrameworkName: String, use compilerArguments: [String]) throws -> String {
-		let toolchains = ["com.apple.dt.toolchain.XcodeDefault"]
-		let skObject: SourceKitObject = [
-			"key.request": UID("source.request.editor.open.interface"),
-			"key.name": UUID().uuidString,
-			"key.compilerargs": compilerArguments,
-			"key.modulename": fullFrameworkName,
-			"key.toolchains": toolchains,
-			"key.synthesizedextensions": 1
-		]
-		do {
-			let result = try Request.customRequest(request: skObject).send()
-			return (result["key.sourcetext"] as? String) ?? ""
-		} catch {
-			Log.info(skObject)
-			throw error
-		}
-	}
-	
 	
 	/// Concatenate framework part with framework name for SourceKit parser.
 	private func fullFrameworkName(moduleName: String, frameworkName: String) -> String {

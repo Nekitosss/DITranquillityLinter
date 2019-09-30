@@ -48,7 +48,7 @@ struct AliasToken: Codable {
 		self.typeName = typeName
 		self.tag = tag
 		self.location = location
-		self.plainTypeName = TypeFinder.parseTypeName(name: typeName).plainTypeName
+    self.plainTypeName = TypeName.unwrapTypeName(name: typeName).unwrappedTypeName
 	}
 	
 	func getRegistrationAccessor() -> RegistrationAccessor {

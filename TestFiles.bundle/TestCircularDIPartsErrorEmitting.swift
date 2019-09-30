@@ -16,7 +16,7 @@ private class MyClass: MyTypealias {
 
 public class ParsablePart: DIPart {
 	
-	public func load(container: DIContainer) {
+	public static func load(container: DIContainer) {
 		container.register(MyClass.self)
 			.as(MyTypealias.self)
 		container.append(part: SecondPart.self)
@@ -25,14 +25,14 @@ public class ParsablePart: DIPart {
 }
 
 class SecondPart: DIPart {
-	func load(container: DIContainer) {
+	static func load(container: DIContainer) {
 		container.append(part: ThirdPart.self)
 	}
 }
 
 
 class ThirdPart: DIPart {
-	func load(container: DIContainer) {
+	static func load(container: DIContainer) {
 		container.append(part: ParsablePart.self)
 	}
 }

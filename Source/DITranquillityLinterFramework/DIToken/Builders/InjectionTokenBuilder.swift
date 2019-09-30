@@ -7,7 +7,6 @@
 
 import Foundation
 import ASTVisitor
-import SourceKittenFramework
 
 /// Trying to create InjectionToken (without injection type resolving)
 final class InjectionTokenBuilder: TokenBuilder {
@@ -44,17 +43,14 @@ final class InjectionTokenBuilder: TokenBuilder {
 							  location: location)
 	}
 
-	static func unwrapSubstitution(declrefSubstitution: [String : String]) -> (typeName: String, plainTypeName: String, isOptional: Bool, modificators: [InjectionModificator]) {
+	static func unwrapSubstitution(declrefSubstitution: [String: String]) -> (typeName: String, plainTypeName: String, isOptional: Bool, modificators: [InjectionModificator]) {
 		
 		var modificators: [InjectionModificator] = []
 		var astTypeName = ""
 		var typeName = ""
 		
 		for substitution in declrefSubstitution {
-			let regexp = try! NSRegularExpression(pattern: "P[0-99]?", options: [])
-			let matches = regexp.matches(in: substitution.key, options: [], range: .init(location: 0, length: substitution.key.bridge().length))
-			
-			if !matches.isEmpty && astTypeName.isEmpty {
+      if substitution.key.range(of: "P[0-99]?", options: .regularExpression) != nil && astTypeName.isEmpty {
 				astTypeName = substitution.value
 			}
 			if substitution.key == "Property" {
@@ -81,7 +77,7 @@ final class InjectionTokenBuilder: TokenBuilder {
 	}
 	
 	private static func unwrapByTag(typeName: String) -> (String, InjectionModificator)? {
-		guard let generic = Composer.parseGenericType(typeName),
+		guard let generic = parseGenericType(typeName),
 			generic.name == DIKeywords.diByTag.rawValue,
 			generic.typeParameters.count == 2 // Tag + TypeName
 			else { return nil }
@@ -92,7 +88,7 @@ final class InjectionTokenBuilder: TokenBuilder {
 	}
 	
 	private static func unwrapByMany(typeName: String) -> (String, InjectionModificator)? {
-		guard let generic = Composer.parseGenericType(typeName),
+		guard let generic = parseGenericType(typeName),
 			generic.name == DIKeywords.diMany.rawValue,
 			generic.typeParameters.count == 1 // TypeName
 			else { return nil }
@@ -100,5 +96,53 @@ final class InjectionTokenBuilder: TokenBuilder {
 		let type = generic.typeParameters[0].typeName.unwrappedTypeName
 		return (type, .many)
 	}
+  
+
+  static func parseGenericType(_ unwrappedTypeName: String) -> GenericType? {
+      let genericComponents = unwrappedTypeName
+          .split(separator: "<", maxSplits: 1)
+          .map({ String($0).trimmingCharacters(in: .whitespacesAndNewlines) })
+
+      guard genericComponents.count == 2 else {
+          return nil
+      }
+
+      let name = genericComponents[0]
+      let typeParametersString = String(genericComponents[1].dropLast())
+      return GenericType(name: name, typeParameters: parseGenericTypeParameters(typeParametersString))
+  }
+
+  static func parseGenericTypeParameters(_ typeParametersString: String) -> [GenericTypeParameter] {
+      return typeParametersString
+          .commaSeparated()
+          .map({ GenericTypeParameter(typeName: TypeName(removingGenericConstraints($0).stripped())) })
+  }
+  
+  fileprivate static func removingGenericConstraints(_ genericTypeString: String) -> String {
+    return genericTypeString.split(separator: ":", maxSplits: 1).first.flatMap({ String($0) }) ?? genericTypeString
+  }
 	
+}
+
+
+/// Descibes Swift generic type parameter
+struct GenericTypeParameter: Codable {
+
+    /// Generic parameter type name
+    let typeName: TypeName
+  
+    /// :nodoc:
+    init(typeName: TypeName) {
+        self.typeName = typeName
+    }
+}
+
+/// Descibes Swift generic type
+struct GenericType: Codable {
+  
+    /// The name of the base type, i.e. `Array` for `Array<Int>`
+    let name: String
+
+    /// This generic type parameters
+    let typeParameters: [GenericTypeParameter]
 }

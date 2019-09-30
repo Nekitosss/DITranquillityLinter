@@ -11,8 +11,6 @@ import ASTVisitor
 // Context in Command scope (single per command launch)
 final class GlobalParsingContext {
 	
-	let fileContainer: FileContainer
-	let collectedInfo: [String: Type]
 	let astFilePaths: [String]
 	var cachedContainers: [String: ContainerPart] = [:]
 	var errors: [GraphError] = []
@@ -21,9 +19,7 @@ final class GlobalParsingContext {
 	var parsedDIParts: [String: ContainerIntermediatePart] = [:]
 	var typealiasInfo: [String: TypealiasDeclaration] = [:]
 	
-	init(container: FileContainer, collectedInfo: [String: Type], astFilePaths: [String]) {
-		self.fileContainer = container
-		self.collectedInfo = collectedInfo
+	init(astFilePaths: [String]) {
 		self.astFilePaths = astFilePaths
 	}
 }

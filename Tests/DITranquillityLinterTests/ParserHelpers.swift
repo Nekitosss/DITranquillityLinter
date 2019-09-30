@@ -39,9 +39,7 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 	let fileURL = pathToSourceFile(with: fileName)
 	let astEmitter: ASTEmitter = container.resolve()
 	let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
-	let tokenizer: Tokenizer = container.resolve()
-	let collectedInfo = try tokenizer.collectInfo(files: [fileURL])
-	let context = GlobalParsingContext(container: tokenizer.container, collectedInfo: collectedInfo, astFilePaths: [astFilePath])
+	let context = GlobalParsingContext(astFilePaths: [astFilePath])
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 	let containerInfoList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 	if containerInfoList.isEmpty {
@@ -50,7 +48,7 @@ func validateGraph(fileName: String) throws -> [GraphError] {
 	XCTAssertFalse(containerInfoList.flatMap({ $0.tokenInfo }).isEmpty)
 	let validator = GraphValidator()
 	return containerInfoList.flatMap {
-		validator.validate(containerPart: $0, collectedInfo: collectedInfo)
+		validator.validate(containerPart: $0)
 	}
 }
 
@@ -62,8 +60,7 @@ func findContainerStructure(fileName: String) throws -> ContainerPart {
 func findContainerStructure(fullPathToFile fileURL: String) throws -> ContainerPart {
 	let astEmitter: ASTEmitter = container.resolve()
 	let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
-	let tokenizer: Tokenizer = container.resolve()
-	let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [astFilePath])
+	let context = GlobalParsingContext(astFilePaths: [astFilePath])
 	let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 	guard let containerInfo = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false).first else {
 		throw TestError.containerInfoNotFound
@@ -86,7 +83,7 @@ func pathsToSourceFiles() -> [String] {
 }
 
 func clearTestArtifacts() {
-	try! (container.resolve() as ResultCacher).clearCaches(isCommonCache: false)
+	try? (container.resolve() as ResultCacher).clearCaches(isCommonCache: false)
 }
 
 let container: DIContainer = {

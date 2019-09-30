@@ -7,12 +7,8 @@
 //
 
 import Foundation
-import SourceKittenFramework
 
 extension NSString {
-	func substringUsingByteRange(start: Int64, length: Int64) -> String? {
-		return self.substringWithByteRange(start: Int(start), length: Int(length))
-	}
 }
 
 extension String {

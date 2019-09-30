@@ -13,8 +13,6 @@ final class RegistrationTokenBuilder: TokenBuilder {
 	
 	typealias RegistrationInfo = (typeName: String, plainTypeName: String, tokenList: [DITokenConvertible])
 	
-	private let typeFinder = TypeFinder()
-	
 	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		guard info.functionName == DIKeywords.initializerRegister.rawValue || info.functionName == DIKeywords.typeRegister.rawValue,
 			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first?.typedNode.unwrap(DeclrefExpression.self),

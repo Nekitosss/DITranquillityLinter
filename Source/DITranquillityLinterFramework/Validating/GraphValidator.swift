@@ -8,14 +8,14 @@ final class GraphValidator {
 	
 	let autoimplementedTypes: Set<String> = ["AnyObject", "Any"]
 	
-	func validate(containerPart: ContainerPart, collectedInfo: [String: Type]) -> [GraphError] {
+	func validate(containerPart: ContainerPart) -> [GraphError] {
 		TimeRecorder.start(event: .validate)
 		defer { TimeRecorder.end(event: .validate) }
 		var errors: [GraphError] = []
 		
 		for (_, registrations) in containerPart.tokenInfo {
 			for registration in registrations {
-				errors += validate(registration: registration, collectedInfo: collectedInfo, containerPart: containerPart)
+				errors += validate(registration: registration, containerPart: containerPart)
 				if let severalRegistrationErr = validateSeveralRegistrationsForType(registrations: registrations, validatingRegistration: registration) {
 					errors.append(severalRegistrationErr)
 				}
@@ -47,19 +47,15 @@ final class GraphValidator {
 	}
 	
 	
-	private func validate(registration: RegistrationToken, collectedInfo: [String: Type], containerPart: ContainerPart) -> [GraphError] {
+	private func validate(registration: RegistrationToken, containerPart: ContainerPart) -> [GraphError] {
 		var errors: [GraphError] = []
-		guard let typeInfo = collectedInfo[registration.plainTypeName] else {
-			return errors
-		}
-		
 		for token in registration.tokenList {
 			switch token.underlyingValue {
 			case let alias as AliasToken:
-				errors += self.findErrors(inAlias: alias, collectedInfo: collectedInfo, typeInfo: typeInfo, registration: registration)
+				errors += self.findErrors(inAlias: alias, registration: registration)
 				
 			case let injection as InjectionToken:
-				errors += self.findErrors(inInjection: injection, collectedInfo: collectedInfo, containerPart: containerPart)
+				errors += self.findErrors(inInjection: injection, containerPart: containerPart)
 				
 			default:
 				break
@@ -70,34 +66,26 @@ final class GraphValidator {
 	}
 	
 	
-	private func findErrors(inAlias token: AliasToken, collectedInfo: [String: Type], typeInfo: Type, registration: RegistrationToken) -> [GraphError] {
-		var errors: [GraphError] = []
-		if !token.tag.isEmpty && collectedInfo[token.tag] == nil {
-			let info = buildTagTypeNotFoundMessage(tagName: token.tag)
-			errors.append(GraphError(infoString: info, location: token.location, kind: .validation))
-		}
+	private func findErrors(inAlias token: AliasToken, registration: RegistrationToken) -> [GraphError] {
+		let errors: [GraphError] = []
 		guard token.typeName != registration.typeName && !autoimplementedTypes.contains(token.typeName) else {
 			return errors
 		}
-		let inheritanceAndImplementations = typeInfo.inheritanceAndImplementations
-		for aliasType in token.decomposedTypes {
-			let aliasTypeName = nsObjectProtocolConvert(aliasType)
-			guard inheritanceAndImplementations[aliasTypeName] == nil && !typeInfo.inheritedTypes.contains(aliasTypeName) else { continue }
-			let info = buildNotFoundAliasMessage(alias: token)
-			errors.append(GraphError(infoString: info, location: token.location, kind: .validation))
-		}
+//		let inheritanceAndImplementations = typeInfo.inheritanceAndImplementations
+//		for aliasType in token.decomposedTypes {
+//			let aliasTypeName = nsObjectProtocolConvert(aliasType)
+//			guard inheritanceAndImplementations[aliasTypeName] == nil && !typeInfo.inheritedTypes.contains(aliasTypeName) else { continue }
+//			let info = buildNotFoundAliasMessage(alias: token)
+//			errors.append(GraphError(infoString: info, location: token.location, kind: .validation))
+//		}
 		return errors
 	}
 	
 	
-	private func findErrors(inInjection token: InjectionToken, collectedInfo: [String: Type], containerPart: ContainerPart) -> [GraphError] {
+	private func findErrors(inInjection token: InjectionToken, containerPart: ContainerPart) -> [GraphError] {
 		var errors: [GraphError] = []
 		let accessor = token.getRegistrationAccessor()
-		if !accessor.tag.isEmpty && collectedInfo[accessor.tag] == nil {
-			// Could not resolve tag
-			let info = buildTagTypeNotFoundMessage(tagName: accessor.tag)
-			errors.append(GraphError(infoString: info, location: token.location, kind: .validation))
-		} else if let registrations = containerPart.tokenInfo[accessor] {
+		if let registrations = containerPart.tokenInfo[accessor] {
 			let defaultCount = registrations.filter({ registration in
 				registration.tokenList.contains(where: { $0.underlyingValue is IsDefaultToken })
 			}).count
@@ -133,11 +121,6 @@ final class GraphValidator {
 	
 	private func buildHaseMoreThanOneDefaultRegistratioinsForType(registrationName: String) -> String {
 		return "Too many default registrations for \"\(registrationName)\" type. Make exact one of registration as default or delete redundant registration."
-	}
-	
-	
-	private func buildTagTypeNotFoundMessage(tagName: String) -> String {
-		return "Could not resolve \"\(tagName)\" type."
 	}
 	
 	

@@ -52,7 +52,7 @@ final class ASTEmitter: ASTEmitterProtocol {
   
   private func createASTFileURL(filePath: String) -> String {
     let cacheDirectory = resultCacher.cachePath(isCommonCache: false)
-    let fileName = filePath.bridge().lastPathComponent.bridge().deletingPathExtension + ".ast"
+    let fileName = ((filePath as NSString).lastPathComponent as NSString).deletingPathExtension + ".ast"
     return cacheDirectory + fileName
   }
 }

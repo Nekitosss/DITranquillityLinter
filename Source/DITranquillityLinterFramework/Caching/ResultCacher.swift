@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SourceKittenFramework
 
 final class ResultCacher {
 	
@@ -57,29 +56,6 @@ final class ResultCacher {
     try encodedData.write(to: cachePath)
     return cachePath
   }
-	
-	func cacheBinaryFiles(list: [FileParserResult], name: String, isCommonCache: Bool) throws {
-		TimeRecorder.start(event: .saveCache)
-		defer { TimeRecorder.end(event: .saveCache) }
-		
-		let encodedData = try encoder.encode(list)
-		let (cacheDirectory, cacheFileName) = self.getCacheURL(name: name, isCommonCache: isCommonCache)
-		try FileManager.default.createDirectory(atPath: cacheDirectory.path, withIntermediateDirectories: true, attributes: nil)
-		try encodedData.write(to: cacheFileName)
-	}
-	
-	func getCachedBinaryFiles(name: String, isCommonCache: Bool) throws -> [FileParserResult] {
-		TimeRecorder.start(event: .decodeBinary)
-		defer { TimeRecorder.end(event: .decodeBinary) }
-		
-		let cacheFileName = self.getCacheURL(name: name, isCommonCache: isCommonCache).fileName
-		let data = try Data(contentsOf: cacheFileName, options: [])
-		TimeRecorder.start(event: .mapBinary)
-		TimeRecorder.end(event: .mapBinary)
-		let decodedData = try decoder.decode([FileParserResult].self, from: data)
-		decodedData.forEach({ $0.updateRelationshipAfterDecoding() })
-		return decodedData
-	}
 	
 	private func getCacheURL(name: String, isCommonCache: Bool) -> (directory: URL, fileName: URL) {
 		let cacheDicectoryPlace = cachePath(isCommonCache: isCommonCache)

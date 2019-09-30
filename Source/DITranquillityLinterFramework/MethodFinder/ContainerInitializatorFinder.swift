@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SourceKittenFramework
 import ASTVisitor
 
 final class ContainerInitializatorFinder {
@@ -23,6 +22,7 @@ final class ContainerInitializatorFinder {
 		defer { TimeRecorder.end(event: .createTokens) }
 		
 		var intermediateResult: [ContainerIntermediatePart] = []
+    var publiclyAvailableParts = Set<String>()
 		for astFile in parsingContext.astFilePaths {
 			do {
 				let visitor = try Visitor(fileURL: URL(fileURLWithPath: astFile))
@@ -37,6 +37,9 @@ final class ContainerInitializatorFinder {
 					}
 					if let diPartDeclaration = self.extractDIPartDeclaration(node: node) {
 						self.parsingContext.parsedDIParts[diPartDeclaration.name] = diPartDeclaration.part
+            if let accessToken = node[tokenKey: .access].getOne()?.value, accessToken == "public" || accessToken == "open" {
+              publiclyAvailableParts.insert(diPartDeclaration.name)
+            }
 					}
 				}
 			} catch {
@@ -45,10 +48,19 @@ final class ContainerInitializatorFinder {
 		}
 		
 		let result = intermediateResult.map {
-			ContainerPart(name: $0.name, tokenInfo: compose(tokenList: $0.tokenInfo))
+      ContainerPart(name: $0.name, tokenInfo: compose(diPartStack: [], currentPartName: $0.name, tokenList: $0.tokenInfo))
 		}
+    
+    let publiclyAvailable = publiclyAvailableParts
+      .compactMap { self.parsingContext.parsedDIParts[$0] }
+      .map {
+        ContainerPart(name: $0.name,
+                      tokenInfo: compose(diPartStack: [],
+                                         currentPartName: $0.name.map(changeToExactValue),
+                                         tokenList: $0.tokenInfo))
+    }
 		
-		return result
+		return result + publiclyAvailable
 	}
 	
 	private func extractTypealias(node: ASTNode, parents: [ASTNode]) -> TypealiasDeclaration? {
@@ -59,7 +71,7 @@ final class ContainerInitializatorFinder {
 		return typealiasInfo
 	}
 	
-	private func compose(tokenList: [DIToken]) -> [RegistrationAccessor: [RegistrationToken]] {
+  private func compose(diPartStack: [String], currentPartName: String?, tokenList: [DIToken]) -> [RegistrationAccessor: [RegistrationToken]] {
 		let tokenListWithResolvedTypealiases = changeTypealaisesToExactValues(tokenList: tokenList)
 		return tokenListWithResolvedTypealiases.reduce(into: [:]) { result, token in
 			switch token {
@@ -74,7 +86,27 @@ final class ContainerInitializatorFinder {
 				
 			case .futureAppend(let futureContainer):
 				guard let containerPart = self.parsingContext.parsedDIParts[futureContainer.typeName] else { return }
-				compose(tokenList: containerPart.tokenInfo)
+        
+        var diPartStack = diPartStack
+        if let partName = currentPartName {
+          if diPartStack.contains(partName) {
+            let message = "Invalid DIPart appending: \(diPartStack.joined(separator: ", ")) and trying to append \(partName) that already exists in append stack."
+            let error = GraphError(infoString: message, location: futureContainer.location, kind: .circularPartAppending)
+            self.parsingContext.errors.append(error)
+            return
+            
+          } else if partName == futureContainer.typeName {
+            let message = "Invalid DIPart appending: you are trying to append part to itself."
+            let error = GraphError(infoString: message, location: futureContainer.location, kind: .circularPartAppending)
+            self.parsingContext.errors.append(error)
+            return
+            
+          } else {
+            diPartStack.append(partName)
+          }
+        }
+        
+        compose(diPartStack: diPartStack, currentPartName: futureContainer.typeName, tokenList: containerPart.tokenInfo)
 					.forEach { result[$0, default: []] += $1 }
 				
 			default:
@@ -88,24 +120,24 @@ final class ContainerInitializatorFinder {
 		return tokenList.map {
 			switch $0 {
 			case .registration(var token):
-				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
-				token.plainTypeName = changeToExactValue(typealiasName: token.plainTypeName, location: token.location)
+				token.typeName = changeToExactValue(typealiasName: token.typeName)
+				token.plainTypeName = changeToExactValue(typealiasName: token.plainTypeName)
 				token.tokenList = changeTypealaisesToExactValues(tokenList: token.tokenList)
 				return token.diTokenValue
 			case .injection(var token):
-				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
-				token.plainTypeName = changeToExactValue(typealiasName: token.plainTypeName, location: token.location)
+				token.typeName = changeToExactValue(typealiasName: token.typeName)
+				token.plainTypeName = changeToExactValue(typealiasName: token.plainTypeName)
 				return token.diTokenValue
 			case .alias(var token):
-				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
-				token.plainTypeName = changeToExactValue(typealiasName: token.plainTypeName, location: token.location)
-				token.tag = changeToExactValue(typealiasName: token.tag, location: token.location)
+				token.typeName = changeToExactValue(typealiasName: token.typeName)
+				token.plainTypeName = changeToExactValue(typealiasName: token.plainTypeName)
+				token.tag = changeToExactValue(typealiasName: token.tag)
 				return token.diTokenValue
 			case .futureAppend(var token):
-				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				token.typeName = changeToExactValue(typealiasName: token.typeName)
 				return token.diTokenValue
 			case .append(var token):
-				token.typeName = changeToExactValue(typealiasName: token.typeName, location: token.location)
+				token.typeName = changeToExactValue(typealiasName: token.typeName)
 				return token.diTokenValue
 			case .isDefault:
 				return $0
@@ -113,7 +145,7 @@ final class ContainerInitializatorFinder {
 		}
 	}
 	
-	private func changeToExactValue(typealiasName: String, location: Location) -> String {
+	private func changeToExactValue(typealiasName: String) -> String {
 		guard let typealiasValue = self.parsingContext.typealiasInfo[typealiasName] else { return typealiasName }
 		return TypeName.onlyUnwrappedName(name: typealiasValue.sourceTypeName)
 	}
@@ -168,45 +200,7 @@ final class ContainerInitializatorFinder {
 		return (containerPartName, containerPart)
 	}
 	
-	private func getProssibleContainerTypeHolders() -> [Type] {
-		var possibleContainerValues = parsingContext.collectedInfo.values.filter {
-			$0.inheritedTypes.contains(DIKeywords.diPart.rawValue)
-				|| $0.inheritedTypes.contains(DIKeywords.diFramework.rawValue)
-				|| $0.inheritedTypes.contains(DIKeywords.xcTestCase.rawValue)
-		}
-		if let appDelegateClass = parsingContext.collectedInfo[DIKeywords.appDelegate.rawValue] {
-			possibleContainerValues.insert(appDelegateClass, at: 0)
-		}
-		return possibleContainerValues
-	}
-	
-	
-//	private func recursivelyFindContainerAndBuildGraph(list: [SourceKitStructure], file: File) -> [ContainerPart] {
-//		return list
-//			.enumerated()
-//			.filter { self.isContainerInitialization(structure: $1) }
-//			.compactMap { self.buildContainerPart(containerInitIndex: $0, structure: $1, file: file, list: list) }
-//			+ list.flatMap { self.recursivelyFindContainerAndBuildGraph(list: $0.substructures, file: file) }
-//	}
-	
 	private func buildContainerPart(list: [ASTNode]) -> ContainerIntermediatePart? {
 			return ContainerIntermediatePart(substructureList: list, parsingContext: parsingContext, containerParsingContext: ContainerParsingContext(), currentPartName: nil, diPartNameStack: [])
-	}
-	
-	private func isContainerInitialization(structure: SourceKitStructure) -> Bool {
-		let isDiContainerInitializerMethodName = structure.nameIs(DIKeywords.initDIContainer) || structure.nameIs(DIKeywords.diContainer)
-		return isDiContainerInitializerMethodName && structure.isKind(of: SwiftExpressionKind.call)
-	}
-	
-	private func extractPublicDIPart(type: Type, file: File, parsingContext: GlobalParsingContext) -> [ContainerPart] {
-		guard type.isPubliclyAvailable else {
-			return []
-		}
-		return []
-//		let loadContainerSubstructure = type.substructure
-//			.filter { $0.get(.name) == "load(container:)" }
-//			.flatMap { $0.substructures }
-//
-//		return [ContainerPart(substructureList: loadContainerSubstructure, file: file, parsingContext: parsingContext, containerParsingContext: ContainerParsingContext(), currentPartName: type.name, diPartNameStack: [])]
 	}
 }

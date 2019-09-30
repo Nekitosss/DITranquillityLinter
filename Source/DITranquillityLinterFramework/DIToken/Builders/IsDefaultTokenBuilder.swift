@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SourceKittenFramework
 
 /// Trying to create IsDefaultToken
 final class IsDefaultTokenBuilder: TokenBuilder {

@@ -6,26 +6,11 @@
 //
 
 
-import SourceKittenFramework
 import Foundation
 import ASTVisitor
 
 final class ContainerPartBuilder {
-	
-	static func argumentInfo(substructures: [SourceKitStructure], content: NSString) -> [ArgumentInfo] {
-		return substructures.compactMap { structure in
-			
-			guard
-				structure.isKind(of: SwiftExpressionKind.argument),
-				let body = structure.body(using: content),
-				let (nameOffset, nameLength) = structure.getNameInfo()
-				else { return nil }
-			let name = nameLength > 0 ? content.substringUsingByteRange(start: nameOffset, length: nameLength) ?? "_" : "_"
-			return ArgumentInfo(name: name, value: body, structure: structure)
-		}
-	}
-	
-	
+
 	private let parsingContext: GlobalParsingContext
 	private let containerParsingContext: ContainerParsingContext
 	private let currentPartName: String?
@@ -149,8 +134,7 @@ final class ContainerPartBuilder {
 				let possibleCallee = loadContainerBodyPart[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.last,
 				let declIndex = possibleCallee.info.firstIndex(where: { $0.key == TokenKey.decl.rawValue }),
 				!isDIDeclarationValue(decl: possibleCallee.info[declIndex].value), // NOT!
-				let calleeRange = possibleCallee.info[declIndex].value.range(of: "Name.\\(file\\).[a-zA-Z\\d_-]+.load\\(container:\\).[a-zA-Z\\d_-]+@", options: .regularExpression)
-				{
+				let calleeRange = possibleCallee.info[declIndex].value.range(of: "Name.\\(file\\).[a-zA-Z\\d_-]+.load\\(container:\\).[a-zA-Z\\d_-]+@", options: .regularExpression) {
 					let fullCallee = possibleCallee.info[declIndex].value[calleeRange]
 					let rawCallee = fullCallee.split(separator: ".").last?.dropLast()
 					callee = rawCallee.map { String($0) }

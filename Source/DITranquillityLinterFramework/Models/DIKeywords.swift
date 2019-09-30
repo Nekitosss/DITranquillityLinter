@@ -14,6 +14,7 @@ enum DIKeywords: String {
 	case `default` = "extension.default()"
 	case `as` = "extension.as"
     case taggedAlias = "extension.as(check:tag:_:)"
+  case checkedAlias = "extension.as(check:_:)"
 	case check = "check"
 	case tag = "tag"
 	case by = "by"

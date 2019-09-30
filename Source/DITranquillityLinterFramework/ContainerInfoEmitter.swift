@@ -9,23 +9,19 @@ import Foundation
 
 public final class ContainerInfoEmitter {
 	
-	let container: FileContainer
-	
 	private let isTestEnvironment: Bool
-	private let moduleParser: ModuleParser
 	private let tokenCacher: DependencyTokenCacher
+  private let astEmitter: ASTEmitter
 	
-	init(isTestEnvironment: Bool, fileContainer: FileContainer, moduleParser: ModuleParser, tokenCacher: DependencyTokenCacher) {
+	init(isTestEnvironment: Bool, tokenCacher: DependencyTokenCacher, astEmitter: ASTEmitter) {
 		self.isTestEnvironment = isTestEnvironment
-		self.moduleParser = moduleParser
-		self.container = fileContainer
 		self.tokenCacher = tokenCacher
+    self.astEmitter = astEmitter
 	}
 	
 	public func process(files: [String], outputFilePath: URL) throws -> Bool {
-		let filteredFiles = files.filter(moduleParser.shouldBeParsed)
-		let collectedInfo = try moduleParser.collectInfo(files: filteredFiles)
-		let parsingContext = GlobalParsingContext(container: container, collectedInfo: collectedInfo, astFilePaths: [])
+    let astFiles = try astEmitter.emitAST(from: files)
+		let parsingContext = GlobalParsingContext(astFilePaths: astFiles)
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: parsingContext)
 		
 		let initContainerStructureList = containerBuilder.findContainerStructure(separatlyIncludePublicParts: true)

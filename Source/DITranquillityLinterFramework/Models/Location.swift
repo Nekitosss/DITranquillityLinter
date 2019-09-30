@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import SourceKittenFramework
 import ASTVisitor
 
 public struct Location: CustomStringConvertible, Equatable, Codable {
@@ -33,17 +32,6 @@ public struct Location: CustomStringConvertible, Equatable, Codable {
 		self.file = visitorLocation.file
 		self.line = visitorLocation.line
 		self.character = visitorLocation.char
-	}
-	
-	public init(file: File, byteOffset offset: Int64?) {
-		self.file = file.path
-		if let offset = offset, let lineAndCharacter = file.contents.bridge().lineAndCharacter(forByteOffset: Int(offset)) {
-			line = lineAndCharacter.line
-			character = lineAndCharacter.character
-		} else {
-			line = nil
-			character = nil
-		}
 	}
 }
 
