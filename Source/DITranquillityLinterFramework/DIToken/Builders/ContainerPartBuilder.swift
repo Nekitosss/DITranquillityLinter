@@ -154,14 +154,22 @@ final class ContainerPartBuilder {
 					let fullCallee = possibleCallee.info[declIndex].value[calleeRange]
 					let rawCallee = fullCallee.split(separator: ".").last?.dropLast()
 					callee = rawCallee.map { String($0) }
-			}
-			
-//			else if info.argumentStack.contains(where: { $0.value == parsingContext.currentContainerName }) {
-//				let message = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
-//				let invalidCallError = GraphError(infoString: message, location: info.location, kind: .parsing)
-//				parsingContext.errors.append(invalidCallError)
-//			}
+      }
 		}
+    
+    if let dotSyntaxCall = loadContainerBodyPart[.dotSyntaxCallExpr].getOne(), let anotherMethodCall = dotSyntaxCall[tokenKey: .type].getOne()?.value {
+      
+      let regexp = "DIContainer"
+      if anotherMethodCall.range(of: regexp, options: .regularExpression) != nil {
+        let message = "You should use \(DIKeywords.diFramework.rawValue) or \(DIKeywords.diPart.rawValue) for injection purposes"
+        let astLocation = dotSyntaxCall.typedNode.unwrap(DotSyntaxCall.self)?.location
+        let location = astLocation.map(Location.init(visitorLocation:)) ?? Location(file: nil)
+        let invalidCallError = GraphError(infoString: message,
+                                          location: location,
+                                          kind: .parsing)
+        parsingContext.errors.append(invalidCallError)
+      }
+    }
 		
 		for substructure in loadContainerBodyPart.children {
 			result += processLoadContainerBodyPart(loadContainerBodyPart: substructure, tokenList: &tokenList, callee: &callee)

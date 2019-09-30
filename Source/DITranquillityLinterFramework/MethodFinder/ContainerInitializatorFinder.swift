@@ -190,23 +190,7 @@ final class ContainerInitializatorFinder {
 //	}
 	
 	private func buildContainerPart(list: [ASTNode]) -> ContainerIntermediatePart? {
-//		if containerInitIndex == 0 {
-//			// something like "var container: DIContainer!"
-//			// We cannot handle it yet
-//			let nameInfo = structure.getNameInfo()
-//
-//			let location = Location(file: file, byteOffset: nameInfo?.offset)
-//			let error = GraphError(infoString: "Incorrect graph initialization. DIContainer should be filled", location: location, kind: .parsing)
-//			parsingContext.errors.append(error)
-//			return nil
-//
-//		} else if containerInitIndex > 0 {
-			// .init call should be after variable name declaration. So index should be greater than 0
-//			parsingContext.currentContainerName = list[containerInitIndex - 1].get(.name) ?? DIKeywords.container.rawValue
 			return ContainerIntermediatePart(substructureList: list, parsingContext: parsingContext, containerParsingContext: ContainerParsingContext(), currentPartName: nil, diPartNameStack: [])
-//		} else {
-//			return nil
-//		}
 	}
 	
 	private func isContainerInitialization(structure: SourceKitStructure) -> Bool {

@@ -20,10 +20,10 @@ private class ParsablePart2: DIPart {
 	}()
 	
 	static func load(container: DIContainer) {
-		invalidInjectionMethod(container)
+    invalidInjectionMethod(container, str: "")
 	}
 	
-	static func invalidInjectionMethod(_ c: DIContainer) {
+  static func invalidInjectionMethod(_ c: DIContainer, str: String) {
 		c.register(MyClass2.init)
 	}
 }

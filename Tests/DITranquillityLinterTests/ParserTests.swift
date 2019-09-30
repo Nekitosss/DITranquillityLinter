@@ -36,7 +36,9 @@ final class ParserTests: XCTestCase {
 	func testInvalidMethodCallingRegistration() throws {
 		let tokenizer: Tokenizer = container.resolve()
 		let fileURL = pathToSourceFile(with: "TestInvalidMethodCallingRegistration")
-		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [])
+    let astEmitter: ASTEmitter = container.resolve()
+    let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
+		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [astFilePath])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		let containerPart = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 		
@@ -48,7 +50,9 @@ final class ParserTests: XCTestCase {
 	func testInitialDefinitionInvalidMethodCallingRegistration() throws {
 		let tokenizer: Tokenizer = container.resolve()
 		let fileURL = pathToSourceFile(with: "TestInitialDefinitionInvalidMethodCallingRegistration")
-		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [])
+    let astEmitter: ASTEmitter = container.resolve()
+    let astFilePath = try astEmitter.emitAST(from: [fileURL]).first!
+		let context = try GlobalParsingContext(container: tokenizer.container, collectedInfo: tokenizer.collectInfo(files: [fileURL]), astFilePaths: [astFilePath])
 		let containerBuilder = ContainerInitializatorFinder(parsingContext: context)
 		let containerPart = containerBuilder.findContainerStructure(separatlyIncludePublicParts: false)
 		
@@ -58,9 +62,14 @@ final class ParserTests: XCTestCase {
 	
 	// Space in file name
 	func testSpacedPlainRegistration() throws {
-		let containerInfo = try findContainerStructure(fileName: " TestSpacedPlainRegistration")
-		let registration = try extractRegistrationInfo(containerInfo: containerInfo)
-		XCTAssertEqual(registration.typeName, "MyClass")
+    do {
+      _ = try findContainerStructure(fileName: " TestSpacedPlainRegistration")
+      XCTFail("We should throw error then path contain spaces.")
+    } catch let error as GraphError where error.kind == .parsing {
+      return
+    } catch {
+      throw error
+    }
 	}
 	
 	// Two containers in single file
