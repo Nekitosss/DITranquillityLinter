@@ -46,7 +46,9 @@ public enum EnvVariable: String {
 		case .defaultTarget:
 			return "x86_64-apple-macos10.10"
 		case .defaultSDK:
-			return shell(command: "xcrun --show-sdk-path") ?? "NOT-FOUND"
+			let commandLineToolsPath = shell(command: "xcode-select -p")?.trimmingCharacters(in: .whitespacesAndNewlines)
+				?? "/Applications/Xcode.app/Contents/Developer"
+			return commandLineToolsPath + "/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
 		case .testableProjectFolder:
 			return "/Users/nikita/development/fooddly/Fooddly/"
 		case .testableProjectName:
