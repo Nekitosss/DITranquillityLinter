@@ -8,18 +8,18 @@ env:
   global:
     - LC_CTYPE=en_US.UTF-8
     - LANG=en_US.UTF-8
-    - DI_LINTER_PROJECT_FOLDER=$TRAVIS_BUILD_DIR
     - DI_LINTER_DEFAULT_TARGET='x86_64-apple-macosx10.10'
 before_install:
+  - curl -L -O https://github.com/Carthage/Carthage/releases/download/0.33.0/Carthage.pkg
+  - sudo installer -pkg Carthage.pkg -target /
   - curl -L -O https://github.com/realm/SwiftLint/releases/download/0.28.2/SwiftLint.pkg
   - sudo installer -pkg SwiftLint.pkg -target /
   - bundle install
-  - swift package --version
+  - brew install make
   - swift package resolve
-  - Scripts/generate-xcodeproj.sh
 script:
   - swiftlint
-  - swift test
+  - make test
 notifications:
   email:
     on_success: never

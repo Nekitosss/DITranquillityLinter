@@ -74,7 +74,7 @@ func pathToSourceFile(with name: String) -> String {
 }
 
 func testBundlePath() -> String {
-	return FileManager.default.currentDirectoryPath + "/TestFiles.bundle"
+	return Bundle(for: Tokenizer.self).path(forResource: "TestFiles", ofType: "bundle")!
 }
 
 func pathsToSourceFiles() -> [String] {

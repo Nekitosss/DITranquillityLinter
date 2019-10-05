@@ -52,5 +52,8 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
-LintableProject/Pods
 DITranquillityLinter.xcodeproj
+
+TestFiles.bundle/Build
+*.lintcache
+.swiftpm

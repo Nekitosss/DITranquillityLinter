@@ -2,7 +2,7 @@ import Commandant
 import Dispatch
 import Foundation
 import DITranquillityLinterFramework
-import xcodeproj
+import XcodeProj
 import PathKit
 import Yams
 

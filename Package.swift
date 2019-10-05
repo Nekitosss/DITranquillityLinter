@@ -4,14 +4,14 @@ import PackageDescription
 let package = Package(
 	name: "DITranquillityLinter",
 	products: [
-		.executable(name: "ditranquillity", targets: ["DITranquillityLinter"]),
+		.executable(name: "dilinter", targets: ["DITranquillityLinter"]),
 	],
 	dependencies: [
-		.package(url: "https://github.com/tuist/xcodeproj.git", .upToNextMajor(from: "6.0.1")),
-		.package(url: "https://github.com/kylef/PathKit.git", .upToNextMajor(from: "0.9.2")),
-		.package(url: "https://github.com/Carthage/Commandant.git", from: "0.15.0"),
-		.package(url: "https://github.com/jpsim/Yams.git", from: "1.0.1"),
-		.package(url: "https://github.com/ivlevAstef/DITranquillity", from: "3.6.3"),
+		.package(url: "https://github.com/tuist/xcodeproj.git", .upToNextMajor(from: "7.0.0")),
+		.package(url: "https://github.com/kylef/PathKit.git", .upToNextMajor(from: "1.0.0")),
+		.package(url: "https://github.com/Carthage/Commandant.git", from: "0.17.0"),
+		.package(url: "https://github.com/jpsim/Yams.git", .upToNextMajor(from: "2.0.0")),
+		.package(url: "https://github.com/ivlevAstef/DITranquillity", .upToNextMajor(from: "3.0.0")),
 		.package(url: "https://github.com/Nekitosss/swift-ast-visitor.git", from: "0.0.1"),
 	],
 	targets: [
@@ -26,7 +26,7 @@ let package = Package(
 		.target(
 			name: "DITranquillityLinterFramework",
 			dependencies: [
-				"xcodeproj",
+				"XcodeProj",
 				"PathKit",
 				"DITranquillity",
 				"ASTVisitor",

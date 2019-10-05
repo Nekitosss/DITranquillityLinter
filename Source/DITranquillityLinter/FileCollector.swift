@@ -1,7 +1,7 @@
 
 import Foundation
 import DITranquillityLinterFramework
-import xcodeproj
+import XcodeProj
 
 final class FileCollector {
 	

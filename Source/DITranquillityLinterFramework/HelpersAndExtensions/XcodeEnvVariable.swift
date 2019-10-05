@@ -44,17 +44,15 @@ public enum EnvVariable: String {
 	public var defaultValue: String {
 		switch self {
 		case .defaultTarget:
-			return "x86_64-apple-ios8.0-simulator"
+			return "x86_64-apple-macos10.10"
 		case .defaultSDK:
-			let commandLineToolsPath = shell(command: "xcode-select -p")?.trimmingCharacters(in: .whitespacesAndNewlines)
-				?? "/Applications/Xcode.app/Contents/Developer"
-			return commandLineToolsPath + "/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
+			return shell(command: "xcrun --show-sdk-path") ?? "NOT-FOUND"
 		case .testableProjectFolder:
 			return "/Users/nikita/development/fooddly/Fooddly/"
 		case .testableProjectName:
 			return "Fooddly.xcodeproj"
 		case .frameworkSearchPath:
-			return FileManager.default.currentDirectoryPath + "/TestFiles.bundle/"
+			return Bundle.init(for: Tokenizer.self).path(forResource: "TestFiles", ofType: "bundle")! + "/Build/Mac/"
 		}
 	}
 	
