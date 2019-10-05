@@ -9,17 +9,21 @@
 import Foundation
 
 /// Total collected info about registration
-struct RegistrationToken: DIToken {
+struct RegistrationToken: Codable {
+	
+	var isIntermediate: Bool {
+		return false
+	}
 	
 	/// Unique type name of registration. With resolved generic constraints and typealiases
-	let typeName: String
+	var typeName: String
 	
 	/// Type name for accessing [String: Type] dicationary for getting all collected info of type
-	let plainTypeName: String
+	var plainTypeName: String
 	
 	/// Location of registration token (For printing message in XCode)
 	let location: Location
 	
 	/// Collected tokens of registration. Injection info, isDefault component info
-	let tokenList: [DIToken]
+	var tokenList: [DIToken]
 }

@@ -1,41 +1,83 @@
-//
-//  AppendContainerTokenBuilder.swift
-//  DITranquillityLinterFramework
-//
-//  Created by Nikita Patskov on 28/09/2018.
-//
 
 import Foundation
-import SourceKittenFramework
+import ASTVisitor
 
 /// Trying to create AppendContainerToken
-final class AppendContainerTokenBuilder {
+final class AppendContainerTokenBuilder: TokenBuilder {
 	
-	static func build(functionName: String, parsingContext: ParsingContext, argumentStack: [ArgumentInfo], currentPartName: String?, location: Location) -> AppendContainerToken? {
-		guard functionName == DIKeywords.append.rawValue,
-			let appendInfo = argumentStack.first,
-			argumentStack.count == 1 else { return nil }
+	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
 		
-		let value = appendInfo.value.droppedDotSelf()
-		let isDIPart: (ArgumentInfo) -> Bool = {
-			return ($0.name == "part" && (parsingContext.collectedInfo[value]?.inheritedTypes ?? []).contains(DIKeywords.diPart.rawValue))
-				|| ($0.name == "framework" && (parsingContext.collectedInfo[value]?.inheritedTypes ?? []).contains(DIKeywords.diFramework.rawValue))
+		guard
+			info.functionName == DIKeywords.appendPart.rawValue || info.functionName == DIKeywords.appendFramework.rawValue,
+			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getOne()?.typedNode.unwrap(DeclrefExpression.self),
+			let astLocation = declrefExpr.location,
+			let appendedType = info.node[.tupleExpr][.erasureExpr][.dotSelfExpr][.typeExpr].getOne()?[tokenKey: .typerepr].getOne()?.value
+			else { return nil }
+		let location = Location(visitorLocation: astLocation)
+		if let containerPart = info.parsingContext.cachedContainers[appendedType] {
+			return AppendContainerToken(location: location, typeName: appendedType, containerPart: containerPart)
+		} else {
+			return FutureAppendContainerToken(location: location, typeName: appendedType)
 		}
-		let typeName = value
-		guard isDIPart(appendInfo),
-			typeName != currentPartName // Circular append block. TODO: Throw XCode error
-			else { return nil }
-		guard let swiftType = parsingContext.collectedInfo[typeName],
-			let loadContainerStructure = swiftType.substructure.first(where: { $0.get(.name, of: String.self) == DIKeywords.loadContainer.rawValue })
-			else { return nil }
 		
-		let anotherFile = parsingContext.fileContainer[swiftType.filePath]!
-		let oldContainerName = parsingContext.currentContainerName
-		parsingContext.currentContainerName = DIKeywords.container.rawValue
-		let containerPart = ContainerPart(substructureList: loadContainerStructure.substructures, file: anotherFile, parsingContext: parsingContext, currentPartName: typeName)
-		parsingContext.currentContainerName = oldContainerName
+//		let typeName = appendInfo.value.droppedDotSelf()
+//
+//		if info.diPartNameStack.contains(typeName) {
+//			// Handle circular DIPart append
+//			let appendDIChain = (info.diPartNameStack + [typeName]).joined(separator: " -> ")
+//			let error = GraphError(infoString: "Circular dependency: \(appendDIChain)", location: info.location, kind: .circularPartAppending)
+//			info.parsingContext.errors.append(error)
+//			return nil
+//		}
+//
+//		guard let containerPart =
+//			self.tryParseContainerPartInCurrentModule(info: info, appendInfo: appendInfo, typeName: typeName)
+//			?? info.parsingContext.cachedContainers[typeName]
+//			else { return nil }
+//
+//		guard validateAlreadyAppendedPartToThisContainer(info: info, typeName: typeName) else {
+//			return nil
+//		}
 		
-		return AppendContainerToken(location: location, typeName: typeName, containerPart: containerPart)
+		
 	}
+	
+//	private func tryParseContainerPartInCurrentModule(info: TokenBuilderInfo, appendInfo: ArgumentInfo, typeName: String) -> ContainerPart? {
+//		guard
+//			let swiftType = info.parsingContext.collectedInfo[typeName],
+//			self.isDIPart(appendInfo, swiftType: swiftType),
+//			let loadContainerStructure = swiftType.substructure.first(where: { $0.nameIs(DIKeywords.loadContainer) }),
+//			let newContainerPartFile = info.parsingContext.fileContainer.getOrCreateFile(by: swiftType.filePath)
+//			else { return nil }
+//		return nil
+////		let oldContainerName = info.parsingContext.currentContainerName
+////		info.parsingContext.currentContainerName = DIKeywords.container.rawValue
+////		let containerPart = ContainerPart(substructureList: loadContainerStructure.substructures,
+////										  file: newContainerPartFile,
+////										  parsingContext: info.parsingContext,
+////										  containerParsingContext: info.containerParsingContext,
+////										  currentPartName: typeName,
+////										  diPartNameStack: info.diPartNameStack)
+////		info.parsingContext.currentContainerName = oldContainerName
+////		return containerPart
+//	}
+//
+//	private func isDIPart(_ argumentInfo: ArgumentInfo, swiftType: Type) -> Bool {
+//		return (argumentInfo.name == DIKeywords.part.rawValue && swiftType.inheritedTypes.contains(DIKeywords.diPart.rawValue))
+//			|| (argumentInfo.name == DIKeywords.framework.rawValue && swiftType.inheritedTypes.contains(DIKeywords.diFramework.rawValue))
+//	}
+//	
+//	private func validateAlreadyAppendedPartToThisContainer(info: TokenBuilderInfo, typeName: String) -> Bool {
+//		if var previousParsedLocations = info.containerParsingContext.parsedParts[typeName] {
+//			previousParsedLocations.append(info.location)
+//			info.containerParsingContext.parsedParts[typeName] = previousParsedLocations
+//			let warning = GraphWarning(infoString: "\(typeName) was already included to container", location: info.location)
+//			info.parsingContext.warnings.append(warning)
+//			return false
+//		} else {
+//			info.containerParsingContext.parsedParts[typeName] = [info.location]
+//			return true
+//		}
+//	}
 	
 }

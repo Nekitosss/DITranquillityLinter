@@ -1,17 +1,24 @@
 language: swift
-osx_image: xcode10.1
-
+osx_image: xcode11
 git:
   submodules: false
-
 env:
   global:
-    - LC_CTYPE=en_US.UTF-8
-    - LANG=en_US.UTF-8
-    - DI_LINTER_PROJECT_FOLDER=$TRAVIS_BUILD_DIR
+  - LC_CTYPE=en_US.UTF-8
+  - LANG=en_US.UTF-8
+  - DI_LINTER_DEFAULT_TARGET='x86_64-apple-macosx10.10'
+  - secure: Y6Ex2JUoEf3+rHF0aVWdpJ94nWjEzidkVqLdB+a9pGWSNiHot2+uVgCVMCnw5KVWtK76XYAXwzaHw8MlpUZxt/87QGYADiMBw3LMcRfoXYvcpsDLalpLbxfBR2MZXq2F0oMIdqAcSjsKj5adJVe2qwqlXG4Kf2jOeQgsbemBcjL3WjijqIx3zWpJWAfc5rN0a69iATl304Qt3vAlQzBhVbIeS5YQHSGNKMhDwYkGD/gGVYkNXjdamQXWe/mo5Um/xCvV1BNja/do+QMj5PBfdL9l+ww8uZmZlAkEphV01kjiV5AsyV7qjSGuGJ1c0v8YWFv/IbhaGTTsnXFKdT9s+dCgSoSBcR6Z3t7GQKjLyXoXIOowmm/sYpjKcw2LuUIDcdLwtc8n29hV1tYVFVY0oQHqPxOhDg8OtqQq2lDNvivJUfNqvd7LqBN1Ql48wRVkgo2qLP8OWE9+xCfxOSNDyG+18RsZlD36ZjcgwUhc+LiZ+17iUTwLtJc73aVCqGQiySTQEy8mJSYqLeeVgVne2xc9x0u7t6z34JugBH+b8rfcM4jbPoCAdtRdaszgQfashZy4mEPaZmcq7xv/zr5a3dnSr9p0sL4W8Tnczcqk3MbGs2eMbvoVbL3Hb2BQi3ysBLeAjNkIg9x9SNUW8RKxMpSolo8N8D06mepbwMxC5fg=
+before_install:
+- curl -L -O https://github.com/Carthage/Carthage/releases/download/0.33.0/Carthage.pkg
+- sudo installer -pkg Carthage.pkg -target /
+- curl -L -O https://github.com/realm/SwiftLint/releases/download/0.28.2/SwiftLint.pkg
+- sudo installer -pkg SwiftLint.pkg -target /
+- bundle install
+- brew install make
+- swift package resolve
 script:
-  - swift package resolve
-  - swift test
+- swiftlint
+- make test
 notifications:
   email:
     on_success: never

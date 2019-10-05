@@ -6,128 +6,159 @@
 //
 
 import Foundation
-import SourceKittenFramework
+import ASTVisitor
 
 /// Trying to create RegsitrationToken. Resolves containing InjectionToken types.
-final class RegistrationTokenBuilder {
+final class RegistrationTokenBuilder: TokenBuilder {
 	
-	typealias RegistrationInfo = (typeName: String, plainTypeName: String, tokenList: [DIToken])
+	typealias RegistrationInfo = (typeName: String, plainTypeName: String, tokenList: [DITokenConvertible])
 	
-	static func build(functionName: String, invocationBody: String, tokenList: [DIToken], parsingContext: ParsingContext, substructureList: [[String : SourceKitRepresentable]], content: NSString, bodyOffset: Int64, file: File) -> RegistrationToken? {
-		guard functionName == DIKeywords.register.rawValue || functionName == DIKeywords.register1.rawValue else {
-			return nil
-		}
+	func build(using info: TokenBuilderInfo) -> DITokenConvertible? {
+		guard info.functionName == DIKeywords.initializerRegister.rawValue || info.functionName == DIKeywords.typeRegister.rawValue,
+			let declrefExpr = info.node[.dotSyntaxCallExpr][.declrefExpr].getSeveral()?.first?.typedNode.unwrap(DeclrefExpression.self),
+			let astLocation = declrefExpr.location
+			else { return nil }
+		let location = Location(visitorLocation: astLocation)
 		
-		var info: RegistrationInfo = ("", "", tokenList)
+		var registrationInfo: RegistrationInfo = ("", "", info.tokenList)
 		
-		// TODO: process generics here
-		if let typedRegistration = invocationBody.firstMatch(RegExp.trailingTypeInfo) {
-			// container.register(MyClass.self)
-			info.typeName = typedRegistration.droppedDotSelf()
-			info.plainTypeName = TypeFinder.parseTypeName(name: info.typeName).typeName
-		}
-		let plainInfo = extractPlainRegistration(substructureList: substructureList, invocationBody: invocationBody, parsingContext: parsingContext, file: file, bodyOffset: bodyOffset)
-			?? extractClosureRegistration(substructureList: substructureList, parsingContext: parsingContext, content: content, file: file, bodyOffset: bodyOffset)
-		if let plainInfo = plainInfo {
-			info.typeName = plainInfo.typeName
-			info.plainTypeName = plainInfo.plainTypeName
-			info.tokenList += plainInfo.tokenList
-		}
-		info.typeName = parsingContext.collectedInfo[info.typeName]?.name ?? info.typeName
-		info.typeName = info.typeName.trimmingCharacters(in: .whitespacesAndNewlines)
-		info.plainTypeName = info.plainTypeName.trimmingCharacters(in: .whitespacesAndNewlines)
-		
-		// Class registration by default available by its own type without tag.
-		let location = Location(file: file, byteOffset: bodyOffset)
-		let aliasToken = AliasToken(typeName: info.typeName, tag: "", location: location)
-		info.tokenList.append(aliasToken)
-		
-		info.tokenList = fillTokenListWithInfo(input: info.tokenList, registrationTypeName: info.typeName, parsingContext: parsingContext, content: content, file: file)
-		return RegistrationToken(typeName: info.typeName, plainTypeName: info.plainTypeName, location: location, tokenList: info.tokenList)
-	}
-	
-	private static func extractPlainRegistration(substructureList: [SourceKitStructure], invocationBody: String, parsingContext: ParsingContext, file: File, bodyOffset: Int64) -> RegistrationInfo? {
-		// container.register(MyClass.init)
-		guard substructureList.isEmpty && !invocationBody.hasSuffix(".self") else { return nil }
-		let (typeName, fullTypeName, genericType) = TypeFinder.parseTypeName(name: invocationBody)
-		guard let dotIndex = invocationBody.lastIndex(of: ".") else { return nil }
-		let signatureText = String(invocationBody[invocationBody.index(after: dotIndex)...])
-		let methodSignature = MethodSignature(name: signatureText, injectableArgumentInfo: [], injectionModificators: [:])
-		
-		var tokenList: [DIToken] = []
-		if let methodInjection = TypeFinder.findMethodInfo(methodSignature: methodSignature, initialObjectName: typeName, parsingContext: parsingContext, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset, forcedAllInjection: true) {
-			tokenList = methodInjection as [DIToken]
-		}
-		return (fullTypeName, typeName, tokenList)
-	}
-	
-	private static func extractClosureRegistration(substructureList: [SourceKitStructure], parsingContext: ParsingContext, content: NSString, file: File, bodyOffset: Int64)  -> RegistrationInfo? {
-		// container.register { MyClass.init($0, $1) }
-		guard substructureList.count == 1 else { return nil }
-		var substructure = substructureList[0]
-		guard let closureKind: String = substructure.get(.kind), closureKind == SwiftExpressionKind.closure.rawValue else { return nil }
-		if let expressionCallInitSubstructure = substructure.substructures.first {
-			substructure = expressionCallInitSubstructure
-			
-			guard let kind: String = substructure.get(.kind),
-				let name: String = substructure.get(.name),
-				kind == SwiftExpressionKind.call.rawValue
-				else { return nil }
-			let (typeName, fullTypeName, genericType) = TypeFinder.parseTypeName(name: name)
-			let argumentsSubstructure = substructure.get(.substructure, of: [SourceKitStructure].self) ?? []
-			
-			// Handle MyClass.NestedClass()
-			// NestedClass can be class name, but it also can be expression call. So we check is MyClass.NestedClass available class name
-			// and if if exists, adds ".init" at the end of initialization call
-			let nameWithInitializer = parsingContext.collectedInfo[name] != nil && !name.hasSuffix(".init") ? name + ".init" : name
-			let methodName = TypeFinder.restoreMethodName(registrationName: nameWithInitializer)
-			let signature = TypeFinder.restoreSignature(name: methodName, substructureList: argumentsSubstructure, content: content)
-			
-			var tokenList: [DIToken] = []
-			if let methodInjection = TypeFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, parsingContext: parsingContext, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset, forcedAllInjection: false) {
-				tokenList = methodInjection as [DIToken]
-			}
-			return (fullTypeName, typeName, tokenList)
-			
-		} else if let bodyOffset: Int64 = substructure.get(.bodyOffset),
-			let bodyLength: Int64 = substructure.get(.bodyLength),
-			let body = content.substringUsingByteRange(start: bodyOffset, length: bodyLength)?.trimmingCharacters(in: .whitespacesAndNewlines),
-			let lastDotIndex = body.lastIndex(of: ".") {
-			// Static variable registration
-			
-			let typeContainerName = String(body[..<lastDotIndex])
-			let staticVariableName = String(body[body.index(after: lastDotIndex)...])
-			if let (typeName, plainTypeName, _) = TypeFinder.findArgumentTypeInfo(typeName: typeContainerName, tokenName: staticVariableName, parsingContext: parsingContext, modificators: []) {
-				return (typeName, plainTypeName, [])
+		for substitution in declrefExpr.substitution {
+			if substitution.key == "Impl" {
+				registrationInfo.typeName = substitution.value
+			} else if !substitution.value.isEmpty {
+				let (typeName, plainTypeName, isOptional, modificators) = InjectionTokenBuilder.unwrapSubstitution(declrefSubstitution: [substitution.key: substitution.value])
+				let injection = InjectionToken(name: "",
+											   typeName: typeName,
+											   plainTypeName: plainTypeName,
+											   cycle: false,
+											   optionalInjection: isOptional,
+											   methodInjection: true,
+											   modificators: modificators,
+											   location: location)
+				registrationInfo.tokenList.append(injection)
 			}
 		}
 		
-		return nil
+		let aliasToken = AliasToken(typeName: registrationInfo.typeName, tag: "", location: location)
+		registrationInfo.tokenList.append(aliasToken)
+		
+		return RegistrationToken(typeName: registrationInfo.typeName,
+								 plainTypeName: registrationInfo.plainTypeName,
+								 location: location,
+								 tokenList: registrationInfo.tokenList.map({ $0.diTokenValue }))
+		
+//
+//		// TODO: process generics here
+//		if let typedRegistration = info.invocationBody.firstMatch(RegExp.trailingTypeInfo) {
+//			// container.register(MyClass.self)
+//			registrationInfo.typeName = typedRegistration.droppedDotSelf()
+//			registrationInfo.plainTypeName = TypeFinder.parseTypeName(name: registrationInfo.typeName).plainTypeName
+//		}
+//
+//		if let extractedInfo = extractPlainRegistration(using: info) ?? extractClosureRegistration(using: info) {
+//			registrationInfo.typeName = extractedInfo.typeName
+//			registrationInfo.plainTypeName = extractedInfo.plainTypeName
+//			registrationInfo.tokenList += extractedInfo.tokenList
+//		}
+//		registrationInfo.typeName = info.parsingContext.collectedInfo[registrationInfo.typeName]?.name ?? registrationInfo.typeName
+//		registrationInfo.typeName = registrationInfo.typeName.trimmingCharacters(in: .whitespacesAndNewlines)
+//		registrationInfo.plainTypeName = registrationInfo.plainTypeName.trimmingCharacters(in: .whitespacesAndNewlines)
+//
+//		// Class registration by default available by its own type without tag.
+//		let location = Location(file: info.file, byteOffset: info.bodyOffset)
+		
+//
+//		registrationInfo.tokenList = self.fillTokenListWithInfo(input: registrationInfo.tokenList, registrationTypeName: registrationInfo.typeName, parsingContext: info.parsingContext, content: info.content, file: info.file)
 	}
 	
-	static func fillTokenListWithInfo(input: [DIToken], registrationTypeName: String, parsingContext: ParsingContext, content: NSString, file: File) -> [DIToken] {
-		// Recursively walk through all classes and find injection type
-		var result = [DIToken]()
-		for token in input {
-			// injectionToken.typeName.isEmpty always really empty here (in alpha at least)
-			if var injectionToken = token as? InjectionToken, injectionToken.typeName.isEmpty {
-				if let foundedInfo = TypeFinder.findArgumentTypeInfo(typeName: registrationTypeName, tokenName: injectionToken.name, parsingContext: parsingContext, modificators: injectionToken.modificators) {
-					injectionToken.typeName = foundedInfo.typeName
-					injectionToken.plainTypeName = foundedInfo.plainTypeName
-					injectionToken.optionalInjection = foundedInfo.optionalInjection
-					result.append(injectionToken)
-				} else {
-					// after "findMethodTypeInfo" we not input type info. We write new tokens.
-					// so we no need append old
-					let methodInjectedTokens = TypeFinder.findMethodTypeInfo(typeName: registrationTypeName, parsingContext: parsingContext, content: content, file: file, token: injectionToken)
-					result += methodInjectedTokens
-				}
-			} else {
-				result.append(token)
-			}
-		}
-		
-		return result
-	}
+	
+//	private func extractPlainRegistration(using info: TokenBuilderInfo) -> RegistrationInfo? {
+//		// container.register(MyClass.init)
+//		guard info.substructureList.isEmpty,
+//			!info.invocationBody.hasSuffix(".self"),
+//			let dotIndex = info.invocationBody.lastIndex(of: ".")
+//			else { return nil }
+//
+//		let (typeName, fullTypeName, genericType) = TypeFinder.parseTypeName(name: info.invocationBody)
+//
+//		let signatureText = String(info.invocationBody[info.invocationBody.index(after: dotIndex)...])
+//		let methodSignature = MethodSignature(name: signatureText, injectableArgumentInfo: [], injectionModificators: [:])
+//		let tokenList = typeFinder.findMethodInfo(methodSignature: methodSignature, initialObjectName: typeName, parsingContext: info.parsingContext, file: info.file, genericType: genericType, methodCallBodyOffset: info.bodyOffset, forcedAllInjection: true) ?? []
+//
+//		return (fullTypeName, typeName, tokenList)
+//	}
+//
+//
+//	private func extractClosureRegistration(using info: TokenBuilderInfo) -> RegistrationInfo? {
+//		// container.register { MyClass.init($0, $1) }
+//		guard
+//			let substructure = info.substructureList.first,
+//			info.substructureList.count == 1,
+//			substructure.isKind(of: SwiftExpressionKind.closure)
+//			else { return nil }
+//
+//		if let expressionCallInitSubstructure = substructure.substructures.first,
+//			let name: String = expressionCallInitSubstructure.get(.name),
+//			expressionCallInitSubstructure.isKind(of: SwiftExpressionKind.call) {
+//
+//			return extractStaticMethodRegistration(expressionCallInitSubstructure: expressionCallInitSubstructure, name: name, parsingContext: info.parsingContext, content: info.content, file: info.file, bodyOffset: info.bodyOffset)
+//
+//		} else if let body = substructure.body(using: info.content)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+//			return extractStaticVariableRegistration(body: body, parsingContext: info.parsingContext)
+//		}
+//
+//		return nil
+//	}
+//
+//
+//	// TODO: Currently only .init extracts. Should handle all other static methods
+//	private func extractStaticMethodRegistration(expressionCallInitSubstructure: SourceKitStructure, name: String, parsingContext: GlobalParsingContext, content: NSString, file: File, bodyOffset: Int64) -> RegistrationInfo {
+//		let (typeName, fullTypeName, genericType) = TypeFinder.parseTypeName(name: name)
+//
+//		// Handle MyClass.NestedClass()
+//		// NestedClass can be class name, but it also can be expression call. So we check is MyClass.NestedClass available class name
+//		// and if if exists, adds ".init" at the end of initialization call
+//		let nameWithInitializer = parsingContext.collectedInfo[name] != nil && !name.hasSuffix(".init") ? name + ".init" : name
+//		let methodName = TypeFinder.restoreMethodName(initial: nameWithInitializer)
+//		let signature = self.typeFinder.restoreSignature(name: methodName, substructureList: expressionCallInitSubstructure.substructures, content: content)
+//		let tokenList = self.typeFinder.findMethodInfo(methodSignature: signature, initialObjectName: typeName, parsingContext: parsingContext, file: file, genericType: genericType, methodCallBodyOffset: bodyOffset, forcedAllInjection: false) ?? []
+//
+//		return (fullTypeName, typeName, tokenList)
+//	}
+//
+//
+//	private func extractStaticVariableRegistration(body: String, parsingContext: GlobalParsingContext) -> RegistrationInfo? {
+//		guard let lastDotIndex = body.lastIndex(of: ".") else {
+//			return nil
+//		}
+//		let typeContainerName = String(body[..<lastDotIndex])
+//		let staticVariableName = String(body[body.index(after: lastDotIndex)...])
+//		if let (typeName, plainTypeName, _) = self.typeFinder.findArgumentTypeInfo(typeName: typeContainerName, tokenName: staticVariableName, parsingContext: parsingContext, modificators: []) {
+//			return (typeName, plainTypeName, [])
+//		}
+//		return nil
+//	}
+//
+//
+//	func fillTokenListWithInfo(input: [DITokenConvertible], registrationTypeName: String, parsingContext: GlobalParsingContext, content: NSString, file: File) -> [DITokenConvertible] {
+//		// Recursively walk through all classes and find injection type
+//		return input.reduce(into: []) { result, token in
+//			// injectionToken.typeName.isEmpty always really empty here (in alpha at least)
+//			guard var injectionToken = token as? InjectionToken, injectionToken.typeName.isEmpty else {
+//				result.append(token)
+//				return
+//			}
+//			if let foundedInfo = self.typeFinder.findArgumentTypeInfo(typeName: registrationTypeName, tokenName: injectionToken.name, parsingContext: parsingContext, modificators: injectionToken.modificators) {
+//				injectionToken.typeName = foundedInfo.typeName
+//				injectionToken.plainTypeName = foundedInfo.plainTypeName
+//				injectionToken.optionalInjection = foundedInfo.optionalInjection
+//				result.append(injectionToken)
+//			} else {
+//				// after "findMethodTypeInfo" we not input type info. We write new tokens.
+//				// so we no need append old
+//				result += self.typeFinder.findMethodTypeInfo(typeName: registrationTypeName, parsingContext: parsingContext, content: content, file: file, token: injectionToken)
+//			}
+//		}
+//	}
 	
 }

@@ -8,52 +8,26 @@
 import Foundation
 
 extension Array {
-	func parallelFlatMap<T>(transform: (Element) throws -> [T]) throws -> [T] {
-		return try parallelMap(transform).flatMap { $0 }
+	
+	func parallelFlatMap<T>(_ transform: ((Element) throws -> T?)) rethrows -> [T] {
+		return try parallelMap(transform).compactMap { $0 }
 	}
 	
-	/// We have to roll our own solution because concurrentPerform will use slowPath if no NSApplication is available
-	func parallelMap<T>(_ transform: (Element) throws -> T, progress: ((Int) -> Void)? = nil) throws -> [T] {
-		let count = self.count
-		let maxConcurrentJobs = ProcessInfo.processInfo.activeProcessorCount
-		
-		guard count > 1 && maxConcurrentJobs > 1 else {
-			// skip GCD overhead if we'd only run one at a time anyway
-			return try map(transform)
-		}
-		
-		var result = [(Int, [T])]()
-		result.reserveCapacity(count)
-		let group = DispatchGroup()
-		let uuid = NSUUID().uuidString
-		let jobCount = Int(ceil(Double(count) / Double(maxConcurrentJobs)))
-		
-		let queueLabelPrefix = "io.pixle.DILint.map.\(uuid)"
-		let resultAccumulatorQueue = DispatchQueue(label: "\(queueLabelPrefix).resultAccumulator")
-		
-		var mapError: Error?
-		withoutActuallyEscaping(transform) { escapingtransform in
-			for jobIndex in stride(from: 0, to: count, by: jobCount) {
-				let queue = DispatchQueue(label: "\(queueLabelPrefix).\(jobIndex / jobCount)")
-				queue.async(group: group) {
-					let jobElements = self[jobIndex..<Swift.min(count, jobIndex + jobCount)]
-					do {
-						let jobIndexAndResults = try (jobIndex, jobElements.map(escapingtransform))
-						resultAccumulatorQueue.sync {
-							result.append(jobIndexAndResults)
-						}
-					} catch {
-						resultAccumulatorQueue.sync {
-							mapError = error
-						}
-					}
+	func parallelMap<T>(_ transform: (Element) throws -> T) rethrows -> [T] {
+		var result = ContiguousArray<T?>(repeating: nil, count: count)
+		return try result.withUnsafeMutableBufferPointer { buffer in
+			var anError: Error?
+			DispatchQueue.concurrentPerform(iterations: buffer.count) { idx in
+				do {
+					buffer[idx] = try transform(self[idx])
+				} catch {
+					anError = error
 				}
 			}
-			group.wait()
+			if let error = anError {
+				throw error
+			}
+			return buffer.map { $0! }
 		}
-		if let mapError = mapError {
-			throw mapError
-		}
-		return result.sorted { $0.0 < $1.0 }.flatMap { $0.1 }
 	}
 }

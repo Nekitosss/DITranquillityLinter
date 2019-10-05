@@ -15,10 +15,11 @@ public final class TimeRecorder {
 		case collectDependencies
 		case parseSourceAndDependencies
 		case parseBinary
+		case parseCachedContainers
 		case compose
 		case createTokens
 		case validate
-		case encodeBinary
+		case saveCache
 		case decodeBinary
 		case mapBinary
 		case decodeCachedSource
@@ -28,9 +29,9 @@ public final class TimeRecorder {
 	public static let common = TimeRecorder()
 	
 	var events: [Event: Date] = [:]
-	private let monitor = NSObject()
+	private let mutex = PThreadMutex(normal: ())
 	
-	let isRecording = true
+	var isRecording: Bool { return LintOptions.shared.shouldRecordTime }
 	
 	init() {
 		start(event: .total)
@@ -45,29 +46,22 @@ public final class TimeRecorder {
 	}
 	
 	public func start(event: Event) {
-		objc_sync_enter(monitor)
-		defer { objc_sync_exit(monitor) }
 		guard isRecording else { return }
-		events[event] = Date()
-		print("Start \(event)")
+		mutex.sync {
+			events[event] = Date()
+			Log.info("Start \(event)")
+		}
 	}
 	
-	var infoDict = [(String, TimeInterval)]()
 	public func end(event: Event) {
-		objc_sync_enter(monitor)
-		defer { objc_sync_exit(monitor) }
 		guard isRecording else { return }
-		guard let startDate = events[event] else {
-			print("Not found \(event) for logging")
-			return
-		}
-		let interval = Date().timeIntervalSince(startDate)
-		print("End \(event) with time: \(interval)")
-		switch event {
-		case .file(let path):
-			infoDict.append((path, interval))
-		default:
-			break
+		mutex.sync {
+			guard let startDate = events[event] else {
+				Log.warning("Not found \(event) for logging")
+				return
+			}
+			let interval = Date().timeIntervalSince(startDate)
+			Log.info("End \(event) with time: \(interval)")
 		}
 	}
 }

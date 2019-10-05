@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/tadija/AEXML",
         "state": {
           "branch": null,
-          "revision": "54bb8ea6fb693dd3f92a89e5fcc19e199fdeedd0",
-          "version": "4.3.3"
+          "revision": "e4d517844dd03dac557e35d77a8e9ab438de91a6",
+          "version": "4.4.0"
         }
       },
       {
@@ -15,8 +15,35 @@
         "repositoryURL": "https://github.com/Carthage/Commandant.git",
         "state": {
           "branch": null,
-          "revision": "07cad52573bad19d95844035bf0b25acddf6b0f6",
-          "version": "0.15.0"
+          "revision": "ab68611013dec67413628ac87c1f29e8427bc8e4",
+          "version": "0.17.0"
+        }
+      },
+      {
+        "package": "CwlCatchException",
+        "repositoryURL": "https://github.com/mattgallagher/CwlCatchException.git",
+        "state": {
+          "branch": null,
+          "revision": "7cd2f8cacc4d22f21bc0b2309c3b18acf7957b66",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "CwlPreconditionTesting",
+        "repositoryURL": "https://github.com/mattgallagher/CwlPreconditionTesting.git",
+        "state": {
+          "branch": null,
+          "revision": "c228db5d2ad1b01ebc84435e823e6cca4e3db98b",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "DITranquillity",
+        "repositoryURL": "https://github.com/ivlevAstef/DITranquillity",
+        "state": {
+          "branch": null,
+          "revision": "5ab7f1d1b49f9224d2d5c8cb7fc6b5f7497843c1",
+          "version": "3.8.4"
         }
       },
       {
@@ -24,8 +51,8 @@
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {
           "branch": null,
-          "revision": "cd6dfb86f496fcd96ce0bc6da962cd936bf41903",
-          "version": "7.3.1"
+          "revision": "6abeb3f5c03beba2b9e4dbe20886e773b5b629b6",
+          "version": "8.0.4"
         }
       },
       {
@@ -33,8 +60,8 @@
         "repositoryURL": "https://github.com/kylef/PathKit.git",
         "state": {
           "branch": null,
-          "revision": "e2f5be30e4c8f531c9c1e8765aa7b71c0a45d7a0",
-          "version": "0.9.2"
+          "revision": "73f8e9dca9b7a3078cb79128217dc8f2e585a511",
+          "version": "1.0.0"
         }
       },
       {
@@ -42,26 +69,17 @@
         "repositoryURL": "https://github.com/Quick/Quick.git",
         "state": {
           "branch": null,
-          "revision": "5fbf13871d185526993130c3a1fad0b70bfe37ce",
-          "version": "1.3.2"
+          "revision": "33682c2f6230c60614861dfc61df267e11a1602f",
+          "version": "2.2.0"
         }
       },
       {
-        "package": "Result",
-        "repositoryURL": "https://github.com/antitypical/Result.git",
+        "package": "Shell",
+        "repositoryURL": "https://github.com/tuist/Shell",
         "state": {
           "branch": null,
-          "revision": "8fc088dcf72802801efeecba76ea8fb041fb773d",
-          "version": "4.0.0"
-        }
-      },
-      {
-        "package": "SourceKitten",
-        "repositoryURL": "https://github.com/jpsim/SourceKitten.git",
-        "state": {
-          "branch": null,
-          "revision": "4be914be6fa49cd30b1e7ef5d32d06c037d8f469",
-          "version": "0.21.2"
+          "revision": "d38121f89401db902b0d0bfc30b987e2c84c254e",
+          "version": "2.0.3"
         }
       },
       {
@@ -74,39 +92,30 @@
         }
       },
       {
-        "package": "SwiftProtobuf",
-        "repositoryURL": "https://github.com/apple/swift-protobuf.git",
+        "package": "ASTVisitor",
+        "repositoryURL": "https://github.com/Nekitosss/swift-ast-visitor.git",
         "state": {
           "branch": null,
-          "revision": "86c579d280d629416c7bd9d32a5dfacab8e0b0b4",
-          "version": "1.2.0"
+          "revision": "e7ba05ef7ad347c1941f393a558d0c14ff1b875a",
+          "version": "0.0.14"
         }
       },
       {
-        "package": "SwiftShell",
-        "repositoryURL": "https://github.com/kareman/SwiftShell",
+        "package": "SwiftLazy",
+        "repositoryURL": "https://github.com/ivlevAstef/SwiftLazy.git",
         "state": {
           "branch": null,
-          "revision": "beebe43c986d89ea5359ac3adcb42dac94e5e08a",
-          "version": "4.1.2"
+          "revision": "988bd1bc5850115a8f3ae20e4db937963b076960",
+          "version": "1.1.5"
         }
       },
       {
-        "package": "SWXMLHash",
-        "repositoryURL": "https://github.com/drmohundro/SWXMLHash.git",
-        "state": {
-          "branch": null,
-          "revision": "b130217d81833cecd7ddf78b76d60200f1070d98",
-          "version": "4.7.4"
-        }
-      },
-      {
-        "package": "xcodeproj",
+        "package": "XcodeProj",
         "repositoryURL": "https://github.com/tuist/xcodeproj.git",
         "state": {
           "branch": null,
-          "revision": "23da51abd3de3bedaad59a0afbb150b48504b5b0",
-          "version": "6.3.0"
+          "revision": "aefcbf59cea5b0831837ed2f385e6dfd80d82cc9",
+          "version": "7.1.0"
         }
       },
       {
@@ -114,8 +123,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
           "branch": null,
-          "revision": "26ab35f50ea891e8edefcc9d975db2f6b67e1d68",
-          "version": "1.0.1"
+          "revision": "c947a306d2e80ecb2c0859047b35c73b8e1ca27f",
+          "version": "2.0.0"
         }
       }
     ]

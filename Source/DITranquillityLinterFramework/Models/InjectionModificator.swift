@@ -6,7 +6,7 @@
 //  Copyright © 2018 Nikita. All rights reserved.
 //
 
-enum InjectionModificator {
+enum InjectionModificator: Codable {
 	case tagged(String)
 	case typed(String)
 	case many
@@ -35,4 +35,37 @@ enum InjectionModificator {
 		}
 		return nil
 	}
+	
+	private enum CodingKeys: String, CodingKey {
+		case tagged
+		case typed
+		case many
+	}
+	
+	init(from decoder: Decoder) throws {
+		let values = try decoder.container(keyedBy: CodingKeys.self)
+		if let value = try? values.decode(String.self, forKey: .tagged) {
+			self = .tagged(value)
+		} else if let value = try? values.decode(String.self, forKey: .typed) {
+			self = .typed(value)
+		} else if (try? values.decode(String.self, forKey: .many)) != nil {
+			self = .many
+		} else {
+			let context = DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Could not decode modificator")
+			throw DecodingError.valueNotFound(String.self, context)
+		}
+	}
+	
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		switch self {
+		case .tagged(let tag):
+			try container.encode(tag, forKey: .tagged)
+		case .typed(let type):
+			try container.encode(type, forKey: .typed)
+		case .many:
+			try container.encode("", forKey: .many)
+		}
+	}
+	
 }

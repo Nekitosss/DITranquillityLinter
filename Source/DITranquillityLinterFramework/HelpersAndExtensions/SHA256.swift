@@ -25,7 +25,7 @@ final class SHA256 {
 	]
 	
 	/// The constants in the algorithm (K).
-	private static let konstants: [UInt32] = [
+	private static let constants: [UInt32] = [
 		0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 		0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
 		0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
@@ -102,7 +102,7 @@ final class SHA256 {
 	private func process(_ block: ArraySlice<UInt8>) {
 		
 		// Compute message schedule.
-		var W = [UInt32](repeating: 0, count: SHA256.konstants.count)
+		var W = [UInt32](repeating: 0, count: SHA256.constants.count)
 		for t in 0..<W.count {
 			switch t {
 			case 0...15:
@@ -129,10 +129,10 @@ final class SHA256 {
 		var h = hash[7]
 		
 		// Run the main algorithm.
-		for t in 0..<SHA256.konstants.count {
+		for t in 0..<SHA256.constants.count {
 			let Σ1 = e.rotateRight(by: 6) ^ e.rotateRight(by: 11) ^ e.rotateRight(by: 25)
 			let ch = (e & f) ^ (~e & g)
-			let t1 = h &+ Σ1 &+ ch &+ SHA256.konstants[t] &+ W[t]
+			let t1 = h &+ Σ1 &+ ch &+ SHA256.constants[t] &+ W[t]
 			
 			let Σ0 = a.rotateRight(by: 2) ^ a.rotateRight(by: 13) ^ a.rotateRight(by: 22)
 			let maj = (a & b) ^ (a & c) ^ (b & c)

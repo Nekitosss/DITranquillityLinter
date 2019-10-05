@@ -7,12 +7,8 @@
 //
 
 import Foundation
-import SourceKittenFramework
 
 extension NSString {
-	func substringUsingByteRange(start: Int64, length: Int64) -> String? {
-		return self.substringWithByteRange(start: Int(start), length: Int(length))
-	}
 }
 
 extension String {
@@ -25,13 +21,17 @@ extension String {
 	}
 	
 	func listMatches(_ pattern: String) -> [String] {
-		let regex = try! NSRegularExpression(pattern: pattern, options: [])
-		let range = NSMakeRange(0, self.count)
-		let matches = regex.matches(in: self, options: [], range: range)
-		
-		return matches.map {
-			let range = $0.range
-			return (self as NSString).substring(with: range)
+		do {
+			let regex = try NSRegularExpression(pattern: pattern, options: [])
+			let range = NSRange(location: 0, length: self.count)
+			let matches = regex.matches(in: self, options: [], range: range)
+			
+			return matches.map {
+				let range = $0.range
+				return (self as NSString).substring(with: range)
+			}
+		} catch {
+			return []
 		}
 	}
 	
@@ -51,6 +51,14 @@ extension String {
 	
 	func droppedDotSelf() -> String {
 		return droppedSuffix(".self")
+	}
+	
+	func droppedDotType() -> String {
+		return droppedSuffix(".Type")
+	}
+	
+	func droppedDotProtocol() -> String {
+		return droppedSuffix(".Protocol")
 	}
 	
 	func droppedSuffix(_ suffix: String) -> String {

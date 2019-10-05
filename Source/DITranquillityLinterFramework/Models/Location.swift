@@ -7,9 +7,9 @@
 //
 
 import Foundation
-import SourceKittenFramework
+import ASTVisitor
 
-public struct Location: CustomStringConvertible, Comparable {
+public struct Location: CustomStringConvertible, Equatable, Codable {
 	public let file: String?
 	public let line: Int?
 	public let character: Int?
@@ -21,9 +21,6 @@ public struct Location: CustomStringConvertible, Comparable {
 		let charString: String = character.map({ ":\($0)" }) ?? ""
 		return [fileString, lineString, charString].joined()
 	}
-	public var relativeFile: String? {
-		return file?.replacingOccurrences(of: FileManager.default.currentDirectoryPath + "/", with: "")
-	}
 	
 	public init(file: String?, line: Int? = nil, character: Int? = nil) {
 		self.file = file
@@ -31,39 +28,10 @@ public struct Location: CustomStringConvertible, Comparable {
 		self.character = character
 	}
 	
-	public init(file: File, byteOffset offset: Int64) {
-		self.file = file.path
-		if let lineAndCharacter = file.contents.bridge().lineAndCharacter(forByteOffset: Int(offset)) {
-			line = lineAndCharacter.line
-			character = lineAndCharacter.character
-		} else {
-			line = nil
-			character = nil
-		}
-	}
-	
-	public init(file: File, characterOffset offset: Int) {
-		self.file = file.path
-		if let lineAndCharacter = file.contents.bridge().lineAndCharacter(forCharacterOffset: offset) {
-			line = lineAndCharacter.line
-			character = lineAndCharacter.character
-		} else {
-			line = nil
-			character = nil
-		}
-	}
-}
-
-// MARK: Comparable
-
-private func < <T: Comparable>(lhs: T?, rhs: T?) -> Bool {
-	switch (lhs, rhs) {
-	case let (lhs?, rhs?):
-		return lhs < rhs
-	case (nil, _?):
-		return true
-	default:
-		return false
+	init(visitorLocation: ASTVisitor.Location) {
+		self.file = visitorLocation.file
+		self.line = visitorLocation.line
+		self.character = visitorLocation.char
 	}
 }
 
@@ -71,14 +39,4 @@ public func == (lhs: Location, rhs: Location) -> Bool {
 	return lhs.file == rhs.file &&
 		lhs.line == rhs.line &&
 		lhs.character == rhs.character
-}
-
-public func < (lhs: Location, rhs: Location) -> Bool {
-	if lhs.file != rhs.file {
-		return lhs.file < rhs.file
-	}
-	if lhs.line != rhs.line {
-		return lhs.line < rhs.line
-	}
-	return lhs.character < rhs.character
 }

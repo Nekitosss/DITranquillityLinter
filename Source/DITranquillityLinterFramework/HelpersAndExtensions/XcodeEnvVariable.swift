@@ -21,27 +21,40 @@ public enum XcodeEnvVariable: String {
 	public func value() -> String? {
 		return ProcessInfo.processInfo.environment[self.rawValue]
 	}
+	
+	public var defaultValue: String {
+		switch self {
+		case .srcRoot:
+			return EnvVariable.testableProjectFolder.value()
+		case .projectFilePath:
+			return EnvVariable.testableProjectFolder.value() + EnvVariable.testableProjectName.value()
+		default:
+			return ""
+		}
+	}
 }
 
 public enum EnvVariable: String {
 	case defaultTarget = "DI_LINTER_DEFAULT_TARGET"
 	case defaultSDK = "DI_LINTER_DEFAULT_SDK"
-	case currentProjectFolder = "DI_LINTER_PROJECT_FOLDER"
 	case testableProjectFolder = "DI_LINTER_TESTABLE_PROJECT_FOLDER"
 	case testableProjectName = "DI_LINTER_TESTABLE_PROJECT_NAME"
+	case frameworkSearchPath = "DI_LINTER_FRAMEWORK_PATH"
 	
 	public var defaultValue: String {
 		switch self {
 		case .defaultTarget:
-			return "x86_64-apple-ios11.4"
+			return "x86_64-apple-macos10.10"
 		case .defaultSDK:
-			return "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.1.sdk"
+			let commandLineToolsPath = shell(command: "xcode-select -p")?.trimmingCharacters(in: .whitespacesAndNewlines)
+				?? "/Applications/Xcode.app/Contents/Developer"
+			return commandLineToolsPath + "/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
 		case .testableProjectFolder:
-			return "/Users/nikitapatskov/Develop/fooddly/Fooddly/"
+			return "/Users/nikita/development/fooddly/Fooddly/"
 		case .testableProjectName:
 			return "Fooddly.xcodeproj"
-		case .currentProjectFolder:
-			return "/Users/nikita/development/DITranquillityLinter"
+		case .frameworkSearchPath:
+			return Bundle.init(for: Tokenizer.self).path(forResource: "TestFiles", ofType: "bundle")! + "/Build/Mac/"
 		}
 	}
 	

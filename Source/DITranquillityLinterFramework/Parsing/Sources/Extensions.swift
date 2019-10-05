@@ -47,9 +47,11 @@ extension String {
     }
 
     /// :nodoc:
+	//swiftlint:disable identifier_name
     func dropFirstAndLast(_ n: Int = 1) -> String {
         return drop(first: n, last: n)
     }
+	//swiftlint:enable identifier_name
 
     /// :nodoc:
     func drop(first: Int, last: Int) -> String {
